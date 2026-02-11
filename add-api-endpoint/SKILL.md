@@ -271,6 +271,8 @@ Then regenerate wire:
 cd /home/user/microservices/<service>/cmd/<service> && wire
 ```
 
+> ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.
+
 ### Step 7: Register Routes in Server
 
 **File**: `internal/server/http.go`

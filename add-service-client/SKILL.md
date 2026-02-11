@@ -294,6 +294,8 @@ Regenerate wire:
 cd /home/user/microservices/<source-service>/cmd/<service> && wire
 ```
 
+> ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.
+
 ### Step 7: Configure Service Address
 
 Add the target service gRPC address to the source service's config:
