@@ -1,0 +1,372 @@
+---
+name: commit-code
+description: Pre-commit validation, dependency management, and git commit workflow for microservices
+---
+
+# Commit Code Skill
+
+Use this skill when committing code changes to any microservice. It ensures all validation passes, dependencies are clean, and commits follow project conventions.
+
+## When to Use
+- After finishing a feature, fix, or refactor
+- Before pushing code to remote
+- When `common` package changed and other services need the update
+- When proto definitions changed
+
+---
+
+## ⚠️ CRITICAL RULES
+
+1. **NO `replace` directives** for `gitlab.com/ta-microservices` in `go.mod` — always use `go get @latest`
+2. **Common package commits first** — if both `common` and a service changed, commit & tag `common` first
+3. **`make api` required** if any `.proto` file changed
+4. **`wire` regen required** if DI providers changed
+5. **Zero `golangci-lint` warnings** before commit
+6. **Conventional commits** format required
+
+---
+
+## Commit Order (When Multiple Repos Changed)
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    COMMIT ORDER MATTERS                         │
+│                                                                 │
+│  1. common/  ──→  commit + tag (v1.x.y) + push                │
+│       ↓                                                         │
+│  2. service/ ──→  go get common@v1.x.y + commit + push         │
+│       ↓                                                         │
+│  3. gitops/  ──→  update image tag + commit + push              │
+│                                                                 │
+│  ⚠️ If common changed, it MUST be committed and tagged FIRST   │
+│     so services can `go get` the new version                    │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Why Common First?
+- Services import `common` via `go get gitlab.com/ta-microservices/common@<tag>`
+- If service is committed before `common` is tagged, `go.mod` will reference a non-existent version
+- The `replace` directive is **forbidden** — it works locally but breaks CI/CD
+
+---
+
+## Process for Committing a Service
+
+### Step 1: Check if `common` Changed
+
+```bash
+# Check if common has uncommitted changes
+cd /home/user/microservices/common && git status
+
+# If common changed → go to "Process for Common" section below FIRST
+# If common is clean → continue with Step 2
+```
+
+### Step 2: Clean Dependencies
+
+```bash
+cd /home/user/microservices/<service>
+
+# 1. Check for forbidden replace directives
+grep 'replace gitlab.com/ta-microservices' go.mod
+
+# 2. If found, REMOVE them and use import instead:
+# Delete the replace line(s), then:
+go get gitlab.com/ta-microservices/common@latest
+go get gitlab.com/ta-microservices/<other-dep>@latest
+
+# 3. Always tidy
+go mod tidy
+```
+
+**Rule:** Every `replace gitlab.com/ta-microservices/... => ../...` must be converted to a proper import with version.
+
+### Step 3: Regenerate Proto (if changed)
+
+```bash
+# Only if .proto files were modified
+cd /home/user/microservices/<service>
+make api
+```
+
+This regenerates:
+- `api/<service>/v1/<service>.pb.go`
+- `api/<service>/v1/<service>_grpc.pb.go`
+- `api/<service>/v1/<service>_http.pb.go`
+
+### Step 4: Regenerate Wire (if DI changed)
+
+```bash
+# Only if wire.go or providers changed
+cd /home/user/microservices/<service>/cmd/<service> && wire
+cd /home/user/microservices/<service>/cmd/worker && wire  # if worker exists
+```
+
+### Step 5: Lint
+
+```bash
+cd /home/user/microservices/<service>
+golangci-lint run
+
+# Target: ZERO warnings
+# Fix all reported issues before proceeding
+```
+
+### Step 6: Build
+
+```bash
+cd /home/user/microservices/<service>
+go build ./...
+
+# Must pass with zero errors
+```
+
+### Step 7: Update CHANGELOG.md
+
+Update `<service>/CHANGELOG.md` (create if not exists):
+
+```markdown
+## [Unreleased]
+### Added
+- <describe new features>
+
+### Changed
+- <describe changes>
+
+### Fixed
+- <describe bug fixes>
+```
+
+### Step 8: Commit
+
+```bash
+cd /home/user/microservices/<service>
+git add -A
+git commit -m "<type>(<scope>): <description>"
+```
+
+**Conventional commit types:**
+
+| Type | When | Example |
+|------|------|---------|
+| `feat` | New feature | `feat(order): add order history API` |
+| `fix` | Bug fix | `fix(payment): fix race condition in capture` |
+| `refactor` | Code refactor | `refactor(catalog): extract pricing logic` |
+| `docs` | Documentation | `docs(order): update API documentation` |
+| `chore` | Maintenance | `chore(order): update dependencies` |
+| `perf` | Performance | `perf(search): optimize query performance` |
+| `test` | Tests | `test(order): add unit tests for cart` |
+
+### Step 9: Push
+
+```bash
+cd /home/user/microservices/<service>
+git push origin main
+```
+
+### Step 10: Get Commit Hash (for GitOps)
+
+```bash
+cd /home/user/microservices/<service>
+git rev-parse --short HEAD
+# Output: e.g. 2c23782
+```
+
+### Step 11: Update GitOps (if deploying)
+
+```bash
+# Update image tag in gitops overlay
+# Edit: gitops/apps/<service>/overlays/dev/kustomization.yaml
+# Change: newTag: <old-hash> → newTag: <new-hash>
+
+cd /home/user/microservices/gitops
+git add -A
+git commit -m "deploy: <service> <new-hash>"
+git push origin main
+```
+
+---
+
+## Process for Common Package
+
+**Common MUST be committed and tagged before any service that depends on the changes.**
+
+### Step 1: Validate Common
+
+```bash
+cd /home/user/microservices/common
+
+# 1. Lint
+golangci-lint run
+
+# 2. Build
+go build ./...
+
+# 3. Run tests
+go test ./...
+```
+
+### Step 2: Check What Changed
+
+```bash
+cd /home/user/microservices/common
+git diff --stat
+
+# Determine version bump:
+# MAJOR: breaking changes (removed/renamed exports, changed interfaces)
+# MINOR: new features (new packages, new functions, new constants)
+# PATCH: bug fixes, documentation
+```
+
+### Step 3: Update CHANGELOG.md
+
+```bash
+# Update common/CHANGELOG.md with changes
+```
+
+### Step 4: Commit Common
+
+```bash
+cd /home/user/microservices/common
+git add -A
+git commit -m "<type>(common): <description>"
+```
+
+### Step 5: Tag Common
+
+```bash
+cd /home/user/microservices/common
+
+# Check current latest tag
+git tag --sort=-creatordate | head -5
+
+# Create new tag (increment based on change type)
+# Example: if latest is v1.9.6 and this is a MINOR change:
+git tag -a v1.9.7 -m "v1.9.7: <summary of changes>
+
+Added:
+- <new feature>
+
+Fixed:
+- <bug fix>"
+```
+
+### Step 6: Push Common + Tag
+
+```bash
+cd /home/user/microservices/common
+git push origin main
+git push origin v1.9.7  # push the specific tag
+```
+
+### Step 7: Update Services to Use New Common
+
+```bash
+cd /home/user/microservices/<service>
+
+# Get the new common version
+go get gitlab.com/ta-microservices/common@v1.9.7
+go mod tidy
+
+# Verify build
+go build ./...
+```
+
+Then proceed with the normal service commit process (Step 2 onwards).
+
+---
+
+## Quick Reference: Full Flow
+
+```bash
+# ═══════════════════════════════════════════════════════
+# SCENARIO 1: Only service changed (common unchanged)
+# ═══════════════════════════════════════════════════════
+
+cd /home/user/microservices/<service>
+
+# Validate
+grep 'replace gitlab.com/ta-microservices' go.mod  # must be empty
+go get gitlab.com/ta-microservices/common@latest    # get latest deps
+go mod tidy
+make api        # if proto changed
+wire            # if DI changed (in cmd/<service>/ and cmd/worker/)
+golangci-lint run
+go build ./...
+
+# Commit & push
+git add -A && git commit -m "feat(<service>): <description>"
+git push origin main
+
+# ═══════════════════════════════════════════════════════
+# SCENARIO 2: Common + service changed
+# ═══════════════════════════════════════════════════════
+
+# 1. Common first
+cd /home/user/microservices/common
+golangci-lint run && go build ./... && go test ./...
+git add -A && git commit -m "feat(common): <description>"
+git tag -a v1.9.7 -m "v1.9.7: <summary>"
+git push origin main && git push origin v1.9.7
+
+# 2. Then service
+cd /home/user/microservices/<service>
+go get gitlab.com/ta-microservices/common@v1.9.7
+go mod tidy
+make api        # if proto changed
+golangci-lint run && go build ./...
+git add -A && git commit -m "feat(<service>): <description>"
+git push origin main
+
+# ═══════════════════════════════════════════════════════
+# SCENARIO 3: Multiple services changed
+# ═══════════════════════════════════════════════════════
+
+# 1. Common first (if changed)
+# 2. Services with proto changes that others depend on
+# 3. Remaining services
+# 4. GitOps last
+```
+
+---
+
+## Dependency Management Rules
+
+### ✅ DO
+```
+go get gitlab.com/ta-microservices/common@v1.9.7
+go get gitlab.com/ta-microservices/catalog@latest
+go mod tidy
+```
+
+### ❌ DON'T
+```
+# NEVER use replace for ta-microservices
+replace gitlab.com/ta-microservices/common => ../common    # ❌ FORBIDDEN
+replace gitlab.com/ta-microservices/catalog => ../catalog  # ❌ FORBIDDEN
+```
+
+### Converting Replace to Import
+```bash
+# 1. Remove the replace line from go.mod
+# 2. Run go get to get the proper version:
+go get gitlab.com/ta-microservices/common@latest
+go get gitlab.com/ta-microservices/<service>@latest
+# 3. Tidy
+go mod tidy
+```
+
+---
+
+## Pre-Commit Checklist
+
+- [ ] `grep 'replace gitlab.com/ta-microservices' go.mod` returns empty
+- [ ] `go get gitlab.com/ta-microservices/common@latest` (or specific tag)
+- [ ] `go mod tidy` completed
+- [ ] `make api` run (if proto changed)
+- [ ] `wire` regenerated (if DI changed)
+- [ ] `golangci-lint run` — zero warnings
+- [ ] `go build ./...` — passes
+- [ ] `CHANGELOG.md` updated
+- [ ] Commit message follows conventional commits
+- [ ] If `common` changed: committed + tagged + pushed **before** service commit
