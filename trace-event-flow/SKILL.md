@@ -76,6 +76,19 @@ Warehouse → stock.reserved → Order Service (confirm availability)
 Warehouse → stock.released → Order Service (release hold)
 ```
 
+### 7. Pricing → Search Sync
+```
+Pricing → pricing.price.updated → Search Worker (update ES price)
+Pricing → pricing.price.deleted → Search Worker (remove ES price)
+  ↳ If product not in ES → fetch from Catalog gRPC → index → apply price
+  ↳ On price update → set has_price=true (product visible in search)
+  ↳ On price delete → check remaining prices → if none → has_price=false (hidden)
+```
+
+> **GOTCHA**: Pricing uses the **outbox pattern** (`worker/outbox.go`). Events are
+> written to an outbox table in the same DB transaction, then a worker polls and
+> publishes via Dapr. This guarantees at-least-once delivery.
+
 ## How to Trace an Event
 
 ### Step 1: Identify the Event Topic
@@ -233,3 +246,30 @@ grep -rn "DLQ\|dead.letter\|retry" /home/user/microservices/<service>/internal/ 
 4. **Use outbox pattern** for critical events - Ensures event is published even if service crashes
 5. **Version your events** - Include version field for backward compatibility
 6. **Keep events small** - Include IDs, not full objects. Let consumers fetch details if needed.
+
+## Known Gotchas
+
+### 1. Dapr PubSub Component Namespace
+The `pubsub-redis` Dapr component MUST exist in **every namespace** that has Dapr-enabled pods.
+If a service can't subscribe to topics, check:
+```bash
+kubectl get component pubsub-redis -n <service>-dev
+```
+If missing, create the component in that namespace (copy from `common-operations-dev`).
+
+### 2. Consumer Sees Event But Processing Fails
+Common causes:
+- **ES `document_parsing_exception`**: Check that all fields in the ES document match the mapping (see `mapping.go`). ES `dynamic: strict` rejects unmapped fields.
+- **ES `document_missing_exception`**: Product/document doesn't exist in ES yet. The search-worker's price consumer now handles this by fetching from catalog and indexing first.
+- **ES alias vs base index**: All CRUD operations must use `products_search` (alias), NOT `products` (base index). The sync job creates timestamped indexes and switches the alias.
+
+### 3. ES Index Name Conventions (Search Service)
+| Name | Use |
+|------|-----|
+| `products` | Base index name for `CreateProductIndex` (creates timestamped `products_YYYYMMDD_HHMMSS`) |
+| `products_search` | **Alias** pointing to current timestamped index — ALL CRUD operations must use this |
+
+### 4. Go Map Dotted Keys in ES Documents
+**NEVER** use dotted keys like `doc["name.suggest"]` in Go maps that get serialized to JSON for ES.
+Go serializes it as `{"name.suggest": value}` which ES interprets as nested path `name` → `suggest`, overwriting the `name` text field with an object and causing `document_parsing_exception`.
+ES multi-fields (e.g., `name.suggest`, `name.ngram`) are auto-indexed from the parent text value — no explicit handling needed.

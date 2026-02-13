@@ -25,7 +25,8 @@ Service Issue
 ├── Runtime Error?
 │   ├── Migration → Check SQL syntax, -- +goose Up annotations
 │   ├── Data layer → Check GORM model matches DB schema
-│   └── Event/Dapr → Check Dapr sidecar logs
+│   ├── Event/Dapr → Check Dapr sidecar logs
+│   └── Elasticsearch → See ES section below
 └── K8s Issue? → Use debug-k8s skill
 ```
 
@@ -99,3 +100,78 @@ echo "=== PostgreSQL ===" && psql -h localhost -U ecommerce_user -d postgres -c 
 echo "=== Redis ===" && redis-cli ping
 echo "=== Consul ===" && curl -s http://localhost:8500/v1/status/leader
 ```
+
+## Elasticsearch Issues (Search Service)
+
+### Common ES Errors
+
+#### `document_parsing_exception`
+The document has a field that conflicts with the ES mapping.
+- **Cause 1**: Dotted keys in Go maps (`doc["name.suggest"]`) get interpreted as nested paths by ES
+- **Fix**: Remove dotted keys. ES auto-indexes multi-fields from the parent text field
+- **Cause 2**: New field not in mapping with `dynamic: strict`
+- **Fix**: Add field to `mapping.go` AND update live index mapping (see below)
+
+#### `document_missing_exception`
+The document doesn't exist in the target index.
+- **Common cause**: Writing to wrong index (`products` vs `products_search` alias)
+- All CRUD ops must use `GetIndexName("products_search")` (the alias)
+- Only `CreateProductIndex` uses `GetIndexName("products")` (creates timestamped indexes)
+
+#### `strict_dynamic_mapping_exception`
+ES rejects documents with fields not defined in the mapping.
+- **Fix**: Add field to `mapping.go` (`ProductIndexMapping`) AND update live mapping:
+```bash
+# Add new field to live ES index mapping
+kubectl run es-curl --image=curlimages/curl --rm -it --restart=Never -n search-dev -- \
+  curl -s -X PUT 'http://elasticsearch.argocd.svc.cluster.local:9200/products_search/_mapping' \
+  -H 'Content-Type: application/json' \
+  -d '{"properties":{"new_field":{"type":"boolean"}}}'
+```
+
+### ES Debugging Commands
+
+```bash
+# Check index alias mapping
+kubectl exec -n search-dev deploy/search -c search -- wget -qO- \
+  'http://elasticsearch.argocd.svc.cluster.local:9200/_alias/products_search'
+
+# Check document by ID
+kubectl exec -n search-dev deploy/search -c search -- wget -qO- \
+  'http://elasticsearch.argocd.svc.cluster.local:9200/products_search/_doc/<product_id>'
+
+# Search by SKU
+kubectl exec -n search-dev deploy/search -c search -- wget -qO- \
+  'http://elasticsearch.argocd.svc.cluster.local:9200/products_search/_search?q=sku:<SKU>&size=1'
+
+# Check mapping (verify field exists)
+kubectl exec -n search-dev deploy/search -c search -- wget -qO- \
+  'http://elasticsearch.argocd.svc.cluster.local:9200/products_search/_mapping'
+
+# Bulk update field for all docs (use curl pod, since BusyBox wget doesn't support PUT)
+kubectl run es-curl --image=curlimages/curl --rm -it --restart=Never -n search-dev -- \
+  curl -s -X POST 'http://elasticsearch.argocd.svc.cluster.local:9200/products_search/_update_by_query?refresh=true' \
+  -H 'Content-Type: application/json' \
+  -d '{"script":{"source":"ctx._source.has_price = true","lang":"painless"},"query":{"match_all":{}}}'
+```
+
+### ES Index Architecture (Search Service)
+
+```
+products (base name)
+├── products_20260213_101251 (created by sync job)
+│   └── alias: products_search → points here
+└── products_20260213_102147 (new sync creates new index)
+    └── alias: products_search → switched here
+
+All CRUD code → GetIndexName("products_search") → resolves to alias
+Sync job → GetIndexName("products") + timestamp suffix → creates new index
+```
+
+### Product Visibility via `has_price`
+
+Products are **only visible** in search when `has_price: true`:
+- **Price update** → sets `has_price = true` (via `UpdateProduct` in price consumer)
+- **Price delete** → checks if any `warehouse_stock` entries still have `base_price` > 0; if none → sets `has_price = false`
+- **Search queries** → mandatory filter `{"term": {"has_price": true}}`
+- **Sync job** → sets `HasPrice: true` for all indexed products (sync already skips no-price products)

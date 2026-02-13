@@ -205,8 +205,8 @@ type OrderEvent struct {
 
 #### ⚙️ 15. Config & GitOps Alignment (P1)
 
+- [ ] **Port allocation follows [PORT_ALLOCATION_STANDARD.md](gitops/docs/PORT_ALLOCATION_STANDARD.md)**: `config.yaml` addr ↔ `deployment.yaml` containerPort ↔ `service.yaml` targetPort ↔ `dapr.io/app-port` ↔ health probe ports
 - [ ] **New env vars**: Code reads new env var → ConfigMap/Secret updated in `gitops/`?
-- [ ] **Port consistency**: Code listens on port X → `deployment.yaml` exposes port X → `service.yaml` targets port X
 - [ ] **Resource limits**: CPU/memory requests/limits reasonable for workload
 - [ ] **Secrets**: New secrets added to both `sealed-secret.yaml` and code config
 - [ ] **Feature flags**: New features behind config toggle for safe rollout?
@@ -320,9 +320,9 @@ Documentation, code style, low test coverage, naming.
 
 ### Step 2: Checklist & TODO
 
-1. **Open or create** the service checklist:
+1. **Track review findings** in the service doc:
    ```
-   docs/10-appendix/checklists/v3/{serviceName}_service_checklist_v3.md
+   docs/03-services/<group>/{serviceName}-service.md
    ```
 
 2. **Align items** with P0/P1/P2 from Step 1
@@ -494,7 +494,7 @@ Brief overview of service health and readiness.
 2. TODO: description (P2)
 
 ### 📋 Checklist Status
-- Link to: `docs/10-appendix/checklists/v3/{serviceName}_service_checklist_v3.md`
+- Link to: `docs/03-services/<group>/{serviceName}-service.md`
 
 ### Dependencies
 - `go.mod` clean (no replace directives): Yes / No

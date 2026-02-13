@@ -181,6 +181,8 @@ git rev-parse --short HEAD
 # Change: newTag: <old-hash> → newTag: <new-hash>
 
 cd /home/user/microservices/gitops
+# ⚠️ ALWAYS pull before commit — gitops is shared across all services
+git pull --rebase origin main
 git add -A
 git commit -m "deploy: <service> <new-hash>"
 git push origin main
@@ -326,7 +328,7 @@ git push origin main
 # 1. Common first (if changed)
 # 2. Services with proto changes that others depend on
 # 3. Remaining services
-# 4. GitOps last
+# 4. GitOps last (⚠️ git pull --rebase origin main BEFORE commit!)
 ```
 
 ---

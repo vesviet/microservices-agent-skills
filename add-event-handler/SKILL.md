@@ -24,6 +24,7 @@ Use this skill when adding new event publishing or consuming capabilities to a m
 5. **Main service publishes, Worker consumes** — NEVER consume in main service
 6. **Event structs use JSON tags** — `json:"field_name"`
 7. **Always add DLQ** (dead letter queue) — `deadLetterTopic: "<topic>.dlq"`
+8. **Dapr pubsub component must exist in EVERY namespace** — if consumer can't subscribe, check `kubectl get component pubsub-redis -n <service>-dev`
 
 ---
 
