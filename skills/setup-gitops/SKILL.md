@@ -59,10 +59,10 @@ patches:
 images:
   - name: <service>-service
     newName: registry-api.tanhdev.com/<service>-service
-    newTag: "abc1234"  # ← Git commit short SHA
+    newTag: "abc1234"  # ← Auto-updated by CI/CD pipeline (DO NOT edit manually)
 ```
 
-**To update image tag**: Change `newTag` to the new commit SHA.
+> ⚠️ **NEVER manually update `newTag`** — CI/CD pipeline automatically updates this after building the Docker image. Manual edits will be overwritten or cause conflicts.
 
 ### `base/deployment.yaml` - Deployment Manifest
 
@@ -177,11 +177,11 @@ spec:
 ## Common Operations
 
 ### Deploy a New Version
-1. Push code to GitLab (CI builds Docker image)
-2. Get commit SHA: `cd <service> && git rev-parse --short HEAD`
-3. Update `gitops/apps/<service>/overlays/dev/kustomization.yaml` → `newTag: <sha>`
-4. Commit and push gitops: `cd gitops && git add -A && git commit -m "deploy: <service> <sha>" && git push`
-5. ArgoCD auto-syncs within 3 minutes
+1. Push code to GitLab (CI builds Docker image automatically)
+2. CI/CD pipeline auto-updates `newTag` in `gitops/apps/<service>/overlays/dev/kustomization.yaml`
+3. ArgoCD auto-syncs within 3 minutes
+
+> ⚠️ **NEVER manually update `newTag`** — CI/CD handles image tag updates automatically after building. Only commit gitops changes for ConfigMaps, Secrets, Deployments, or other infrastructure config.
 
 ### Add New Environment Variable
 1. Edit `gitops/apps/<service>/overlays/dev/configmap.yaml`

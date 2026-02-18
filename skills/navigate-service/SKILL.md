@@ -39,8 +39,8 @@ All services follow the same **Clean Architecture + DDD** pattern built with the
 | Catalog | `catalog/` | 8015 | 9015 |
 | Review | `review/` | 8016 | 9016 |
 | Search | `search/` | 8017 | 9017 |
-| Analytics | `analytics/` | 8018 | 9018 |
-| Common Ops | `common-operations/` | 8019 | 9019 |
+| Common Ops | `common-operations/` | 8018 | 9018 |
+| Analytics | `analytics/` | 8019 | 9019 |
 | Gateway | `gateway/` | 80 | - |
 | Admin | `admin/` | 3001 | - |
 | Frontend | `frontend/` | 3000 | - |

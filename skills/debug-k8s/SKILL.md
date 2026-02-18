@@ -17,10 +17,10 @@ Use this skill when the user reports Kubernetes deployment issues, pod failures,
 
 ## Environment Details
 
-- **Cluster**: k3d/k3s (remote dev server)
+- **Cluster**: k3d/k3s (kubectl configured locally to connect to remote cluster)
 - **GitOps**: ArgoCD watches `gitops/` repo for changes → auto-deploy
 - **Registry**: `registry-api.tanhdev.com` (private Docker registry)
-- **SSH Access**: `ssh tuananh@dev.tanhdev.com -p 8785`
+- **Access**: kubectl and argocd CLI run directly on local machine (no SSH needed)
 - **Namespaces**: Each service has its own namespace: `<service>-dev` (e.g., `auth-dev`, `order-dev`)
 - **GitOps Repo**: `/home/user/microservices/gitops/`
 
@@ -39,7 +39,7 @@ ALL changes MUST go through GitOps:
 cd /home/user/microservices/gitops && git add -A && git commit -m "fix: <service> <description>" && git push origin main
 
 # Then force ArgoCD sync (do NOT wait 3 min for auto-sync)
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force"
+argocd app sync <service>-dev --force
 ```
 
 ---
@@ -50,16 +50,16 @@ ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force"
 
 ```bash
 # Check pod status
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+kubectl get pods -n <service>-dev
 
 # Get detailed pod events
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l app=<service>-service"
+kubectl describe pod -n <service>-dev -l app=<service>-service
 
 # Check pod logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service --tail=100"
+kubectl logs -n <service>-dev -l app=<service>-service --tail=100
 
 # Check previous crash logs (if CrashLoopBackOff)
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service --previous --tail=50"
+kubectl logs -n <service>-dev -l app=<service>-service --previous --tail=50
 ```
 
 ### Step 2: Diagnose the Root Cause
@@ -80,17 +80,17 @@ cd /home/user/microservices/gitops && git add -A && git commit -m "fix: <service
 cd /home/user/microservices/gitops && git push origin main
 
 # Force ArgoCD sync immediately
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force"
+argocd app sync <service>-dev --force
 ```
 
 ### Step 5: Verify the Fix
 
 ```bash
 # Watch pod status until Running
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev -w"
+kubectl get pods -n <service>-dev -w
 
 # Check logs for healthy startup
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service --tail=30"
+kubectl logs -n <service>-dev -l app=<service>-service --tail=30
 ```
 
 ---
@@ -101,24 +101,22 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<servi
 
 **Diagnosis:**
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l app=<service>-service | grep -A5 'Events\|image\|Error'"
+kubectl describe pod -n <service>-dev -l app=<service>-service | grep -A5 'Events\|image\|Error'
 ```
 
 **Root Causes & GitOps Fixes:**
 
-**1a. Wrong image tag:**
-Edit `gitops/apps/<service>/overlays/dev/kustomization.yaml`:
-```yaml
-images:
-- name: registry-api.tanhdev.com/<service>
-  newName: registry-api.tanhdev.com/<service>
-  newTag: "<correct-commit-sha>"   # ← Fix this
+**1a. Wrong image tag (CI/CD didn't update):**
+
+> ⚠️ **Do NOT manually edit `newTag`** — CI/CD auto-updates it. If the tag is wrong, the CI pipeline likely failed.
+
+Check if CI pipeline ran successfully:
+```bash
+cd /home/user/microservices/<service> && git log --oneline -5
+# Verify the latest commit has a successful CI pipeline in GitLab
 ```
 
-Get correct commit SHA:
-```bash
-cd /home/user/microservices/<service> && git rev-parse --short HEAD
-```
+If CI failed, fix the build error in the service code, push again, and CI will update the tag automatically.
 
 **1b. Missing registry secret:**
 Check if `imagePullSecrets` is in deployment. Edit `gitops/apps/<service>/base/deployment.yaml`:
@@ -146,10 +144,10 @@ cd /home/user/microservices/<service> && git log --oneline -5
 **Diagnosis:**
 ```bash
 # Pod logs (most important)
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service --tail=100"
+kubectl logs -n <service>-dev -l app=<service>-service --tail=100
 
 # Previous crash logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service --previous --tail=50"
+kubectl logs -n <service>-dev -l app=<service>-service --previous --tail=50
 ```
 
 **Root Causes & GitOps Fixes:**
@@ -199,8 +197,8 @@ Compare `<service>/configs/config.yaml` with `gitops/apps/<service>/overlays/dev
 
 **Diagnosis:**
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get svc -n <service>-dev"
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get endpoints -n <service>-dev"
+kubectl get svc -n <service>-dev
+kubectl get endpoints -n <service>-dev
 ```
 
 **GitOps Fix:**
@@ -213,24 +211,24 @@ Check `gitops/apps/<service>/base/service.yaml` ports match the deployment conta
 **Diagnosis:**
 ```bash
 # Check app status
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app get <service>-dev"
+argocd app get <service>-dev
 
 # Check sync status
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get application -n argocd <service>-dev -o jsonpath='{.status.sync.status}'"
+kubectl get application -n argocd <service>-dev -o jsonpath='{.status.sync.status}'
 ```
 
 **Fixes:**
 
 ```bash
 # Force sync (most common fix)
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force"
+argocd app sync <service>-dev --force
 
 # If stuck, hard refresh then sync
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app get <service>-dev --hard-refresh"
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force --prune"
+argocd app get <service>-dev --hard-refresh
+argocd app sync <service>-dev --force --prune
 
 # If old resources block sync, replace
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force --replace"
+argocd app sync <service>-dev --force --replace
 ```
 
 ---
@@ -239,8 +237,8 @@ ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force --rep
 
 **Diagnosis:**
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get jobs -n <service>-dev"
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs job/<service>-migration -n <service>-dev"
+kubectl get jobs -n <service>-dev
+kubectl logs job/<service>-migration -n <service>-dev
 ```
 
 **GitOps Fixes:**
@@ -248,8 +246,8 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs job/<service>-migration -n <se
 **5a. Stuck old job (most common):**
 Delete the stuck job, then ArgoCD recreates it on next sync:
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl delete job <service>-migration -n <service>-dev"
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force"
+kubectl delete job <service>-migration -n <service>-dev
+argocd app sync <service>-dev --force
 ```
 
 **5b. Wrong migration image:**
@@ -280,22 +278,22 @@ Fix the migration file in `<service>/migrations/`, commit+push the service code,
 
 ```bash
 # Get all pods across all service namespaces
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep -E '(NAME|-dev)'"
+kubectl get pods --all-namespaces | grep -E '(NAME|-dev)'
 
 # Get pods for a specific service
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+kubectl get pods -n <service>-dev
 
 # Watch pod status changes
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev -w"
+kubectl get pods -n <service>-dev -w
 
 # Get recent events for a namespace
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get events -n <service>-dev --sort-by=.metadata.creationTimestamp | tail -20"
+kubectl get events -n <service>-dev --sort-by=.metadata.creationTimestamp | tail -20
 
 # Get all ArgoCD applications and their sync status
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app list"
+argocd app list
 
 # Check what image is currently deployed
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get deployment -n <service>-dev -o jsonpath='{.items[0].spec.template.spec.containers[0].image}'"
+kubectl get deployment -n <service>-dev -o jsonpath='{.items[0].spec.template.spec.containers[0].image}'
 ```
 
 ## GitOps Fix + Force Sync (Copy-Paste Template)
@@ -306,8 +304,8 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get deployment -n <service>-dev -o 
 cd /home/user/microservices/gitops && git add -A && git commit -m "fix: <service> <description>" && git push origin main
 
 # 3. Force sync ArgoCD
-ssh tuananh@dev.tanhdev.com -p 8785 "argocd app sync <service>-dev --force"
+argocd app sync <service>-dev --force
 
 # 4. Verify
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev -w"
+kubectl get pods -n <service>-dev -w
 ```

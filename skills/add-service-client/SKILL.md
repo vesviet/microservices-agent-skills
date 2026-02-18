@@ -337,7 +337,8 @@ data:
 | Catalog | 9015 | `catalog-service.catalog-dev.svc.cluster.local:9015` |
 | Review | 9016 | `review-service.review-dev.svc.cluster.local:9016` |
 | Search | 9017 | `search-service.search-dev.svc.cluster.local:9017` |
-| Analytics | 9018 | `analytics-service.analytics-dev.svc.cluster.local:9018` |
+| Analytics | 9019 | `analytics-service.analytics-dev.svc.cluster.local:9019` |
+| Common Ops | 9018 | `common-operations-service.common-operations-dev.svc.cluster.local:9018` |
 
 ---
 

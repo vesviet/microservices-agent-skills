@@ -231,7 +231,62 @@ cat gitops/apps/{serviceName}/base/configmap.yaml
 - [ ] **Rollback plan**: Previous image tag known; `kubectl rollout undo` works
 - [ ] **Monitoring alerts**: Key metrics have alerting rules (error rate, latency p99)
 
-### Step 3: Output Review
+### Step 3: Auto-Fix Issues
+
+> **IMPORTANT**: After identifying issues, DO NOT just report them. **Automatically fix** all P0 and P1 issues. Only report P2 issues without fixing (unless trivial).
+
+> **Code comment rule**: Do NOT add issue-tracking comments (e.g. `// P1-6 FIX:`, `// REVIEW-FIX:`, `// was 8015, changed to 8016`, `// P0: Fixed port`) directly in code or YAML files. The code should be clean — issue context belongs ONLY in commit messages, CHANGELOG entries, and review output.
+
+#### Auto-fix decision matrix
+
+| Severity | Action | Exceptions |
+|---|---|---|
+| **P0** | **Always auto-fix** | Never skip — these block deployment |
+| **P1** | **Auto-fix** | Skip only if fix requires user design decision |
+| **P2** | **Report only** | Auto-fix if trivial (typo, formatting, missing comment) |
+
+#### Fix patterns by category
+
+**🏗️ Architecture violations (P0)**
+- Biz calls DB directly → Extract to repository interface + implementation
+- Service layer too thick → Move logic to biz usecase
+- Missing error wrapping → Add `fmt.Errorf("context: %w", err)`
+
+**🛡️ Security issues (P0)**
+- Hardcoded secrets → Replace with `os.Getenv()` or config
+- Raw SQL concatenation → Convert to parameterized queries
+- Missing auth check → Add middleware or guard
+
+**💽 Data issues (P0)**
+- Missing transaction → Wrap multi-write in `db.Transaction()`
+- N+1 query → Add `Preload()` or `Joins()`
+- Unsafe migration → Rewrite with nullable columns + backfill strategy
+
+**⚡ Performance (P1)**
+- Missing timeout → Add `context.WithTimeout()`
+- No connection pool config → Add `MaxOpenConns`, `MaxIdleConns`
+- Missing cache → Add cache-aside pattern with Redis
+
+**⚙️ Config/GitOps (P1)**
+- Port mismatch → Fix ALL sources to match PORT_ALLOCATION_STANDARD
+- Missing env var in ConfigMap → Add to gitops configmap.yaml
+- ServiceMonitor port mismatch → Align port name with service.yaml
+- Missing Dapr annotations → Add to deployment.yaml
+- Missing health probes → Add liveness/readiness to deployment.yaml
+- Missing envFrom → Add `configMapRef: overlays-config`
+
+**📝 Code quality (P2 — auto-fix if trivial)**
+- Missing error context → Add `fmt.Errorf` wrapper
+- Unused imports → Remove
+- Wrong naming → Rename to Go conventions
+
+#### After fixing
+
+1. Run `go build ./...` and `go test ./...` to verify fixes don't break anything
+2. If build fails due to pre-existing issues (e.g., Windows `syscall.Statfs`), document but don't block
+3. Commit fixes with conventional commit format
+
+### Step 4: Output Review
 
 ```markdown
 ## 🔍 Code Review Summary
@@ -244,11 +299,11 @@ cat gitops/apps/{serviceName}/base/configmap.yaml
 
 ### 🔴 P0 — Blocking (Must Fix)
 Security, data inconsistency, SQL injection, missing transactions, unmanaged goroutines.
-1. [file:line] Issue description
+1. [file:line] Issue description — ✅ **AUTO-FIXED**: <what was done>
 
 ### 🟡 P1 — High (Should Fix)
 Performance (N+1), missing observability, no timeouts/retries, missing validation.
-1. [file:line] Issue description
+1. [file:line] Issue description — ✅ **AUTO-FIXED**: <what was done>
 
 ### 🔵 P2 — Normal (Nice to Have)
 Documentation, code style, low test coverage, naming.
@@ -256,6 +311,12 @@ Documentation, code style, low test coverage, naming.
 
 ### 🟢 Good Practices Observed
 1. [Positive observation]
+
+### ✅ Auto-Fix Summary
+| # | Severity | File | Fix Applied |
+|---|----------|------|-------------|
+| 1 | P0 | file.go:42 | Description of fix |
+| 2 | P1 | deployment.yaml | Added health probes |
 
 ### 📋 Detailed Review
 
@@ -317,6 +378,8 @@ Documentation, code style, low test coverage, naming.
 | **P0 (Blocking)** | Security, data inconsistency, SQL injection, missing transactions, breaking backward compat | Biz calls DB directly, no auth check, raw SQL concat, proto field removed without `reserved` |
 | **P1 (High)** | Performance, missing observability, no timeouts/retries, config mismatch | N+1 queries, no circuit breaker, missing metrics, env var not in configmap |
 | **P2 (Normal)** | Documentation, code style, low test coverage | Missing comments, naming issues, TODO without ticket |
+
+6. **Auto-fix ALL P0 and P1 issues** — Do NOT just report them. Use the auto-fix patterns from Mode A Step 3 above. Fix directly, verify with build/test, then commit.
 
 ### Step 2: Checklist & TODO
 
