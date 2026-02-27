@@ -59,10 +59,10 @@ patches:
 images:
   - name: <service>-service
     newName: registry-api.tanhdev.com/<service>-service
-    newTag: "abc1234"  # ← Auto-updated by CI/CD pipeline (DO NOT edit manually)
+    newTag: "abc1234"  # ← Git commit short SHA
 ```
 
-> ⚠️ **NEVER manually update `newTag`** — CI/CD pipeline automatically updates this after building the Docker image. Manual edits will be overwritten or cause conflicts.
+**To update image tag**: Change `newTag` to the new commit SHA.
 
 ### `base/deployment.yaml` - Deployment Manifest
 
@@ -177,11 +177,11 @@ spec:
 ## Common Operations
 
 ### Deploy a New Version
-1. Push code to GitLab (CI builds Docker image automatically)
-2. CI/CD pipeline auto-updates `newTag` in `gitops/apps/<service>/overlays/dev/kustomization.yaml`
-3. ArgoCD auto-syncs within 3 minutes
-
-> ⚠️ **NEVER manually update `newTag`** — CI/CD handles image tag updates automatically after building. Only commit gitops changes for ConfigMaps, Secrets, Deployments, or other infrastructure config.
+1. Push code to GitLab (CI builds Docker image)
+2. Get commit SHA: `cd <service> && git rev-parse --short HEAD`
+3. Update `gitops/apps/<service>/overlays/dev/kustomization.yaml` → `newTag: <sha>`
+4. Commit and push gitops: `cd gitops && git add -A && git commit -m "deploy: <service> <sha>" && git push`
+5. ArgoCD auto-syncs within 3 minutes
 
 ### Add New Environment Variable
 1. Edit `gitops/apps/<service>/overlays/dev/configmap.yaml`
@@ -196,7 +196,7 @@ spec:
 1. Copy structure from an existing service in `gitops/apps/`
 2. Update all references (namespace, service name, ports, image)
 3. Add ArgoCD Application manifest
-4. Update port numbers per SERVICE_INDEX.md
+4. Update port numbers per gitops/docs/PORT_ALLOCATION_STANDARD.md
 
 ### Fix Migration Job
 1. Check `gitops/apps/<service>/base/migration-job.yaml`
@@ -207,7 +207,7 @@ spec:
 
 ## Port Reference
 
-Always use the standardized ports from `docs/SERVICE_INDEX.md`:
+Always use the standardized ports from `gitops/docs/PORT_ALLOCATION_STANDARD.md`:
 - HTTP: `80XX` (where XX is the service number)
 - gRPC: `90XX` (same numbering)
 

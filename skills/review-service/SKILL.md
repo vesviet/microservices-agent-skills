@@ -1,420 +1,333 @@
 ---
 name: review-service
-description: Full service review & release — index codebase, cross-reference GitOps, fix P0/P1/P2 issues, commit and tag both repos
+description: Single process for reviewing and releasing any microservice based on service-review-release-prompt.md
 ---
 
-# Review Service Skill
+# Service Review & Release Skill
 
-Operational step-by-step process for reviewing and releasing any microservice. Codifies the exact workflow validated across analytics, gateway, and location service reviews.
+Use this skill to review an entire service for production readiness and prepare it for release.
 
-> **Trigger**: User says "review service X", "review and release X", or references `service-review-release-prompt.md`
-
----
-
-## Prerequisites
-
-Before starting, you MUST read these three standards (they define severity levels and review criteria):
-
-1. **[Coding Standards](docs/07-development/standards/coding-standards.md)** — Go style, layers, errors
-2. **[Team Lead Code Review Guide](docs/07-development/standards/TEAM_LEAD_CODE_REVIEW_GUIDE.md)** — P0/P1/P2 severity
-3. **[Development Review Checklist](docs/07-development/standards/development-review-checklist.md)** — Quality gates
-
-Also read the PORT_ALLOCATION_STANDARD — it is the single source of truth for ports:
-- **[PORT_ALLOCATION_STANDARD](gitops/docs/PORT_ALLOCATION_STANDARD.md)**
+## When to Use
+- When the user asks to "review service X" or "review and release X"
+- When running the full service release process
+- Before a major feature merge or production deployment of a microservice
 
 ---
 
-## Phase 1: Index & Review (PLANNING mode)
+## Standards (read first)
 
-### Step 1.1: Parallel initial indexing
+Before any code change, apply these standards:
+1. **[Coding Standards](docs/07-development/standards/coding-standards.md)** — Go style, proto, layers, context, errors, constants.
+2. **[Team Lead Code Review Guide](docs/07-development/standards/TEAM_LEAD_CODE_REVIEW_GUIDE.md)** — Architecture, API, biz logic, data, security, performance, observability.
+3. **[Development Review Checklist](docs/07-development/standards/development-review-checklist.md)** — Pre-review, issue levels, Go/security/testing/DevOps criteria.
 
-Run ALL of these in parallel to maximize speed:
+---
 
-```
-// All parallel:
-list_dir:     {serviceName}/
-list_dir:     gitops/apps/{serviceName}/base/
-find_by_name: *.go in {serviceName}/ (get full file inventory)
-view_file:    docs/07-development/standards/service-review-release-prompt.md (if not cached)
-```
+## Process for `<serviceName>`
 
-### Step 1.2: Read critical config files (parallel batch)
+Use this process for the service identified by **`<serviceName>`** (e.g. warehouse → `warehouse`, pricing → `pricing`).
+Paths and commands below use `<serviceName>`; replace it with the real service name.
 
-```
-// All parallel:
-view_file: {serviceName}/configs/config.yaml
-view_file: {serviceName}/go.mod
-view_file: {serviceName}/internal/config/config.go
-view_file: {serviceName}/cmd/{serviceName}/main.go
-```
+> [!IMPORTANT]
+> Many services use a **dual-binary architecture**: `cmd/<serviceName>/` (main API server) + `cmd/worker/` (event consumers, cron, outbox). Always review **both** entry points.
 
-**Key checks on go.mod:**
-- [ ] No `replace gitlab.com/ta-microservices` directives (breaks CI/CD)
-- [ ] `common` version — note exact version for later comparison
-- [ ] Other service dependencies (shipping, user, warehouse, etc.)
+### Step 0: Sync Latest Code
 
-### Step 1.3: Read ALL GitOps base manifests (parallel batch)
+> [!CAUTION]
+> **Always pull latest before reviewing.** Missing recent commits leads to reviewing stale code and duplicating already-fixed work.
 
-```
-// All parallel:
-view_file: gitops/apps/{serviceName}/base/deployment.yaml
-view_file: gitops/apps/{serviceName}/base/service.yaml
-view_file: gitops/apps/{serviceName}/base/configmap.yaml
-view_file: gitops/apps/{serviceName}/base/networkpolicy.yaml
-view_file: gitops/apps/{serviceName}/base/servicemonitor.yaml
+```bash
+# Pull latest for the service AND related repos
+cd /home/user/microservices/<serviceName> && git pull origin main
+cd /home/user/microservices/common && git pull origin main
+cd /home/user/microservices/gitops && git pull origin main
 ```
 
-Also check if these exist (may or may not):
-- `hpa.yaml` — HorizontalPodAutoscaler
-- `pdb.yaml` — PodDisruptionBudget
-- `ingress.yaml` — Ingress (usually only gateway)
-- `migration-job.yaml` — Migration Job
-- `serviceaccount.yaml` — ServiceAccount
-- Worker deployment: `{serviceName}-worker.yaml` or separate worker deployment
+### Step 1: Index & Review Codebase
 
-### Step 1.4: Port cross-reference table (CRITICAL)
+1. **Index and understand the `<serviceName>` service**:
+   - Directory `<serviceName>/` layout: `cmd/` (main + worker entry points), `internal/biz/`, `internal/data/`, `internal/service/`, `internal/client/`, `internal/events/`, `internal/worker/`, `internal/constants/`
+   - Proto under `api/<serviceName>/v1/`
+   - Migrations: `migrations/`
+   - Config: `configs/`, `go.mod`
+2. **Review code** against the three standards above (architecture, layers, context, errors, validation, security, no N+1, transactions, observability).
+3. **List P0 / P1 / P2 issues** (use severity from TEAM_LEAD_CODE_REVIEW_GUIDE).
 
-Build this table from PORT_ALLOCATION_STANDARD and compare ALL config sources. This single check has found P0 issues in EVERY service reviewed so far.
+| Severity | Definition | Examples |
+|----------|-----------|----------|
+| **P0 (Blocking)** | Security, data inconsistency, breaking backward compat | No auth, raw SQL concat, biz calls DB directly, proto field removed without `reserved`, breaking event schema |
+| **P1 (High)** | Performance, missing observability, config mismatch | N+1 queries, no circuit breaker, env var not in configmap |
+| **P2 (Normal)** | Documentation, code style, naming | Missing comments, TODO without ticket |
 
-| Source | HTTP Port | gRPC Port | Status |
-|---|---|---|---|
-| **PORT_ALLOCATION_STANDARD** | `80XX` | `90XX` | Authoritative |
-| deployment.yaml `containerPort` | ? | ? | Must match standard |
-| service.yaml `targetPort` | ? | ? | Must match standard |
-| base ConfigMap `config.yaml` (embedded) | ? | ? | Must match standard |
-| overlay ConfigMap env vars | ? | ? | Must match standard |
-| local `configs/config.yaml` | ? | ? | Should match standard |
-| NetworkPolicy ingress ports | ? | ? | Must match standard |
-| Dapr `app-port` annotation | ? | ? | Must match standard |
-| Health probe ports | ? | ? | Must match standard |
-| README.md port references | ? | ? | Should match standard |
+### Step 2: Cross-Service Impact Analysis
 
-> **Known pattern from past reviews**: Port values are frequently copied from other services during scaffolding and never updated. Check for checkout ports (8010), auth ports (8000), search ports (8017), loyalty ports (8014) appearing where they shouldn't.
+> [!WARNING]
+> **This step is mandatory.** Skipping it risks deploying breaking changes that crash other services at runtime.
 
-### Step 1.5: Deployment checklist
-
-Check deployment.yaml for ALL of:
-
-- [ ] **Security context** — `runAsNonRoot: true`, `runAsUser: 65532`
-- [ ] **Dapr annotations** — `dapr.io/enabled`, `dapr.io/app-id`, `dapr.io/app-port`, `dapr.io/app-protocol`
-- [ ] **Health probes** — liveness + readiness with correct port and path
-- [ ] **envFrom** — `configMapRef: overlays-config` (env var overrides from overlay)
-- [ ] **Resource limits** — requests + limits for CPU and memory
-- [ ] **Volume mounts** — config.yaml mounted correctly
-
-### Step 1.6: ServiceMonitor check
-
-- [ ] Port name in ServiceMonitor MUST match port name in service.yaml
-  - Common bug: ServiceMonitor says `http-svc`, service.yaml says `http` → Prometheus can't scrape
-
-### Step 1.7: Overlay check
-
-```
-// Parallel:
-list_dir:  gitops/apps/{serviceName}/overlays/
-view_file: gitops/apps/{serviceName}/overlays/dev/kustomization.yaml
-view_file: gitops/apps/{serviceName}/overlays/dev/configmap.yaml  (if exists)
-view_file: gitops/apps/{serviceName}/overlays/dev/secrets.yaml    (if exists)
-```
-
-**Check for:**
-- [ ] Overlay `configmap.yaml` env vars have correct port values
-- [ ] No plaintext secrets in ConfigMap (JWT_SECRET, DB passwords → should be in Secret)
-- [ ] Secrets reference is mounted in deployment (`secretRef` or volume)
-
-### Step 1.8: Cross-service impact
+#### 2.1 Proto/API Backward Compatibility
 
 ```bash
 # Who depends on this service's proto?
-grep -r 'ta-microservices/{serviceName}' --include='go.mod' /home/user/microservices/*/go.mod
-
-# Who consumes this service's events?
-grep -r 'Topic.*{serviceName}' /home/user/microservices/common/constants/events.go
+grep -r 'gitlab.com/ta-microservices/<serviceName>' --include='go.mod' /home/user/microservices/*/go.mod
 ```
 
-- [ ] Proto field numbers preserved (no reuse)
-- [ ] Event schemas additive-only
-- [ ] No circular module imports
+- Proto field numbers preserved (use `reserved` for deleted fields)
+- New fields are optional (adding required fields = MAJOR break)
+- RPC signatures stable (no rename/remove without versioning `v1` → `v2`)
+- All client services still compile after changes
 
-### Step 1.9: Code architecture spot check
-
-Use `view_file_outline` on key files (not full read — just verify structure):
-
-```
-view_file_outline: internal/biz/{entity}/{entity}_usecase.go
-view_file_outline: internal/data/postgres/{entity}.go
-view_file_outline: internal/service/{entity}.go
-```
-
-**Quick checks:**
-- [ ] Service layer is thin (parse → call biz → return)
-- [ ] Biz layer doesn't import gorm/DB directly
-- [ ] Repository interface defined in biz, implemented in data
-- [ ] Error wrapping with context (`fmt.Errorf("...: %w", err)`)
-
-### Step 1.10: Check for stale files
-
-```
-find_by_name: *.disabled in {serviceName}/
-find_by_name: *REVIEW* or *CHECKLIST* or *FINAL* at root of {serviceName}/
-```
-
----
-
-## Phase 2: Compile Issue List & Plan (PLANNING mode)
-
-### Severity definitions
-
-| Severity | Emoji | Definition | Examples |
-|---|---|---|---|
-| **P0** | 🔴 | Blocks deployment or causes runtime failure | Port mismatch (pod won't start), missing probes, security vuln, broken config |
-| **P1** | 🟡 | Impacts reliability or observability | Missing Dapr, ServiceMonitor mismatch, no HPA, wrong README |
-| **P2** | 🔵 | Documentation, style, cleanup | Stale files, missing CHANGELOG, naming |
-
-### Write implementation_plan.md
-
-Must include:
-1. Summary of findings
-2. Port cross-reference table (from Step 1.4)
-3. All P0/P1/P2 issues with file:line references
-4. Proposed changes grouped by component
-5. Verification plan
-
-### Request user approval via notify_user
-
----
-
-## Phase 3: Fix All Issues (EXECUTION mode)
-
-> **Code comment rule**: Do NOT add issue-tracking comments (e.g. `# P0: Fixed port`, `// REVIEW-FIX:`, `# was 8015, changed to 8016`) directly in code or YAML files. The code should be clean — issue context belongs ONLY in commit messages and CHANGELOG entries.
-
-### Fix order (most critical first)
-
-1. **Port fixes** — service.yaml, configmap.yaml, local config.yaml
-2. **Deployment fixes** — envFrom, Dapr, probes, security context
-3. **ServiceMonitor** — port name alignment
-4. **Documentation** — README ports, CHANGELOG creation
-5. **Stale file cleanup** — delete review docs, disabled files
-
-### Fix patterns (use multi_replace_file_content for efficiency)
-
-```
-# Port fix in service.yaml — change targetPort
-multi_replace_file_content: service.yaml
-  targetPort: WRONG → CORRECT (both HTTP and gRPC)
-
-# Port fix in base ConfigMap config.yaml
-multi_replace_file_content: configmap.yaml
-  addr: 0.0.0.0:WRONG → 0.0.0.0:CORRECT
-
-# Deployment — add envFrom + Dapr + probes
-multi_replace_file_content: deployment.yaml
-  1. Add annotations block under template.metadata
-  2. Add envFrom before env block
-  3. Add probes after env block
-```
-
----
-
-## Phase 4: Verify (VERIFICATION mode)
-
-### Build & test
+#### 2.2 Event Schema Compatibility
 
 ```bash
-# Build (expected: pre-existing Windows syscall.Statfs error from common lib is OK)
+# Who consumes this service's events?
+grep -r 'Topic.*<serviceName>' /home/user/microservices/*/internal/ --include='*.go' -l
+```
+
+- Event struct changes are additive-only (removing/renaming fields = breaking)
+- Consumers handle old + new format gracefully
+- Topic names immutable (never rename existing topics)
+
+#### 2.3 Go Module Dependency Graph
+- No circular imports between services
+- Minimal import surface (don't import entire service module for one type)
+
+### Step 3: Checklist & TODO for `<serviceName>`
+
+- Track review findings and TODOs in a dedicated review checklist (e.g., `docs/10-appendix/workflow/<serviceName>-review-checklist.md`). **Do NOT put checklists, TODOs, or review findings in the service documentation.**
+- Align items with TEAM_LEAD_CODE_REVIEW_GUIDE and development-review-checklist (P0/P1/P2).
+- Mark completed items; add items for remaining work. **Skip adding or requiring test-case tasks** (per user request).
+
+### Step 4: Dependencies (Go Modules)
+
+> [!CAUTION]
+> **NO `replace` directives for `gitlab.com/ta-microservices` are allowed.** This works locally but breaks CI/CD.
+
+#### 4.1 Check if `common` changed
+
+```bash
+# If common has uncommitted changes, it MUST be committed + tagged FIRST
+cd /home/user/microservices/common && git status
+```
+
+**If `common` changed → commit, tag, and push `common` BEFORE touching the service:**
+
+```bash
+cd /home/user/microservices/common
+golangci-lint run && go build ./... && go test ./...
+rm -rf bin/ # ALWAYS check and remove bin directory before committing
+git add -A && git commit -m "<type>(common): <description>"
+git tag --sort=-creatordate | head -5   # check current latest tag
+git tag -a v1.x.y -m "v1.x.y: <summary>"
+git push origin main && git push origin v1.x.y
+```
+
+> [!IMPORTANT]
+> **Common must be tagged before any service commit.** Services import `common` via `go get @<tag>`. If the service is committed before common is tagged, `go.mod` references a non-existent version.
+
+#### 4.2 Convert replace to import (if needed)
+
+```bash
+# Check for forbidden replace directives
+grep 'replace gitlab.com/ta-microservices' <serviceName>/go.mod
+
+# If found: remove replace lines, then get latest versions:
+cd /home/user/microservices/<serviceName>
+go get gitlab.com/ta-microservices/common@latest
+go get gitlab.com/ta-microservices/<other-dep>@latest
+go mod tidy
+```
+
+#### 4.3 Update dependencies
+
+```bash
+cd /home/user/microservices/<serviceName>
+# Always get the latest version for common
+go get gitlab.com/ta-microservices/common@latest    # or @v1.x.y if just tagged
+
+# ALWAYS get the latest tag for ANY OTHER internal dependencies imported in go.mod
+# Example: if importing catalog, run: go get gitlab.com/ta-microservices/catalog@latest
+go mod tidy
+```
+
+> [!IMPORTANT]
+> **Rule on Internal Dependencies**: When importing other services or packages from `gitlab.com/ta-microservices` via `go.mod`, ALWAYS ensure you are pulling their latest tagged version using `go get gitlab.com/ta-microservices/<dependency>@latest`. Do NOT use outdated versions.
+
+### Step 5: Lint & Build
+
+```bash
+cd /home/user/microservices/<serviceName>
+
+# 1. Generate proto (if .proto files changed)
+make api
+
+# 2. Regenerate Wire (if DI providers changed) — BOTH binaries
+cd cmd/<serviceName> && wire
+cd ../worker && wire      # if worker binary exists
+
+# 3. Lint (target: zero warnings)
+cd /home/user/microservices/<serviceName>
+golangci-lint run
+
+# 4. Build
 go build ./...
 
-# Test specific packages
-go test -v ./internal/biz/... ./internal/service/...
+# 5. Run tests
+go test ./...
 ```
 
-> **Note**: `go build` may fail on Windows due to `syscall.Statfs` in `common` health checkers. This is a pre-existing cross-platform issue, not caused by our changes. Document it but don't block on it.
+> [!NOTE]
+> **Never manually edit `wire_gen.go` or `*.pb.go`** — these files are auto-generated. Always use `wire` and `make api` to regenerate.
 
-### Check latest tag
+### Step 6: Deployment Readiness (GitOps Alignment)
+
+Before release, verify config alignment between code and GitOps.
+
+> [!IMPORTANT]
+> **Port allocation MUST follow [PORT_ALLOCATION_STANDARD.md](../../../gitops/docs/PORT_ALLOCATION_STANDARD.md).** Look up the correct HTTP/gRPC ports for `<serviceName>` in the Port Allocation Table and verify all references match.
 
 ```bash
-git tag --sort=-creatordate | head -5
+# 0. Look up correct ports from standard
+grep '<serviceName>' /home/user/microservices/gitops/docs/PORT_ALLOCATION_STANDARD.md
+
+# 1. Check env vars used in code
+grep -rn 'os.Getenv\|viper.Get\|envconfig' <serviceName>/internal/ --include='*.go'
+
+# 2. Compare with gitops configmap
+cat gitops/apps/<serviceName>/base/configmap.yaml
+
+# 3. Verify ports match (MUST align with PORT_ALLOCATION_STANDARD.md)
+grep 'addr:' <serviceName>/configs/config.yaml
+grep 'containerPort:' gitops/apps/<serviceName>/base/deployment.yaml
+grep 'targetPort:' gitops/apps/<serviceName>/base/service.yaml
+grep 'dapr.io/app-port:' gitops/apps/<serviceName>/base/deployment.yaml
+grep -A2 'livenessProbe:\|readinessProbe:' gitops/apps/<serviceName>/base/deployment.yaml | grep port
+
+# 4. Check resource limits are set
+grep -A5 'resources:' gitops/apps/<serviceName>/base/deployment.yaml
+
+# 5. Check HPA exists
+ls gitops/apps/<serviceName>/base/hpa.yaml 2>/dev/null || echo "⚠️ No HPA configured"
 ```
 
----
+Checklist:
+- [ ] **Ports match PORT_ALLOCATION_STANDARD.md**: `config.yaml` addr ↔ `deployment.yaml` containerPort ↔ `service.yaml` targetPort ↔ `dapr.io/app-port` ↔ health probe ports
+- [ ] New env vars in code → ConfigMap/Secret updated in `gitops/`
+- [ ] Resource limits set (not unbounded)
+- [ ] Health probes configured (liveness + readiness) on correct port
+- [ ] Dapr annotations correct (`app-id`, `app-port`, `app-protocol`)
+- [ ] NetworkPolicy allows required egress/ingress
+- [ ] Migration strategy safe for zero-downtime deploy
 
-## Phase 5: Commit & Release (EXECUTION mode)
+### Step 7: Docs
 
-> **Execute all `run_command` steps below. Each service is its own git repo — there is NO git repo at `d:\microservices` root.**
+#### 7.1 Service documentation
+Update or create service docs under **`docs/03-services/<group>/<serviceName>-service.md`**.
+> [!NOTE]
+> **Service documentation is an introduction to the service, its architecture, and its capabilities.** It is NOT a checklist or a place to track TODOs/review findings.
 
-### Commit order matters
+- `core-services`: order, catalog, customer, payment, auth, user
+- `operational-services`: notification, analytics, search, review, warehouse, fulfillment, shipping, pricing, promotion, loyalty-rewards, location
+- `platform-services`: gateway, common-operations
 
-```
-┌──────────────────────────────────────────────────┐
-│              COMMIT ORDER                         │
-│                                                   │
-│  1. common/ → if changed, commit + tag FIRST      │
-│  2. {serviceName}/ → commit + tag + push           │
-│  3. gitops/ → commit + push (pull --rebase first!) │
-└──────────────────────────────────────────────────┘
-```
+#### 7.2 README.md
+Update **`<serviceName>/README.md`** using the template at `docs/templates/readme-template.md`.
 
-### Step 5.1: Get current tag and compute next version
+#### 7.3 CHANGELOG.md
+Update **`<serviceName>/CHANGELOG.md`** (create if not exists) using conventional changelog format.
+
+> [!IMPORTANT]
+> **Do NOT commit `docs/` repo changes separately.** The `docs/` directory is a separate git repository (`master` branch). Doc file edits (service doc, review checklist) are written to disk but are **not committed** as part of the service review workflow — the user manages `docs/` repo commits independently.
+>
+> **Only** `<serviceName>/CHANGELOG.md` and `<serviceName>/README.md` (inside the service repo) are committed, as part of Step 8.
+
+#### 7.4 Documentation checklist
+- [ ] Current and accurate information
+- [ ] Working commands (tested)
+- [ ] Correct ports and endpoints
+- [ ] Valid configuration examples
+
+### Step 8: Commit & Release
+
+> [!IMPORTANT]
+> **CI/CD builds Docker images and updates GitOps tags automatically.** Never build Docker images locally. Never manually update `newTag` in gitops kustomization.
+
+#### 8.1 Commit order (when multiple components changed)
+1. `common/` → commit + tag (`v1.x.y`) + push
+2. `<serviceName>/` → `go get common@v1.x.y` + commit + push
+3. CI/CD builds image + updates gitops tag auto
+
+#### 8.2 Commit
 
 ```bash
-# // turbo
-cd d:\microservices\{serviceName}
-git tag --sort=-creatordate | Select-Object -First 5
-```
-
-Determine next version: increment PATCH for review fixes (e.g. v1.0.14 → v1.0.15).
-
-### Step 5.2: Stage ALL changes and commit
-
-> ⚠️ **IMPORTANT**: Commit ALL uncommitted changes in the service repo, not just the files you modified during review. Prior uncommitted work (Dockerfiles, go.mod updates, new tests, refactors, etc.) should be included in this commit.
-
-```bash
-cd d:\microservices\{serviceName}
+cd /home/user/microservices/<serviceName>
+rm -rf bin/ # ALWAYS check and remove bin directory before committing
 git add -A
-git status
+git commit -m "<type>(<serviceName>): <description>"
 ```
 
-Review `git status` to confirm all files are staged, then commit:
+#### 8.3 Push & Release
 
 ```bash
-cd d:\microservices\{serviceName}
-git commit -m "fix({serviceName}): service review — P0/P1/P2 fixes
-
-- P0: <list P0 fixes, one per line>
-- P1: <list P1 fixes>
-- P2: <list P2 fixes>
-- Includes prior uncommitted changes"
-```
-
-**Verify clean status after commit:**
-
-```bash
-# // turbo
-cd d:\microservices\{serviceName}
-git status --short
-```
-
-If output is not empty, `git add -A` and `git commit --amend --no-edit` to include remaining files.
-
-### Step 5.3: Tag the service
-
-Follow the tag format from **commit-code** skill:
-
-```bash
-cd d:\microservices\{serviceName}
-git tag -a v{NEXT_VERSION} -m "v{NEXT_VERSION}: service review fixes
-
-Fixed:
-- <list P0 fixes>
-- <list P1 fixes>
-- <list P2 fixes>
-
-Changed:
-- <list changes, e.g. README updated, CHANGELOG entry added>"
-```
-
-### Step 5.4: Push service + tag
-
-```bash
-cd d:\microservices\{serviceName}
+# Push to remote
 git push origin main
-git push origin v{NEXT_VERSION}
+
+# IF RELEASE:
+git tag -a v1.0.7 -m "v1.0.7: description"
+git push origin v1.0.7
 ```
-
-### Step 5.5: Stage and commit GitOps changes
-
-> ⚠️ **ALWAYS pull --rebase before commit** — gitops is shared across all services.
-> ⚠️ **NEVER manually update `newTag`** in `overlays/*/kustomization.yaml` — CI/CD handles image tags.
-
-```bash
-cd d:\microservices\gitops
-git pull --rebase origin main
-git add apps/{serviceName}/
-git status
-```
-
-Review status, then commit:
-
-```bash
-cd d:\microservices\gitops
-git commit -m "fix({serviceName}): service review — GitOps fixes
-
-- <list GitOps-specific fixes with severity>"
-```
-
-### Step 5.6: Push GitOps
-
-```bash
-cd d:\microservices\gitops
-git push origin main
-```
-
-### Step 5.7: Record commit hashes for walkthrough
-
-```bash
-# // turbo
-cd d:\microservices\{serviceName}
-git log -1 --oneline
-
-# // turbo
-cd d:\microservices\gitops
-git log -1 --oneline
-```
-
-Save both commit hashes to include in the walkthrough.md artifact.
 
 ---
 
-## Phase 6: Write Walkthrough (VERIFICATION mode)
+## Review Output Format
 
-Create `walkthrough.md` artifact with:
-- Issue summary table (P0/P1/P2 counts)
-- Changes made (with `render_diffs` for key files)
-- Verification results (build, tests)
-- Commit details (hashes, tags, both repos)
+Use this format to report review findings:
 
----
+```markdown
+## 🔍 Service Review: <serviceName>
 
-## Common Issues Found in Past Reviews
+**Date**: YYYY-MM-DD
+**Status**: ✅ Ready / ⚠️ Needs Work / ❌ Not Ready
 
-These are the most frequent issues — check for them first:
+### 📊 Issue Summary
 
-| Issue | Frequency | Services Affected |
-|---|---|---|
-| Port mismatch across configs | **Every service** | analytics, gateway, location |
-| ServiceMonitor port name ≠ service.yaml port name | Very common | gateway, location |
-| Missing Dapr annotations | Common | location |
-| Missing health probes | Common | location |
-| Missing `envFrom` for overlay ConfigMap | Common | location |
-| Plaintext secrets in ConfigMap | Common | gateway (JWT_SECRET) |
-| Stale review docs at root | Occasional | gateway |
-| README with wrong ports | Common | location (had 8017 instead of 8007) |
-| `go.mod` outdated `common` version | Occasional | varies |
+| Severity | Count | Status |
+|----------|-------|--------|
+| P0 (Blocking) | X | Fixed / Remaining |
+| P1 (High) | X | Fixed / Remaining |
+| P2 (Normal) | X | Fixed / Remaining |
 
----
+### 🔴 P0 Issues (Blocking)
+1. **[CATEGORY]** file:line — Description
 
-## Reference Port Allocation
+### 🟡 P1 Issues (High)
+1. **[CATEGORY]** file:line — Description
 
-| Service | HTTP | gRPC |
-|---|---|---|
-| Auth | 8000 | 9000 |
-| User | 8001 | 9001 |
-| Pricing | 8002 | 9002 |
-| Customer | 8003 | 9003 |
-| Order | 8004 | 9004 |
-| Payment | 8005 | 9005 |
-| Warehouse | 8006 | 9006 |
-| Location | 8007 | 9007 |
-| Fulfillment | 8008 | 9008 |
-| Notification | 8009 | 9009 |
-| Checkout | 8010 | 9010 |
-| Promotion | 8011 | 9011 |
-| Shipping | 8012 | 9012 |
-| Return | 8013 | 9013 |
-| Loyalty | 8014 | 9014 |
-| Catalog | 8015 | 9015 |
-| Review | 8016 | 9016 |
-| Search | 8017 | 9017 |
-| Common Ops | 8018 | 9018 |
-| Analytics | 8019 | 9019 |
-| Gateway | 80 | 81 |
+### 🔵 P2 Issues (Normal)
+1. **[CATEGORY]** file:line — Description
+
+### ✅ Completed Actions
+1. Fixed: description
+
+### 🌐 Cross-Service Impact
+- Services that import this proto: [list]
+- Services that consume events: [list]
+- Backward compatibility: ✅ Preserved / ❌ Breaking
+
+### 🚀 Deployment Readiness
+- Config/GitOps aligned: ✅ / ❌
+- Health probes: ✅ / ❌
+- Resource limits: ✅ / ❌
+- Migration safety: ✅ / ❌
+
+### Build Status
+- `golangci-lint`: ✅ 0 warnings / ❌ X warnings
+- `go build ./...`: ✅ / ❌
+- `wire`: ✅ Generated / ❌ Needs regen
+- Generated Files (`wire_gen.go`, `*.pb.go`): ✅ Not modified manually / ❌ Modified manually
+- `bin/` Files: ✅ Removed / ❌ Present
+
+### Documentation
+- Service doc: ✅ / ❌
+- README.md: ✅ / ❌
+- CHANGELOG.md: ✅ / ❌
+```

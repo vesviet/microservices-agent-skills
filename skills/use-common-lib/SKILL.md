@@ -340,6 +340,7 @@ constants.DaprDefaultPubSub  // "pubsub"
 | Define topic strings inline | Use `common/constants.TopicXxx` |
 | Write CORS middleware | Use `common/middleware.CORS()` |
 | Hash passwords manually | Use `common/security.HashPassword()` |
+| Use `P-0` or `[ ]` in comments, or write >3 line comments | Keep comments to max 3 lines, explaining "Why" without ticket tags |
 | Write base model fields per service | Embed `common/models.BaseModel` |
 
 ---
@@ -353,3 +354,4 @@ constants.DaprDefaultPubSub  // "pubsub"
 - [ ] Used `common/events` for pub/sub (not raw Dapr SDK calls)
 - [ ] Used `common/middleware` for auth/CORS/rate limiting (not custom implementations)
 - [ ] Used `common/validation` for input validation (not ad-hoc checks)
+- [ ] Followed commenting rules: code explanations max 3 lines, and absolutely NO `P-0` or `[ ]` formats in comments.

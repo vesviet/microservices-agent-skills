@@ -8,304 +8,202 @@ description: Debug Kubernetes deployment issues - pods, services, configs, image
 Use this skill when the user reports Kubernetes deployment issues, pod failures, or service connectivity problems.
 
 ## When to Use
-- Pods are in `CrashLoopBackOff`, `ImagePullBackOff`, `ErrImagePull`, `Error`, or `Pending` state
-- Services are not accessible or returning errors
-- ArgoCD sync failures
-- Database connection issues from pods
-- Service initialization hangs or fails
-- Config/secret mismatches
+- Pods are in `CrashLoopBackOff`, `ImagePullBackOff`, `ErrImagePull`, `CreateContainerConfigError`, `Pending` state
+- ArgoCD sync / manifest generation failures
+- Dapr sidecar not ready
+- Missing secrets, broken configmaps, port mismatches
+- Services not accessible
 
 ## Environment Details
 
-- **Cluster**: k3d/k3s (kubectl configured locally to connect to remote cluster)
-- **GitOps**: ArgoCD watches `gitops/` repo for changes → auto-deploy
-- **Registry**: `registry-api.tanhdev.com` (private Docker registry)
-- **Access**: kubectl and argocd CLI run directly on local machine (no SSH needed)
-- **Namespaces**: Each service has its own namespace: `<service>-dev` (e.g., `auth-dev`, `order-dev`)
-- **GitOps Repo**: `/home/user/microservices/gitops/`
+- **Cluster**: k3d/k3s (remote dev server)
+- **SSH Access**: `ssh tuananh@dev.tanhdev.com -p 8785`
+- **Namespaces**: `<service>-dev` (e.g., `auth-dev`, `order-dev`)
+- **GitOps Repo (local)**: `/home/user/microservices/gitops/`
+- **GitOps structure**: `apps/<service>/base/` + `apps/<service>/overlays/dev/`
 
-## ⚠️ CRITICAL RULE: GitOps-Only Changes
+---
 
-**NEVER apply changes directly with `kubectl apply` or `kubectl edit`.**
-ALL changes MUST go through GitOps:
+## ⚠️ GOLDEN RULE: GitOps + CI/CD Only
 
-1. **Edit** the gitops files in `/home/user/microservices/gitops/apps/<service>/`
-2. **Commit** changes to the gitops repo
-3. **Push** to remote
-4. **Force sync** ArgoCD to apply immediately
+1. **ALL fixes go through GitOps or standard commits. Period.**
+2. **NEVER use Docker locally** — no `docker build`, `docker-compose`, or `make docker-build`. All image building happens in GitLab CI.
 
-```bash
-# Standard GitOps commit + force sync flow
-cd /home/user/microservices/gitops && git add -A && git commit -m "fix: <service> <description>" && git push origin main
+```
+Edit code → commit → push → wait for CI pipeline to build image
+Update gitops (if needed) → commit → push → ArgoCD hard-refresh → verify
+```
 
-# Then force ArgoCD sync (do NOT wait 3 min for auto-sync)
-argocd app sync <service>-dev --force
+```
+Edit gitops file → commit → push → ArgoCD hard-refresh → verify
 ```
 
 ---
 
-## Debugging Workflow (Step-by-Step)
+## The Only Workflow You Need
 
-### Step 1: Identify the Symptom
-
-```bash
-# Check pod status
-kubectl get pods -n <service>-dev
-
-# Get detailed pod events
-kubectl describe pod -n <service>-dev -l app=<service>-service
-
-# Check pod logs
-kubectl logs -n <service>-dev -l app=<service>-service --tail=100
-
-# Check previous crash logs (if CrashLoopBackOff)
-kubectl logs -n <service>-dev -l app=<service>-service --previous --tail=50
-```
-
-### Step 2: Diagnose the Root Cause
-
-Based on the symptom, jump to the matching issue section below.
-
-### Step 3: Fix via GitOps
-
-Edit the relevant gitops files (see issue-specific sections below).
-
-### Step 4: Commit, Push & Force Sync
+### Step 1: Diagnose
 
 ```bash
-# Commit the fix
-cd /home/user/microservices/gitops && git add -A && git commit -m "fix: <service> <description>"
+# Pod status
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
 
-# Push to remote
-cd /home/user/microservices/gitops && git push origin main
+# Events (best first signal)
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get events -n <service>-dev --sort-by=.metadata.creationTimestamp | tail -20"
 
-# Force ArgoCD sync immediately
-argocd app sync <service>-dev --force
-```
-
-### Step 5: Verify the Fix
-
-```bash
-# Watch pod status until Running
-kubectl get pods -n <service>-dev -w
-
-# Check logs for healthy startup
-kubectl logs -n <service>-dev -l app=<service>-service --tail=30
-```
-
----
-
-## Common Issues & GitOps Fixes
-
-### Issue 1: ImagePullBackOff / ErrImagePull
-
-**Diagnosis:**
-```bash
-kubectl describe pod -n <service>-dev -l app=<service>-service | grep -A5 'Events\|image\|Error'
-```
-
-**Root Causes & GitOps Fixes:**
-
-**1a. Wrong image tag (CI/CD didn't update):**
-
-> ⚠️ **Do NOT manually edit `newTag`** — CI/CD auto-updates it. If the tag is wrong, the CI pipeline likely failed.
-
-Check if CI pipeline ran successfully:
-```bash
-cd /home/user/microservices/<service> && git log --oneline -5
-# Verify the latest commit has a successful CI pipeline in GitLab
-```
-
-If CI failed, fix the build error in the service code, push again, and CI will update the tag automatically.
-
-**1b. Missing registry secret:**
-Check if `imagePullSecrets` is in deployment. Edit `gitops/apps/<service>/base/deployment.yaml`:
-```yaml
-spec:
-  template:
-    spec:
-      imagePullSecrets:
-        - name: registry-secret    # ← Must be present
-```
-
-**1c. Image not built yet:**
-```bash
-# Check if image exists by checking GitLab CI
-cd /home/user/microservices/<service> && git log --oneline -5
-# Verify the commit SHA has a corresponding CI pipeline that built the Docker image
-```
-
-**After fixing → commit, push, force sync (Step 4).**
-
----
-
-### Issue 2: CrashLoopBackOff
-
-**Diagnosis:**
-```bash
-# Pod logs (most important)
-kubectl logs -n <service>-dev -l app=<service>-service --tail=100
+# Logs
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --tail=80 2>&1"
 
 # Previous crash logs
-kubectl logs -n <service>-dev -l app=<service>-service --previous --tail=50
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --previous --tail=50 2>&1"
+
+# Describe pod (for CreateContainerConfigError, probe failures)
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l app.kubernetes.io/name=<service> 2>&1 | tail -40"
 ```
 
-**Root Causes & GitOps Fixes:**
+### Step 2: Fix in GitOps
 
-**2a. Database connection failed:**
-Edit `gitops/apps/<service>/overlays/dev/configmap.yaml`:
+Edit the relevant file(s) in `/home/user/microservices/gitops/apps/<service>/`.
+
+**GitOps File Map:**
+
+| What to fix | File |
+|---|---|
+| Image tag | `overlays/dev/kustomization.yaml` → `newTag` |
+| Env vars / config | `overlays/dev/configmap.yaml` |
+| Secrets (DB password, keys) | `overlays/dev/secrets.yaml` |
+| Ports, probes, Dapr annotations | `base/deployment.yaml` or `base/worker-deployment.yaml` |
+| Migration job | `base/migration-job.yaml` |
+| Kustomize resource list | `overlays/dev/kustomization.yaml` → `resources:` |
+
+**Infrastructure endpoints (dev cluster):**
+```
+PostgreSQL : postgresql.infrastructure.svc.cluster.local:5432
+Redis      : redis.infrastructure.svc.cluster.local:6379
+Consul     : consul.infrastructure.svc.cluster.local:8500
+```
+
+**Secrets pattern** — if `secretRef: name: <service>-secrets` is in deployment but missing:
 ```yaml
-data:
-  DATABASE_HOST: "postgresql.postgresql-dev.svc.cluster.local"
-  DATABASE_PORT: "5432"
-  DATABASE_USER: "ecommerce_user"
-  DATABASE_NAME: "<service>_db"
-  DATABASE_SSLMODE: "disable"
+# overlays/dev/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <service>-secrets
+  labels:
+    app.kubernetes.io/name: <service>
+    app.kubernetes.io/environment: dev
+type: Opaque
+stringData:
+  <SERVICE>_DATA_DATABASE_SOURCE: "postgres://postgres:microservices@postgresql.infrastructure.svc.cluster.local:5432/<service>_db?sslmode=disable"
+  DATABASE_URL: "postgres://postgres:microservices@postgresql.infrastructure.svc.cluster.local:5432/<service>_db?sslmode=disable"
 ```
+Then add `- secrets.yaml` to `overlays/dev/kustomization.yaml` resources.
 
-**2b. Redis connection failed:**
-Edit `gitops/apps/<service>/overlays/dev/configmap.yaml`:
-```yaml
-data:
-  REDIS_ADDR: "redis-ha.redis-ha-dev.svc.cluster.local:6379"
-```
-
-**2c. Consul connection failed:**
-Edit `gitops/apps/<service>/overlays/dev/configmap.yaml`:
-```yaml
-data:
-  CONSUL_ADDR: "consul.consul-dev.svc.cluster.local:8500"
-```
-
-**2d. Wrong port configuration:**
-Check `docs/SERVICE_INDEX.md` for correct ports, then edit `gitops/apps/<service>/overlays/dev/configmap.yaml`:
-```yaml
-data:
-  HTTP_PORT: "80XX"    # ← Must match SERVICE_INDEX.md
-  GRPC_PORT: "90XX"    # ← Must match SERVICE_INDEX.md
-```
-And ensure `gitops/apps/<service>/base/deployment.yaml` container ports match.
-
-**2e. Missing environment variable:**
-Compare `<service>/configs/config.yaml` with `gitops/apps/<service>/overlays/dev/configmap.yaml` to find missing vars.
-
-**After fixing → commit, push, force sync (Step 4).**
-
----
-
-### Issue 3: Service Not Accessible
-
-**Diagnosis:**
-```bash
-kubectl get svc -n <service>-dev
-kubectl get endpoints -n <service>-dev
-```
-
-**GitOps Fix:**
-Check `gitops/apps/<service>/base/service.yaml` ports match the deployment container ports.
-
----
-
-### Issue 4: ArgoCD Sync Issues
-
-**Diagnosis:**
-```bash
-# Check app status
-argocd app get <service>-dev
-
-# Check sync status
-kubectl get application -n argocd <service>-dev -o jsonpath='{.status.sync.status}'
-```
-
-**Fixes:**
+### Step 3: Verify kustomize builds clean
 
 ```bash
-# Force sync (most common fix)
-argocd app sync <service>-dev --force
+kubectl kustomize /home/user/microservices/gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
+```
 
-# If stuck, hard refresh then sync
-argocd app get <service>-dev --hard-refresh
-argocd app sync <service>-dev --force --prune
+### Step 4: Commit + Push
 
-# If old resources block sync, replace
-argocd app sync <service>-dev --force --replace
+```bash
+cd /home/user/microservices/gitops \
+  && git add -A \
+  && git commit -m "fix: <service> <description>" \
+  && git pull --rebase origin main \
+  && git push origin main
+```
+
+### Step 5: Trigger ArgoCD Sync
+
+> `argocd` CLI is NOT available in SSH PATH. Use `kubectl patch` to trigger hard-refresh + sync.
+
+```bash
+# Hard refresh (forces ArgoCD to pull latest git)
+ssh tuananh@dev.tanhdev.com -p 8785 \
+  "kubectl patch application <service>-dev -n argocd \
+   --type merge \
+   -p '{\"metadata\":{\"annotations\":{\"argocd.argoproj.io/refresh\":\"hard\"}}}'"
+
+# Check ArgoCD picked up the new revision
+ssh tuananh@dev.tanhdev.com -p 8785 \
+  "kubectl get application -n argocd <service>-dev \
+   -o jsonpath='{.status.sync.revision} {.status.sync.status} {.status.health.status}' && echo ''"
+
+# If still OutOfSync, force sync via patch
+ssh tuananh@dev.tanhdev.com -p 8785 \
+  "kubectl patch application <service>-dev -n argocd \
+   --type merge \
+   -p '{\"operation\":{\"initiatedBy\":{\"username\":\"admin\"},\"sync\":{\"revision\":\"HEAD\",\"prune\":true}}}'"
+```
+
+### Step 6: Verify
+
+```bash
+# Watch pods until Running
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+
+# Rollout status
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl rollout status deployment/<service> -n <service>-dev --timeout=90s"
+
+# Confirm secret was created
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get secret <name> -n <service>-dev"
 ```
 
 ---
 
-### Issue 5: Migration Job Failures
+## Common Issues — Quick Reference
 
-**Diagnosis:**
+### CreateContainerConfigError — Missing Secret
+Secret referenced in `secretRef` does not exist in the namespace.
+1. Create `overlays/dev/secrets.yaml` with the correct secret name
+2. Add `- secrets.yaml` to `overlays/dev/kustomization.yaml` resources list
+3. Commit → push → sync
+
+### CrashLoopBackOff — Bad Config / DB unreachable
+Check logs → compare `<service>/configs/config.yaml` with `overlays/dev/configmap.yaml`.
+Fix the mismatch → commit → push → sync.
+
+### ImagePullBackOff — Wrong tag
 ```bash
-kubectl get jobs -n <service>-dev
-kubectl logs job/<service>-migration -n <service>-dev
+cd /home/user/microservices/<service> && git rev-parse --short HEAD
 ```
+Update `newTag` in `overlays/dev/kustomization.yaml` → commit → push → sync.
 
-**GitOps Fixes:**
-
-**5a. Stuck old job (most common):**
-Delete the stuck job, then ArgoCD recreates it on next sync:
+### kustomize build error — Duplicate YAML key / bad manifest
 ```bash
-kubectl delete job <service>-migration -n <service>-dev
-argocd app sync <service>-dev --force
+kubectl kustomize /home/user/microservices/gitops/apps/<service>/overlays/dev 2>&1
 ```
+Fix the YAML error in the reported file → commit → push → sync.
 
-**5b. Wrong migration image:**
-Edit `gitops/apps/<service>/base/migration-job.yaml` to use correct image. Also ensure kustomization image override covers the migration job container image name.
+### Dapr sidecar NotReady — app-port mismatch
+`dapr.io/app-port` in deployment annotation must match the port the app's HTTP server actually listens on.
+Fix in `base/deployment.yaml` or `base/worker-deployment.yaml` → commit → push → sync.
 
-**5c. Missing Goose annotations in SQL:**
-Fix the migration file in `<service>/migrations/`, commit+push the service code, wait for CI, update gitops tag, commit+push gitops, force sync.
+### Stuck Migration Job
+```bash
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl delete job <service>-migration -n <service>-dev"
+# Then sync to recreate
+```
 
 ---
 
-## GitOps File Reference
-
-| What | File Location |
-|------|---------------|
-| **Image tag** (most edited) | `gitops/apps/<service>/overlays/dev/kustomization.yaml` |
-| **ConfigMap** (env vars) | `gitops/apps/<service>/overlays/dev/configmap.yaml` |
-| **Deployment** (containers, ports, probes) | `gitops/apps/<service>/base/deployment.yaml` |
-| **Service** (K8s service, ports) | `gitops/apps/<service>/base/service.yaml` |
-| **Migration job** | `gitops/apps/<service>/base/migration-job.yaml` |
-| **Secrets** | `gitops/apps/<service>/overlays/dev/secrets.yaml` |
-| **Dapr components** | `gitops/apps/<service>/base/dapr-*.yaml` |
-| **Network policy** | `gitops/apps/<service>/base/networkpolicy.yaml` |
-| **Base kustomization** | `gitops/apps/<service>/base/kustomization.yaml` |
-
----
-
-## Quick Diagnosis Commands
+## Bulk Audit — All Services
 
 ```bash
-# Get all pods across all service namespaces
-kubectl get pods --all-namespaces | grep -E '(NAME|-dev)'
+# Check kustomize build for ALL services at once
+for svc in $(ls /home/user/microservices/gitops/apps/); do
+  if [ -d "/home/user/microservices/gitops/apps/$svc/overlays/dev" ]; then
+    kubectl kustomize /home/user/microservices/gitops/apps/$svc/overlays/dev > /dev/null 2>&1 \
+      && echo "✅ $svc" || echo "❌ $svc"
+  fi
+done
 
-# Get pods for a specific service
-kubectl get pods -n <service>-dev
+# All pods across dev namespaces
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep '\-dev'"
 
-# Watch pod status changes
-kubectl get pods -n <service>-dev -w
-
-# Get recent events for a namespace
-kubectl get events -n <service>-dev --sort-by=.metadata.creationTimestamp | tail -20
-
-# Get all ArgoCD applications and their sync status
-argocd app list
-
-# Check what image is currently deployed
-kubectl get deployment -n <service>-dev -o jsonpath='{.items[0].spec.template.spec.containers[0].image}'
-```
-
-## GitOps Fix + Force Sync (Copy-Paste Template)
-
-```bash
-# 1. Edit the gitops files (configmap, deployment, kustomization, etc.)
-# 2. Then run:
-cd /home/user/microservices/gitops && git add -A && git commit -m "fix: <service> <description>" && git push origin main
-
-# 3. Force sync ArgoCD
-argocd app sync <service>-dev --force
-
-# 4. Verify
-kubectl get pods -n <service>-dev -w
+# Find pods not Running
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep -v 'Running\|Completed\|NAME'"
 ```

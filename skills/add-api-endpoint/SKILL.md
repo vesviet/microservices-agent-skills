@@ -30,6 +30,25 @@ Adding a new endpoint requires changes across multiple layers:
 6. Wire DI (cmd/<service>/wire.go)            ← dependency injection
 ```
 
+> [!CAUTION]
+> **NEVER add custom HTTP handlers via `srv.HandleFunc()` in `http.go`.**
+> ALL endpoints MUST be defined in proto with `google.api.http` annotations.
+> This ensures consistent middleware (auth, recovery, tracing), gRPC+REST dual support, and code generation.
+>
+> **Anti-pattern** (DO NOT DO THIS):
+> ```go
+> // ❌ WRONG: Custom handler bypasses middleware pipeline
+> srv.HandleFunc("/api/v1/checkout/validate-inventory", func(w http.ResponseWriter, r *http.Request) { ... })
+> ```
+>
+> **Correct pattern**:
+> ```protobuf
+> // ✅ RIGHT: Define in proto, implement in service layer
+> rpc ValidateInventory(ValidateInventoryRequest) returns (ValidateInventoryReply) {
+>   option (google.api.http) = { post: "/api/v1/checkout/validate-inventory" body: "*" };
+> };
+> ```
+
 ## Step-by-Step Process
 
 ### Step 1: Define the API in Proto
