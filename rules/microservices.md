@@ -60,4 +60,5 @@ This is a comprehensive, production-grade e-commerce microservices platform.
 - **Proto definitions**: `api/<service>/v1/`.
 - **Migrations**: `migrations/` (Goose).
 - **Common Lib Use**: Prefer `gitlab.com/ta-microservices/common` for shared logic.
+- **CRITICAL — Check Before Creating**: Before proposing to add ANY new code to `common` or to any service, ALWAYS thoroughly search the existing `common` library first (grep all packages: `data/`, `utils/`, `repository/`, `client/`, `events/`, `outbox/`, `worker/`, `registry/`, `config/`). Many interfaces and utilities already exist — import them instead of duplicating. This applies to: transaction managers, cache helpers, event publishers, gRPC factories, outbox patterns, etc.
 - **Commenting Rules**: Do not use "P-0" or "[ ]" format in code comments. Keep code explanation comments to a maximum of 3 lines.
