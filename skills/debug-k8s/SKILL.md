@@ -69,7 +69,7 @@ Edit the relevant file(s) in `/home/user/microservices/gitops/apps/<service>/`.
 
 | What to fix | File |
 |---|---|
-| Image tag | `overlays/dev/kustomization.yaml` → `newTag` |
+| Image tag | 🚫 **NEVER modify manually** (Handled by CI/CD) |
 | Env vars / config | `overlays/dev/configmap.yaml` |
 | Secrets (DB password, keys) | `overlays/dev/secrets.yaml` |
 | Ports, probes, Dapr annotations | `base/deployment.yaml` or `base/worker-deployment.yaml` |
@@ -167,10 +167,8 @@ Check logs → compare `<service>/configs/config.yaml` with `overlays/dev/config
 Fix the mismatch → commit → push → sync.
 
 ### ImagePullBackOff — Wrong tag
-```bash
-cd /home/user/microservices/<service> && git rev-parse --short HEAD
-```
-Update `newTag` in `overlays/dev/kustomization.yaml` → commit → push → sync.
+⚠️ **NEVER manually update `newTag` in `kustomization.yaml`** — CI/CD pipeline automatically updates image tags after building.
+If an image is missing, trigger a CI build in GitLab to build and update the image tags automatically.
 
 ### kustomize build error — Duplicate YAML key / bad manifest
 ```bash
@@ -207,3 +205,55 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep '\
 # Find pods not Running
 ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep -v 'Running\|Completed\|NAME'"
 ```
+
+---
+
+## Checklist
+
+### Diagnosis
+- [ ] Pod status checked
+- [ ] Events reviewed
+- [ ] Logs examined
+- [ ] Previous crash logs checked
+
+### Fix
+- [ ] Root cause identified
+- [ ] GitOps file edited
+- [ ] Kustomize build verified
+- [ ] Changes committed and pushed
+
+### Verification
+- [ ] ArgoCD hard refresh triggered
+- [ ] Pods running
+- [ ] Service accessible
+- [ ] No errors in logs
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid K8s debugging:
+
+### Diagnose
+- [ ] Check pod status
+- [ ] Review events
+- [ ] Check logs
+
+### Fix
+- [ ] Edit GitOps files
+- [ ] Verify kustomize
+- [ ] Commit + push
+
+### Deploy
+- [ ] Trigger ArgoCD sync
+- [ ] Verify pods running
+
+---
+
+## Related Skills
+
+- **setup-gitops**: Update GitOps configuration
+- **troubleshoot-service**: Debug service-level issues
+- **commit-code**: Commit GitOps changes
+- **trace-event-flow**: Debug event communication issues
+- **review-service**: Full service review including deployment

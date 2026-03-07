@@ -469,3 +469,36 @@ outboxRepo.Save(ctx, outboxEvent)
 - [ ] Error handling: retry vs skip for permanent errors
 - [ ] **CHANGELOG.md updated** (new consumer = MINOR version bump)
 - [ ] **If topic constant added to `common`**: tag common with new version (`v1.x.y`)
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid event handler addition:
+
+### Publisher Setup
+- [ ] Topic constant defined in common
+- [ ] Event struct created
+- [ ] Publisher method implemented
+- [ ] Called from biz layer
+
+### Consumer Setup
+- [ ] Consumer struct created
+- [ ] Handler method implemented
+- [ ] Wire DI configured
+- [ ] Worker registered
+
+### Verification
+- [ ] Build passes
+- [ ] Event flow tested
+- [ ] CHANGELOG updated
+
+---
+
+## Related Skills
+
+- **trace-event-flow**: Trace event communication between services
+- **troubleshoot-service**: Debug event publishing/consuming issues
+- **use-common-lib**: Use common event utilities
+- **commit-code**: Commit event handler changes
+- **review-code**: Review event handler implementation

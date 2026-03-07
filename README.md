@@ -1,6 +1,6 @@
 # 🛠️ Microservices Agent Skills
 
-> A collection of **19 AI agent skills** and **10 workflows** for developing, reviewing, and operating a production-grade e-commerce microservices platform.
+> A collection of **15 AI agent skills** and **7 workflows** for developing, reviewing, and operating a production-grade e-commerce microservices platform.
 
 ## 🏗️ Project Context
 
@@ -23,57 +23,50 @@ These skills are designed for a **Go microservices platform** built with:
 
 | Skill | Description | When to Use |
 |-------|-------------|-------------|
-| [**add-api-endpoint**](skills/add-api-endpoint/SKILL.md) | Add new REST/gRPC endpoints | Adding CRUD operations, new business APIs |
-| [**add-event-handler**](skills/add-event-handler/SKILL.md) | Add event publishers & consumers | Inter-service communication via Dapr PubSub |
-| [**add-service-client**](skills/add-service-client/SKILL.md) | Add gRPC client for service-to-service calls | Service A needs to call Service B |
-| [**create-migration**](skills/create-migration/SKILL.md) | Create database migrations (Goose) | Schema changes, new tables, indexes |
-| [**scaffold-new-service**](skills/scaffold-new-service/SKILL.md) | Scaffold a new microservice from scratch | Creating an entirely new service |
+| [**add-api-endpoint**](skills/add-api-endpoint/SKILL.md) | Add new REST/gRPC endpoints following Kratos + Clean Architecture patterns | Adding CRUD operations, new business APIs |
+| [**add-event-handler**](skills/add-event-handler/SKILL.md) | Add event publishers & consumers via Dapr PubSub | Inter-service communication, event-driven workflows |
+| [**add-service-client**](skills/add-service-client/SKILL.md) | Add gRPC client for service-to-service calls via service discovery | Service A needs to call Service B |
+| [**create-migration**](skills/create-migration/SKILL.md) | Create database migrations using Goose format | Schema changes, new tables, indexes |
 
 ### 🔍 Understanding & Navigation
 
 | Skill | Description | When to Use |
 |-------|-------------|-------------|
-| [**navigate-service**](skills/navigate-service/SKILL.md) | Navigate and understand service structure | First time exploring a service |
-| [**service-structure**](skills/service-structure/SKILL.md) | Dual-binary architecture (main + worker) | Understanding main vs worker processes |
-| [**service-map**](skills/service-map/SKILL.md) | Quick-reference map of all microservices | Finding ports, dependencies, gRPC clients, event flows |
-| [**trace-event-flow**](skills/trace-event-flow/SKILL.md) | Trace event-driven communication flows | Debugging event chains across services |
-| [**use-common-lib**](skills/use-common-lib/SKILL.md) | Reference guide for shared `common` library | Before writing custom code — check if it exists |
+| [**navigate-service**](skills/navigate-service/SKILL.md) | Navigate and understand service structure, architecture layers, and key components | First time exploring a service |
+| [**service-structure**](skills/service-structure/SKILL.md) | Understand the dual-binary architecture (main + worker) | Understanding main vs worker processes |
+| [**trace-event-flow**](skills/trace-event-flow/SKILL.md) | Trace event-driven communication flows between microservices | Debugging event chains across services |
+| [**use-common-lib**](skills/use-common-lib/SKILL.md) | Reference guide for the shared `common` library | Before writing custom code — check if it already exists |
 
 ### ✅ Quality & Review
 
 | Skill | Description | When to Use |
 |-------|-------------|-------------|
-| [**review-code**](skills/review-code/SKILL.md) | **Tech Lead level** code review (P0/P1/P2) | Code reviews, PR reviews |
+| [**review-code**](skills/review-code/SKILL.md) | Code review following coding standards and Clean Architecture principles | Code reviews, PR reviews |
 | [**review-service**](skills/review-service/SKILL.md) | Full service review & release pipeline | End-to-end service audit, tagging, and release |
-| [**write-tests**](skills/write-tests/SKILL.md) | Testing patterns (testify, table-driven, mocks) | Writing unit & integration tests |
-| [**commit-code**](skills/commit-code/SKILL.md) | Pre-commit validation, dependency management, git | Validating and committing changes |
+| [**write-tests**](skills/write-tests/SKILL.md) | Testing patterns (testify, table-driven, mockgen-generated mocks) | Writing unit & integration tests |
+| [**commit-code**](skills/commit-code/SKILL.md) | Pre-commit validation, dependency management, git workflow | Validating and committing changes |
 
 ### 🚀 Operations & Deployment
 
 | Skill | Description | When to Use |
 |-------|-------------|-------------|
-| [**setup-gitops**](skills/setup-gitops/SKILL.md) | Set up GitOps config (Kustomize overlays) | New service deployment, config updates |
-| [**debug-k8s**](skills/debug-k8s/SKILL.md) | Debug Kubernetes deployment issues | Pods crashing, ImagePullBackOff, sync failures |
-| [**troubleshoot-service**](skills/troubleshoot-service/SKILL.md) | Troubleshoot service runtime issues | Build errors, connection failures, crashes |
-| [**database-maintenance**](skills/database-maintenance/SKILL.md) | Database backup, restore, PITR, maintenance | PostgreSQL backup/restore, point-in-time recovery |
-| [**manage-secrets**](skills/manage-secrets/SKILL.md) | Secret and environment variable management | Managing sensitive config across services |
+| [**setup-gitops**](skills/setup-gitops/SKILL.md) | Set up or update GitOps config (Kustomize overlays, ConfigMaps, Secrets, Deployments) | New service deployment, config updates |
+| [**debug-k8s**](skills/debug-k8s/SKILL.md) | Debug Kubernetes deployment issues (pods, services, configs, images, ArgoCD) | Pods crashing, ImagePullBackOff, sync failures |
+| [**troubleshoot-service**](skills/troubleshoot-service/SKILL.md) | Troubleshoot service runtime issues (build errors, crashes, connection failures) | Build errors, connection failures, crashes |
 
 ## ⚡ Workflows
 
-Workflows are slash-command-invoked procedures in `workflows/`. See [workflows README](workflows/README.md) for turbo mode settings.
+Workflows are step-by-step procedures stored in `workflows/`. See [workflows README](workflows/README.md) for details.
 
-| Slash Command | Purpose | Optimization |
-|---------------|---------|-------------|
-| `/add-api-quick` | Adding new API endpoints | Speed via patterns |
-| `/architecture-planning` | Complex multi-service changes | Deep reasoning |
-| `/debug-issue` | Troubleshooting and debugging | Problem-solving |
-| `/deep-review` | Thorough code review | Quality |
-| `/git-operations` | Git across all microservices | Batch operations |
-| `/plan-event-driven` | Event-driven architecture | Async patterns |
-| `/quick-docs` | Documentation updates | Clarity |
-| `/quick-refactor` | Fast, focused refactoring | Speed |
-| `/write-test-coverage` | Writing comprehensive tests | Coverage |
-| `/wsl-terminal` | WSL terminal usage | Reference |
+| Slash Command | Purpose |
+|---------------|---------|
+| `/add-new-feature` | Complete workflow for adding a new feature to a microservice |
+| `/build-deploy` | How to build and deploy a microservice |
+| `/hotfix-production` | Emergency workflow for hotfixing production issues |
+| `/refactoring` | Safely refactoring code while maintaining functionality |
+| `/service-review-release` | Complete workflow for reviewing and releasing a microservice to production |
+| `/setup-new-service` | Setting up a new microservice from scratch |
+| `/troubleshooting` | Troubleshooting common service issues |
 
 ## 🏛️ Architecture
 
@@ -110,7 +103,7 @@ The `review-code` and `review-service` skills use **P0/P1/P2** severity:
 
 ## 🚀 Usage
 
-### For AI Agents (Cursor, Copilot, etc.)
+### For AI Agents (Cursor, Gemini CLI, etc.)
 
 Place in your workspace as `.agent/`:
 ```
@@ -121,11 +114,11 @@ Place in your workspace as `.agent/`:
 │   ├── ...
 │   └── write-tests/SKILL.md
 ├── workflows/
-│   ├── add-api-quick.md
+│   ├── add-new-feature.md
 │   ├── ...
-│   └── wsl-terminal.md
+│   └── troubleshooting.md
 └── rules/
-    └── testcase.md
+    └── microservices.md
 ```
 
 The AI agent will automatically discover and use relevant skills when you ask it to perform related tasks.
@@ -138,22 +131,13 @@ Use these as **reference guides** when:
 - Debugging issues (K8s, service problems)
 - Understanding the codebase structure
 
-## 📚 Related Documentation
-
-- **Coding Standards**: `docs/07-development/standards/coding-standards.md`
-- **Team Lead Review Guide**: `docs/07-development/standards/TEAM_LEAD_CODE_REVIEW_GUIDE.md`
-- **Development Review Checklist**: `docs/07-development/standards/development-review-checklist.md`
-- **Service Review & Release**: `docs/07-development/standards/service-review-release-prompt.md`
-- **Common Package Usage**: `docs/07-development/standards/common-package-usage.md`
-
 ## 📊 Stats
 
-- **19 skills** covering the full development lifecycle
-- **10 workflows** for common developer tasks
-- **108 review checklist items** in the tech lead review skill
-- **16 review categories** including cross-service impact analysis
+- **15 skills** covering the full development lifecycle
+- **7 workflows** for common developer tasks
+- **1 rule** defining project context and standards
 
 ---
 
-**Maintained by**: Development Team  
-**Last Updated**: 2026-02-18
+**Maintained by**: Development Team
+**Last Updated**: 2026-03-07

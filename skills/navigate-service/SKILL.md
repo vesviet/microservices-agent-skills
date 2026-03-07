@@ -167,3 +167,54 @@ When presenting a service overview, structure your response as:
 5. **Data Model** - Database schema (from migrations)
 6. **Dependencies** - Other services it calls and infrastructure needs
 7. **Event Integration** - Events published/subscribed
+
+---
+
+## Checklist
+
+### Service Understanding
+- [ ] Service purpose identified
+- [ ] Directory structure reviewed
+- [ ] Entry point examined
+- [ ] API contracts understood
+
+### Architecture Review
+- [ ] Domain layer reviewed
+- [ ] Data layer reviewed
+- [ ] Service layer reviewed
+- [ ] Dependencies identified
+
+### Documentation
+- [ ] Key components documented
+- [ ] Event flows understood
+- [ ] Configuration reviewed
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid service navigation:
+
+### Initial Exploration
+- [ ] Identify service directory
+- [ ] Review README.md
+- [ ] Check proto definitions
+
+### Deep Dive
+- [ ] Review biz layer
+- [ ] Review data layer
+- [ ] Review service layer
+
+### Understanding
+- [ ] Document key flows
+- [ ] Identify dependencies
+
+---
+
+## Related Skills
+
+- **review-service**: Full service review and release
+- **troubleshoot-service**: Debug service issues
+- **trace-event-flow**: Understand event communication
+- **add-api-endpoint**: Add new endpoints
+- **service-structure**: Understand dual-binary architecture

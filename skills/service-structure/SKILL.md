@@ -547,3 +547,38 @@ cd /home/user/microservices/<service> && go build ./...
 - [ ] Wire regenerated (`wire` command)
 - [ ] Build passes (`go build ./...`)
 - [ ] Worker name follows convention: descriptive, lowercase with hyphens
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid worker addition:
+
+### Setup
+- [ ] Identified worker type (cron/event/outbox)
+- [ ] Checked existing workers for patterns
+- [ ] Determined worker name
+
+### Implementation
+- [ ] Worker struct created
+- [ ] ContinuousWorker interface implemented
+- [ ] Business logic added
+
+### Integration
+- [ ] Wire provider added
+- [ ] newWorkers() updated
+- [ ] Wire regenerated
+
+### Verification
+- [ ] Build passes
+- [ ] Worker starts correctly
+
+---
+
+## Related Skills
+
+- **add-event-handler**: Add event consumers to worker
+- **troubleshoot-service**: Debug worker issues
+- **commit-code**: Commit worker changes
+- **review-code**: Review worker implementation
+- **use-common-lib**: Use common worker utilities

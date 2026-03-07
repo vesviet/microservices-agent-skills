@@ -233,3 +233,35 @@ Ref: [Coding Standards §3](docs/07-development/standards/coding-standards.md)
 - [ ] Build passes (`go build ./...`)
 - [ ] **CHANGELOG.md updated** with migration description
 - [ ] **Version impact assessed** (add column = MINOR, remove column = MAJOR)
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid migration creation:
+
+### Setup
+- [ ] Checked existing migrations
+- [ ] Determined sequence number
+- [ ] Understood current schema
+
+### Implementation
+- [ ] Migration file created
+- [ ] Up migration written
+- [ ] Down migration written
+- [ ] Annotations added
+
+### Verification
+- [ ] GORM model updated
+- [ ] Repository updated
+- [ ] CHANGELOG updated
+
+---
+
+## Related Skills
+
+- **add-api-endpoint**: Add endpoint that uses new schema
+- **troubleshoot-service**: Debug migration issues
+- **commit-code**: Commit migration changes
+- **review-code**: Review migration before commit
+- **use-common-lib**: Use common base model

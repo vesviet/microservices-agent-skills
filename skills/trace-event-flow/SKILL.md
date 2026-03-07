@@ -273,3 +273,52 @@ Common causes:
 **NEVER** use dotted keys like `doc["name.suggest"]` in Go maps that get serialized to JSON for ES.
 Go serializes it as `{"name.suggest": value}` which ES interprets as nested path `name` → `suggest`, overwriting the `name` text field with an object and causing `document_parsing_exception`.
 ES multi-fields (e.g., `name.suggest`, `name.ngram`) are auto-indexed from the parent text value — no explicit handling needed.
+
+---
+
+## Checklist
+
+### Event Tracing
+- [ ] Event topic identified
+- [ ] Publisher found
+- [ ] Subscriber found
+- [ ] Event structure understood
+
+### Debugging
+- [ ] Publisher logs checked
+- [ ] Subscriber logs checked
+- [ ] Dapr configuration verified
+- [ ] Event flow tested
+
+### Implementation
+- [ ] Event defined in common
+- [ ] Publisher implemented
+- [ ] Subscriber implemented
+- [ ] Dapr subscription configured
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid event flow tracing:
+
+### Trace Flow
+- [ ] Identify event topic
+- [ ] Find publisher
+- [ ] Find subscriber
+- [ ] Check event structure
+
+### Debug Issues
+- [ ] Check logs
+- [ ] Verify Dapr config
+- [ ] Test event flow
+
+---
+
+## Related Skills
+
+- **add-event-handler**: Add new event publishers/consumers
+- **troubleshoot-service**: Debug event processing issues
+- **debug-k8s**: Debug Dapr deployment issues
+- **use-common-lib**: Use common event utilities
+- **review-code**: Review event handler implementation

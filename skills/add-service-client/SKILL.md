@@ -364,3 +364,35 @@ data:
 - [ ] Service address configured (config.yaml + K8s configmap)
 - [ ] Build passes (`go build ./...`)
 - [ ] **CHANGELOG.md updated** (new service client = MINOR version bump)
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid client addition:
+
+### Setup
+- [ ] Identified target service and proto package
+- [ ] Determined which methods are needed
+- [ ] Checked existing clients for patterns
+
+### Implementation
+- [ ] Client interface defined
+- [ ] gRPC client implemented
+- [ ] Helper functions added
+- [ ] Wire DI configured
+
+### Configuration
+- [ ] Service address in config.yaml
+- [ ] K8s ConfigMap updated
+- [ ] Build passes
+
+---
+
+## Related Skills
+
+- **navigate-service**: Understand target service structure
+- **troubleshoot-service**: Debug gRPC connection issues
+- **use-common-lib**: Use common circuit breaker utilities
+- **commit-code**: Commit client changes
+- **review-code**: Review client implementation

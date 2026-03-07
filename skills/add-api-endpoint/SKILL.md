@@ -395,16 +395,66 @@ git push origin v1.3.0
 
 ## Checklist
 
+### Proto & Code Generation
 - [ ] Proto file updated with new RPC and messages
 - [ ] Proto code generated (`make api`)
+- [ ] HTTP method and URL pattern follow conventions
+
+### Domain & Business Logic
 - [ ] Domain entity created in `internal/biz/`
 - [ ] Repository interface defined in `internal/biz/`
+- [ ] Use case logic implemented
+
+### Data Layer
 - [ ] Repository implemented in `internal/data/`
-- [ ] Service method implemented in `internal/service/`
-- [ ] Wire providers added and regenerated
-- [ ] Routes registered in server
-- [ ] Build passes (`go build ./...`)
 - [ ] Database migration created (if new table/columns needed)
+
+### Service Layer
+- [ ] Service method implemented in `internal/service/`
+- [ ] Input validation added
+- [ ] Error handling with Kratos errors
+
+### Dependency Injection
+- [ ] Wire providers added
+- [ ] Wire regenerated (`wire`)
+- [ ] Routes registered in server
+
+### Quality & Documentation
+- [ ] Build passes (`go build ./...`)
 - [ ] **CHANGELOG.md updated** with new entries under `[Unreleased]`
 - [ ] **Version impact assessed** (MAJOR/MINOR/PATCH)
 - [ ] **No breaking changes** in current version (or new API version created)
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid endpoint addition:
+
+### Setup
+- [ ] Identified endpoint requirements (CRUD operation, business logic)
+- [ ] Checked existing endpoints for patterns
+- [ ] Determined version impact
+
+### Implementation
+- [ ] Proto defined with google.api.http annotations
+- [ ] Code generated (`make api`)
+- [ ] Biz layer implemented
+- [ ] Data layer implemented
+- [ ] Service layer implemented
+- [ ] Wire DI configured
+
+### Verification
+- [ ] Build passes
+- [ ] Lint passes
+- [ ] CHANGELOG updated
+
+---
+
+## Related Skills
+
+- **create-migration**: Create database migrations for new tables/columns
+- **write-tests**: Add tests for new endpoint
+- **review-code**: Review endpoint implementation before commit
+- **commit-code**: Commit and push changes following conventions
+- **use-common-lib**: Check common library for existing utilities

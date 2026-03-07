@@ -59,10 +59,10 @@ patches:
 images:
   - name: <service>-service
     newName: registry-api.tanhdev.com/<service>-service
-    newTag: "abc1234"  # ← Git commit short SHA
+    newTag: "abc1234"  # ← Git commit short SHA (UPDATED AUTOMATICALLY BY CI/CD)
 ```
 
-**To update image tag**: Change `newTag` to the new commit SHA.
+⚠️ **NEVER manually update `newTag` in `kustomization.yaml`** — The CI/CD pipeline automatically updates image tags after building. Do not update this file manually for deployments.
 
 ### `base/deployment.yaml` - Deployment Manifest
 
@@ -174,14 +174,41 @@ spec:
   backoffLimit: 3
 ```
 
+### `base/hpa.yaml` - HorizontalPodAutoscaler
+Every production-ready service MUST have an HPA to ensure scalability.
+⚠️ **Sync-Wave Rule**: HPA MUST have a `sync-wave` at least **1 level higher** than the Deployment.
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: <service>
+  annotations:
+    argocd.argoproj.io/sync-wave: "X+1" # Use X+1 relative to Deployment wave X
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: <service>
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+```
+
 ## Common Operations
 
 ### Deploy a New Version
-1. Push code to GitLab (CI builds Docker image)
-2. Get commit SHA: `cd <service> && git rev-parse --short HEAD`
-3. Update `gitops/apps/<service>/overlays/dev/kustomization.yaml` → `newTag: <sha>`
-4. Commit and push gitops: `cd gitops && git add -A && git commit -m "deploy: <service> <sha>" && git push`
-5. ArgoCD auto-syncs within 3 minutes
+1. Push code to GitLab
+2. CI/CD pipeline automatically builds the Docker image.
+3. CI/CD pipeline automatically updates `newTag` in `gitops/apps/<service>/overlays/dev/kustomization.yaml`.
+4. CI/CD pushes the GitOps changes.
+5. ArgoCD auto-syncs within 3 minutes (or you can trigger a hard refresh).
 
 ### Add New Environment Variable
 1. Edit `gitops/apps/<service>/overlays/dev/configmap.yaml`
@@ -233,4 +260,36 @@ To register a service with ArgoCD, an Application manifest is needed (usually in
 - [ ] Dapr components (if service uses events)
 - [ ] Kustomization files (base + overlay)
 - [ ] ArgoCD Application registered
-- [ ] Image tag set to valid commit SHA
+- [ ] Image tag is handled correctly by CI/CD (do not set manually)
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid GitOps setup:
+
+### Base Configuration
+- [ ] Namespace created
+- [ ] Deployment manifest
+- [ ] Service manifest
+- [ ] Migration job
+
+### Environment Configuration
+- [ ] ConfigMap with env vars
+- [ ] Secrets configured
+- [ ] Kustomization files
+
+### Verification
+- [ ] Kustomize build passes
+- [ ] ArgoCD registered
+- [ ] Ports follow standard
+
+---
+
+## Related Skills
+
+- **debug-k8s**: Debug deployment issues
+- **troubleshoot-service**: Debug service configuration
+- **commit-code**: Commit GitOps changes
+- **review-service**: Full service review including GitOps
+- **add-api-endpoint**: Update ConfigMap for new endpoints

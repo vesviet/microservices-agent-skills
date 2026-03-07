@@ -12,6 +12,61 @@ Use this skill to review an entire service for production readiness and prepare 
 - When running the full service release process
 - Before a major feature merge or production deployment of a microservice
 
+## Review Flow Overview
+
+```
+Step 0: Sync Latest Code (git pull)
+        ↓
+Step 1: Index & Review Codebase
+        ├── Architecture & layers
+        ├── API contracts
+        ├── Business logic
+        ├── Data layer
+        └── List P0/P1/P2 issues
+        ↓
+Step 2: Cross-Service Impact Analysis
+        ├── Proto backward compatibility
+        ├── Event schema compatibility
+        └── Go module dependencies
+        ↓
+Step 3: Create Review Checklist
+        └── Track findings in docs/10-appendix/workflow/
+        ↓
+Step 4: Action Plan & Bug Fixes
+        ├── Create action plan for P0/P1
+        └── Implement fixes immediately
+        ↓
+Step 5: Test Coverage Check
+        ├── Run coverage
+        └── Update TEST_COVERAGE_CHECKLIST.md
+        ↓
+Step 6: Dependencies (Go Modules)
+        ├── Check/tag common if changed
+        ├── Remove replace directives
+        └── Update to latest versions
+        ↓
+Step 7: Lint & Build
+        ├── Generate proto (make api)
+        ├── Regenerate Wire
+        ├── Run golangci-lint
+        └── Build & test
+        ↓
+Step 8: Deployment Readiness
+        ├── Verify port allocation
+        ├── Check config/GitOps alignment
+        └── Verify health probes & resources
+        ↓
+Step 9: Documentation
+        ├── Update service doc
+        ├── Update README.md
+        └── Update CHANGELOG.md
+        ↓
+Step 10: Commit & Release
+        ├── Commit with conventional format
+        ├── Tag version (if releasing)
+        └── Update GitOps (if config changed)
+```
+
 ---
 
 ## Standards (read first)
@@ -97,12 +152,90 @@ grep -r 'Topic.*<serviceName>' /home/user/microservices/*/internal/ --include='*
 - Align items with TEAM_LEAD_CODE_REVIEW_GUIDE and development-review-checklist (P0/P1/P2).
 - Mark completed items; add items for remaining work. **Skip adding or requiring test-case tasks** (per user request).
 
-### Step 4: Dependencies (Go Modules)
+### Step 4: Action Plan & Bug Fix Implementation
+
+> [!IMPORTANT]
+> **If bugs are found during review, create an action plan and implement fixes immediately.** Do NOT just log issues and move on — fix P0 and P1 bugs in-place during the review process.
+
+#### 4.1 Create Action Plan
+
+For each P0/P1 issue found in Step 1–3, create a concrete action plan:
+
+```markdown
+## 🔧 Action Plan for <serviceName>
+
+### P0 Fixes (implement now)
+| # | Issue | File:Line | Root Cause | Fix Description | Status |
+|---|-------|-----------|------------|-----------------|--------|
+| 1 | ... | ... | ... | ... | ⬜ TODO / ✅ Done |
+
+### P1 Fixes (implement now if time allows)
+| # | Issue | File:Line | Root Cause | Fix Description | Status |
+|---|-------|-----------|------------|-----------------|--------|
+| 1 | ... | ... | ... | ... | ⬜ TODO / ✅ Done |
+
+### P2 Notes (document only)
+| # | Issue | File:Line | Description |
+|---|-------|-----------|-------------|
+| 1 | ... | ... | ... |
+```
+
+#### 4.2 Implement Bug Fixes
+
+1. **Fix P0 bugs first** — these are blocking and must be resolved before release.
+2. **Fix P1 bugs** — implement if time allows; otherwise, document in the review checklist.
+3. **For each fix**:
+   - Identify root cause
+   - Implement the fix in the correct layer (biz/data/service)
+   - Run `go build ./...` and `go test ./...` after each fix to verify
+   - Mark the action plan item as ✅ Done
+4. **If a fix requires changes in `common`**: follow Step 4 (Dependencies) to commit + tag common first.
+
+> [!WARNING]
+> **Do NOT skip bug fixes.** The purpose of this review is to catch and fix issues before release. If a P0 bug is found, the service CANNOT be released until it is fixed.
+
+### Step 5: Test Coverage Check
+
+> [!NOTE]
+> **After completing the review, check the service's test coverage and update the central checklist.**
+
+#### 5.1 Run Coverage
+
+```bash
+cd /home/user/microservices/<serviceName>
+
+# Full coverage by package
+go test ./internal/... -count=1 -cover 2>&1 | grep -E '^ok|^FAIL'
+
+# Service layer detailed coverage
+go test ./internal/service/... -count=1 -coverprofile=/tmp/<serviceName>_service_cover.out
+go tool cover -func=/tmp/<serviceName>_service_cover.out | tail -30
+```
+
+#### 5.2 Update Test Coverage Checklist
+
+Update `docs/10-appendix/checklists/test/TEST_COVERAGE_CHECKLIST.md` with:
+- Current coverage numbers for each package (biz, service, data)
+- Status changes (e.g., from ⚠️ to ✅ if coverage crossed 60%)
+- Work done description (what tests were added/fixed)
+- Test file counts
+- Update the dashboard section (total test files, services above 60%)
+- Update the `Last Updated` timestamp
+
+#### 5.3 Coverage Targets
+
+| Layer | Target | Priority |
+|-------|--------|----------|
+| Biz | ≥60% | High — core business logic |
+| Service | ≥60% | Medium — gRPC handler tests |
+| Data | ≥60% | Lower — repository tests |
+
+### Step 6: Dependencies (Go Modules)
 
 > [!CAUTION]
 > **NO `replace` directives for `gitlab.com/ta-microservices` are allowed.** This works locally but breaks CI/CD.
 
-#### 4.1 Check if `common` changed
+#### 6.1 Check if `common` changed
 
 ```bash
 # If common has uncommitted changes, it MUST be committed + tagged FIRST
@@ -124,7 +257,7 @@ git push origin main && git push origin v1.x.y
 > [!IMPORTANT]
 > **Common must be tagged before any service commit.** Services import `common` via `go get @<tag>`. If the service is committed before common is tagged, `go.mod` references a non-existent version.
 
-#### 4.2 Convert replace to import (if needed)
+#### 6.2 Convert replace to import (if needed)
 
 ```bash
 # Check for forbidden replace directives
@@ -137,7 +270,7 @@ go get gitlab.com/ta-microservices/<other-dep>@latest
 go mod tidy
 ```
 
-#### 4.3 Update dependencies
+#### 6.3 Update dependencies
 
 ```bash
 cd /home/user/microservices/<serviceName>
@@ -152,7 +285,7 @@ go mod tidy
 > [!IMPORTANT]
 > **Rule on Internal Dependencies**: When importing other services or packages from `gitlab.com/ta-microservices` via `go.mod`, ALWAYS ensure you are pulling their latest tagged version using `go get gitlab.com/ta-microservices/<dependency>@latest`. Do NOT use outdated versions.
 
-### Step 5: Lint & Build
+### Step 7: Lint & Build
 
 ```bash
 cd /home/user/microservices/<serviceName>
@@ -178,7 +311,7 @@ go test ./...
 > [!NOTE]
 > **Never manually edit `wire_gen.go` or `*.pb.go`** — these files are auto-generated. Always use `wire` and `make api` to regenerate.
 
-### Step 6: Deployment Readiness (GitOps Alignment)
+### Step 8: Deployment Readiness (GitOps Alignment)
 
 Before release, verify config alignment between code and GitOps.
 
@@ -215,12 +348,13 @@ Checklist:
 - [ ] Resource limits set (not unbounded)
 - [ ] Health probes configured (liveness + readiness) on correct port
 - [ ] Dapr annotations correct (`app-id`, `app-port`, `app-protocol`)
+- [ ] **HPA sync-wave set correctly**: MUST be at least **1 level higher** than the Deployment wave.
 - [ ] NetworkPolicy allows required egress/ingress
 - [ ] Migration strategy safe for zero-downtime deploy
 
-### Step 7: Docs
+### Step 9: Docs
 
-#### 7.1 Service documentation
+#### 9.1 Service documentation
 Update or create service docs under **`docs/03-services/<group>/<serviceName>-service.md`**.
 > [!NOTE]
 > **Service documentation is an introduction to the service, its architecture, and its capabilities.** It is NOT a checklist or a place to track TODOs/review findings.
@@ -229,10 +363,10 @@ Update or create service docs under **`docs/03-services/<group>/<serviceName>-se
 - `operational-services`: notification, analytics, search, review, warehouse, fulfillment, shipping, pricing, promotion, loyalty-rewards, location
 - `platform-services`: gateway, common-operations
 
-#### 7.2 README.md
+#### 9.2 README.md
 Update **`<serviceName>/README.md`** using the template at `docs/templates/readme-template.md`.
 
-#### 7.3 CHANGELOG.md
+#### 9.3 CHANGELOG.md
 Update **`<serviceName>/CHANGELOG.md`** (create if not exists) using conventional changelog format.
 
 > [!IMPORTANT]
@@ -240,23 +374,23 @@ Update **`<serviceName>/CHANGELOG.md`** (create if not exists) using conventiona
 >
 > **Only** `<serviceName>/CHANGELOG.md` and `<serviceName>/README.md` (inside the service repo) are committed, as part of Step 8.
 
-#### 7.4 Documentation checklist
+#### 9.4 Documentation checklist
 - [ ] Current and accurate information
 - [ ] Working commands (tested)
 - [ ] Correct ports and endpoints
 - [ ] Valid configuration examples
 
-### Step 8: Commit & Release
+### Step 10: Commit & Release
 
 > [!IMPORTANT]
 > **CI/CD builds Docker images and updates GitOps tags automatically.** Never build Docker images locally. Never manually update `newTag` in gitops kustomization.
 
-#### 8.1 Commit order (when multiple components changed)
+#### 10.1 Commit order (when multiple components changed)
 1. `common/` → commit + tag (`v1.x.y`) + push
 2. `<serviceName>/` → `go get common@v1.x.y` + commit + push
 3. CI/CD builds image + updates gitops tag auto
 
-#### 8.2 Commit
+#### 10.2 Commit
 
 ```bash
 cd /home/user/microservices/<serviceName>
@@ -265,7 +399,7 @@ git add -A
 git commit -m "<type>(<serviceName>): <description>"
 ```
 
-#### 8.3 Push & Release
+#### 10.3 Push & Release
 
 ```bash
 # Push to remote
@@ -274,6 +408,18 @@ git push origin main
 # IF RELEASE:
 git tag -a v1.0.7 -m "v1.0.7: description"
 git push origin v1.0.7
+```
+
+#### 10.4 GitOps (only for config changes)
+
+```bash
+# Only if you changed files in gitops/ (e.g. gateway.yaml, configmap.yaml)
+cd /home/user/microservices/gitops
+# ⚠️ ALWAYS pull before commit — gitops is shared across all services
+git pull --rebase origin main
+git add apps/<serviceName>/
+git commit -m "fix(<serviceName>): <description>"
+git push origin main
 ```
 
 ---
@@ -308,6 +454,20 @@ Use this format to report review findings:
 ### ✅ Completed Actions
 1. Fixed: description
 
+### 🔧 Action Plan
+| # | Severity | Issue | File:Line | Fix | Status |
+|---|----------|-------|-----------|-----|--------|
+| 1 | P0 | ... | ... | ... | ✅ Done / ⬜ TODO |
+
+### 📈 Test Coverage
+| Layer | Coverage | Target | Status |
+|-------|----------|--------|--------|
+| Biz | X% | 60% | ✅ / ⚠️ |
+| Service | X% | 60% | ✅ / ⚠️ |
+| Data | X% | 60% | ✅ / ⚠️ |
+
+Coverage checklist updated: ✅ / ❌
+
 ### 🌐 Cross-Service Impact
 - Services that import this proto: [list]
 - Services that consume events: [list]
@@ -331,3 +491,66 @@ Use this format to report review findings:
 - README.md: ✅ / ❌
 - CHANGELOG.md: ✅ / ❌
 ```
+
+---
+
+## Quick Reference Checklist
+
+Use this checklist to ensure all steps are completed:
+
+### Pre-Review
+- [ ] Pulled latest code (service, common, gitops)
+- [ ] Identified service name and structure
+
+### Code Review
+- [ ] Indexed codebase (cmd/, internal/, api/, migrations/)
+- [ ] Reviewed against coding standards
+- [ ] Listed P0/P1/P2 issues with file:line references
+- [ ] Checked cross-service impact (proto, events, imports)
+- [ ] Verified config/GitOps alignment
+
+### Action & Testing
+- [ ] Created action plan for P0/P1 issues
+- [ ] Implemented bug fixes
+- [ ] Ran test coverage check
+- [ ] Updated TEST_COVERAGE_CHECKLIST.md
+
+### Dependencies
+- [ ] Checked/tagged common if changed
+- [ ] Removed replace directives
+- [ ] Updated to latest versions (@latest)
+
+### Build & Quality
+- [ ] Generated proto (make api)
+- [ ] Regenerated Wire (both binaries if dual-binary)
+- [ ] Ran golangci-lint (0 warnings)
+- [ ] Built successfully (go build ./...)
+- [ ] Ran tests (go test ./...)
+
+### Deployment
+- [ ] Verified port allocation matches standard
+- [ ] Checked health probes configured
+- [ ] Verified resource limits set
+- [ ] Confirmed HPA sync-wave correct
+- [ ] Validated migration safety
+
+### Documentation
+- [ ] Updated service doc (docs/03-services/<group>/)
+- [ ] Updated README.md
+- [ ] Updated CHANGELOG.md
+- [ ] Removed bin/ directory
+
+### Release
+- [ ] Committed with conventional format
+- [ ] Tagged version (if releasing)
+- [ ] Pushed to remote
+- [ ] Updated GitOps (if config changed)
+
+---
+
+## Related Skills
+
+- **review-code**: For quick code review of specific changes
+- **navigate-service**: For understanding service structure
+- **troubleshoot-service**: For debugging build/runtime issues
+- **add-api-endpoint**: For adding new endpoints after review

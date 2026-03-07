@@ -175,3 +175,50 @@ Products are **only visible** in search when `has_price: true`:
 - **Price delete** → checks if any `warehouse_stock` entries still have `base_price` > 0; if none → sets `has_price = false`
 - **Search queries** → mandatory filter `{"term": {"has_price": true}}`
 - **Sync job** → sets `HasPrice: true` for all indexed products (sync already skips no-price products)
+
+---
+
+## Checklist
+
+### Diagnosis
+- [ ] Issue type identified (build/runtime/config)
+- [ ] Error messages collected
+- [ ] Logs reviewed
+- [ ] Config checked
+
+### Fix
+- [ ] Root cause identified
+- [ ] Fix applied
+- [ ] Build verified
+- [ ] Service tested
+
+### Verification
+- [ ] Service starts successfully
+- [ ] No errors in logs
+- [ ] Functionality works
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid troubleshooting:
+
+### Diagnose
+- [ ] Check error type
+- [ ] Review logs
+- [ ] Check config
+
+### Fix
+- [ ] Apply fix
+- [ ] Rebuild
+- [ ] Test
+
+---
+
+## Related Skills
+
+- **debug-k8s**: Debug Kubernetes deployment issues
+- **navigate-service**: Understand service structure
+- **review-code**: Review code for issues
+- **commit-code**: Commit fixes
+- **trace-event-flow**: Debug event issues

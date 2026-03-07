@@ -378,3 +378,34 @@ go mod tidy
 - [ ] `CHANGELOG.md` updated
 - [ ] Commit message follows conventional commits
 - [ ] If `common` changed: committed + tagged + pushed **before** service commit
+
+---
+
+## Quick Reference Checklist
+
+Use this for rapid commit workflow:
+
+### Pre-Commit
+- [ ] Dependencies clean (no replace directives)
+- [ ] Code generated (proto, wire)
+- [ ] Lint passes
+- [ ] Build passes
+
+### Commit
+- [ ] CHANGELOG updated
+- [ ] Conventional commit message
+- [ ] bin/ removed
+
+### Post-Commit
+- [ ] Pushed to remote
+- [ ] GitOps updated (if config changed)
+
+---
+
+## Related Skills
+
+- **review-code**: Review code before committing
+- **troubleshoot-service**: Fix build/lint issues
+- **setup-gitops**: Update GitOps configuration
+- **add-api-endpoint**: Commit new endpoint changes
+- **create-migration**: Commit migration changes

@@ -1,6 +1,6 @@
 ---
 name: write-tests
-description: Write unit and integration tests following the project's testing patterns - testify, table-driven tests, manual mocks in biz/mocks.go
+description: Write unit and integration tests following the project's testing patterns - testify, table-driven tests, mockgen-generated mocks
 ---
 
 # Write Tests Skill
@@ -20,10 +20,11 @@ Use this skill when writing or updating tests for microservice code.
 
 1. **Use `testify`** — `assert` and `require` packages, NOT raw `if` checks
 2. **Table-driven tests** — Use `tests := []struct{}` pattern for multiple cases
-3. **Manual mocks in `internal/biz/mocks.go`** — NOT generated mocks (mockgen/mockery)
+3. **Generated mocks via `mockgen`** — Use `go.uber.org/mock/mockgen` to generate mocks in `internal/biz/mocks/` subpackage. Run `go generate ./internal/biz/...` after interface changes
 4. **Test biz layer primarily** — This is where business logic lives
 5. **Test in same package** — Test files in the same package as the code being tested
 6. **Use `_test.go` suffix** — Standard Go convention
+7. **Commit & push after done** — After all tests pass and checklists are updated, use the `commit-code` skill to commit and push changes
 
 ---
 
@@ -33,7 +34,9 @@ Use this skill when writing or updating tests for microservice code.
 <service>/
 ├── internal/
 │   ├── biz/
-│   │   ├── mocks.go                      # 🔴 All mocks defined here
+│   │   ├── mocks/                        # 🔴 Generated mocks (mockgen)
+│   │   │   ├── mock_order_repo.go        #   go:generate mockgen output
+│   │   │   └── mock_event_publisher.go
 │   │   ├── order/
 │   │   │   ├── usecase.go
 │   │   │   ├── create.go
@@ -191,47 +194,65 @@ func TestGetOrder_DatabaseError(t *testing.T) {
 
 ## Mock Patterns
 
-### Manual Mocks in `biz/mocks.go` (Project Standard)
+### Generated Mocks via mockgen (Project Standard)
 
-The project uses **manual mocks** defined in `internal/biz/mocks.go`. These implement the biz layer interfaces directly:
+The project uses `go.uber.org/mock/mockgen` to generate mocks from interfaces.
+
+**Step 1: Add `//go:generate` directives to interface files**
 
 ```go
-// In internal/biz/mocks.go
+// In internal/biz/interfaces.go
 package biz
 
-// MockOrderRepo implements OrderRepo
-type MockOrderRepo struct {
-    Orders map[string]*Order
-    Error  error
-    // Function callbacks for flexible testing
-    FindByIDFunc func(ctx context.Context, id string) (*model.Order, error)
-}
+//go:generate mockgen -destination=mocks/mock_order_repo.go -package=mocks . OrderRepo
+//go:generate mockgen -destination=mocks/mock_event_publisher.go -package=mocks . EventPublisher
 
-func NewMockOrderRepo() *MockOrderRepo {
-    return &MockOrderRepo{
-        Orders: make(map[string]*Order),
-    }
-}
-
-func (m *MockOrderRepo) FindByID(ctx context.Context, id string) (*model.Order, error) {
-    if m.FindByIDFunc != nil {
-        return m.FindByIDFunc(ctx, id)
-    }
-    if m.Error != nil {
-        return nil, m.Error
-    }
-    // ... default implementation
+type OrderRepo interface {
+    FindByID(ctx context.Context, id string) (*model.Order, error)
+    Create(ctx context.Context, order *model.Order) error
 }
 ```
 
-Key patterns:
-- **`Error` field**: Set to simulate errors for all methods
-- **`XxxFunc` callback**: Override specific methods for specific tests
-- **In-memory storage**: `map[string]*Entity` for stateful mocks
+**Step 2: Generate mocks**
+
+```bash
+cd <service>
+go generate ./internal/biz/...
+```
+
+**Step 3: Use in tests**
+
+```go
+package order_test
+
+import (
+    "testing"
+    "go.uber.org/mock/gomock"
+    "gitlab.com/ta-microservices/<service>/internal/biz/mocks"
+)
+
+func TestCreateOrder_Success(t *testing.T) {
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+
+    mockRepo := mocks.NewMockOrderRepo(ctrl)
+    mockRepo.EXPECT().FindByCartSessionID(gomock.Any(), gomock.Any()).
+        Return(nil, nil).Times(1)
+    mockRepo.EXPECT().Create(gomock.Any(), gomock.Any()).
+        Return(nil).Times(1)
+
+    // Act
+    result, err := createOrder(ctx, mockRepo, req)
+
+    // Assert
+    require.NoError(t, err)
+    assert.NotNil(t, result)
+}
+```
 
 ### Testify Mocks in `*_test.go` (For Simpler Cases)
 
-For simpler mock needs within test files, use testify mock:
+For simpler mock needs within test files, testify mock is still acceptable:
 
 ```go
 // In internal/biz/order/mocks_test.go
@@ -254,42 +275,6 @@ func (m *MockOrderRepository) FindByID(ctx context.Context, id string) (*model.O
     }
     return args.Get(0).(*model.Order), args.Error(1)
 }
-
-func (m *MockOrderRepository) FindByCartSessionID(ctx context.Context, sessionID string) (*model.Order, error) {
-    args := m.Called(ctx, sessionID)
-    if args.Get(0) == nil {
-        return nil, args.Error(1)
-    }
-    return args.Get(0).(*model.Order), args.Error(1)
-}
-```
-
-### MockEventPublisher
-
-```go
-// In internal/biz/mocks.go
-type MockEventPublisher struct {
-    Events []interface{}
-    Error  error
-}
-
-func NewMockEventPublisher() *MockEventPublisher {
-    return &MockEventPublisher{Events: make([]interface{}, 0)}
-}
-
-func (m *MockEventPublisher) PublishOrderStatusChanged(ctx context.Context, event *events.OrderStatusChangedEvent) error {
-    if m.Error != nil { return m.Error }
-    m.Events = append(m.Events, event)
-    return nil
-}
-
-func (m *MockEventPublisher) PublishEvent(ctx context.Context, topic string, event interface{}) error {
-    if m.Error != nil { return m.Error }
-    m.Events = append(m.Events, event)
-    return nil
-}
-
-func (m *MockEventPublisher) IsNoOp() bool { return false }
 ```
 
 ---
@@ -363,13 +348,115 @@ go tool cover -html=coverage.out
 
 ## Checklist
 
+### Test Implementation
 - [ ] Tests use `testify/assert` and `testify/require`
 - [ ] Table-driven tests for validation and multiple scenarios
-- [ ] Mocks defined in `internal/biz/mocks.go` (manual) or `_test.go` (testify)
+- [ ] Generated mocks via `mockgen` in `internal/biz/mocks/` (or testify mocks in `_test.go`)
 - [ ] Mock implements the full interface
 - [ ] Happy path tested
 - [ ] Error cases tested (DB errors, validation, not found)
 - [ ] Edge cases tested (nil, empty, zero values)
 - [ ] `mockRepo.AssertExpectations(t)` called for testify mocks
-- [ ] Tests run: `go test ./...`
+
+### Test Execution
+- [ ] Tests run successfully: `go test ./...`
 - [ ] No test leaks (goroutines, file handles)
+- [ ] Coverage checked: `go test -cover ./internal/biz/...`
+- [ ] Coverage meets targets (≥60% for biz layer)
+
+### Documentation
+- [ ] Test files follow naming convention (`*_test.go`)
+- [ ] Test functions have descriptive names
+- [ ] Complex test logic has comments
+- [ ] **⚠️ MANDATORY: Update `docs/10-appendix/checklists/test/TEST_COVERAGE_CHECKLIST.md`** after tests are done
+
+### Commit & Push
+- [ ] Use `commit-code` skill to commit and push all test changes
+- [ ] Commit message uses `test(<service>): <description>` format
+- [ ] Pushed to remote
+
+---
+
+## ⚠️ MANDATORY: Update Coverage Checklist After Tests Done
+
+**After completing test coverage work for ANY service, you MUST update the test coverage checklist:**
+
+**File**: `docs/10-appendix/checklists/test/TEST_COVERAGE_CHECKLIST.md`
+
+**What to update:**
+1. **"Last Updated" timestamp** in the header
+2. **"Recent Changes" table** — add a row for the service you worked on
+3. **Dashboard table** — update the service's Current %, Gap, Est. Effort, and Work Done columns
+4. **Per-Service section** — update each package's coverage %, mark completed items with ✅, add ⚡ for improved items
+5. **Sprint section** — mark service as `⚡ partially done` if applicable
+6. **Test Files inventory** — add new/modified test files
+
+**How to get coverage numbers:**
+```bash
+cd /home/user/microservices/<service>
+go test -cover ./internal/biz/... 2>&1 | grep -E "^ok|coverage"
+```
+
+This checklist is the **single source of truth** for test coverage status across all services. Other agents rely on it to know what work has been done and what remains.
+
+---
+
+## Quick Reference Checklist
+
+Use this checklist for quick test writing workflow:
+
+### Setup
+- [ ] Identified code to test (biz layer priority)
+- [ ] Checked existing test patterns in service
+- [ ] Reviewed interfaces that need mocking
+
+### Write Tests
+- [ ] Created `*_test.go` file in same package
+- [ ] Imported testify (`assert`, `require`)
+- [ ] Used table-driven pattern for multiple cases
+- [ ] Generated mocks via `mockgen` (if needed)
+- [ ] Tested happy path
+- [ ] Tested error cases
+- [ ] Tested edge cases
+
+### Verify
+- [ ] Tests pass: `go test ./...`
+- [ ] Coverage checked: `go test -cover ./internal/biz/...`
+- [ ] No test leaks
+- [ ] Mock expectations asserted
+
+### Document
+- [ ] Updated TEST_COVERAGE_CHECKLIST.md
+- [ ] Added coverage numbers
+- [ ] Marked completed items
+
+### Commit & Push
+- [ ] Use `commit-code` skill to commit and push all test changes
+- [ ] Commit message uses `test(<service>): <description>` format
+- [ ] Pushed to remote
+
+---
+
+## ⚠️ MANDATORY: Commit & Push After Done
+
+**After completing all test work, you MUST commit and push using the `commit-code` skill.**
+
+```bash
+cd /home/user/microservices/<service>
+rm -rf bin/
+git add -A
+git commit -m "test(<service>): <description of test changes>"
+git push origin main
+```
+
+> For full commit workflow (lint, build, dependency checks), refer to the **commit-code** skill.
+
+---
+
+## Related Skills
+
+- **commit-code**: Commit and push changes after tests are done
+- **review-service**: Full service review includes test coverage check
+- **add-api-endpoint**: New endpoints require corresponding tests
+- **troubleshoot-service**: Debug test failures and coverage issues
+- **review-code**: Code review includes test quality assessment

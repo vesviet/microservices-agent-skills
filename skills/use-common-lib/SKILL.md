@@ -355,3 +355,29 @@ constants.DaprDefaultPubSub  // "pubsub"
 - [ ] Used `common/middleware` for auth/CORS/rate limiting (not custom implementations)
 - [ ] Used `common/validation` for input validation (not ad-hoc checks)
 - [ ] Followed commenting rules: code explanations max 3 lines, and absolutely NO `P-0` or `[ ]` formats in comments.
+
+---
+
+## Quick Reference Checklist
+
+Use this before writing any utility code:
+
+### Before Implementation
+- [ ] Searched common library
+- [ ] Checked existing patterns
+- [ ] Identified reusable components
+
+### Implementation
+- [ ] Used common utilities
+- [ ] Followed common patterns
+- [ ] Avoided duplication
+
+---
+
+## Related Skills
+
+- **add-api-endpoint**: Use common middleware and errors
+- **add-event-handler**: Use common event utilities
+- **write-tests**: Use common test utilities
+- **review-code**: Verify common library usage
+- **troubleshoot-service**: Debug common library issues
