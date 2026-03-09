@@ -156,7 +156,7 @@ This is the **definitive code review skill** that consolidates ALL review criter
 
 ```bash
 # Quick check: who imports this service's proto?
-grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' /home/user/microservices/*/go.mod
+grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' /Users/tuananh/Desktop/myproject/microservice/*/go.mod
 ```
 
 ##### 13.2 Event Schema Compatibility (P0 if broken)
@@ -298,11 +298,11 @@ Documentation, code style, low test coverage, naming.
 3. **Cross-service impact scan** (§13 — tech lead mandatory):
    ```bash
    # Who depends on this service's proto?
-   grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' /home/user/microservices/*/go.mod
+   grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' /Users/tuananh/Desktop/myproject/microservice/*/go.mod
    
    # Who consumes this service's events?
-   grep -r 'Topic.*{serviceName}' /home/user/microservices/common/constants/events.go
-   grep -r 'Topic.*{serviceName}' /home/user/microservices/*/internal/ --include='*.go' -l
+   grep -r 'Topic.*{serviceName}' /Users/tuananh/Desktop/myproject/microservice/common/constants/events.go
+   grep -r 'Topic.*{serviceName}' /Users/tuananh/Desktop/myproject/microservice/*/internal/ --include='*.go' -l
    ```
 
 4. **Config/GitOps alignment check** (§15):
@@ -355,7 +355,7 @@ Documentation, code style, low test coverage, naming.
 ### Step 4: Lint & Build
 
 ```bash
-cd /home/user/microservices/{serviceName}
+cd /Users/tuananh/Desktop/myproject/microservice/{serviceName}
 
 # 1. Lint (target: zero warnings)
 golangci-lint run

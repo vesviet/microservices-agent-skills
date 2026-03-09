@@ -357,7 +357,7 @@ Ensure the dependent provider sets include `eventbus.ProviderSet` so the new con
 ### Step 7: Regenerate Wire
 
 ```bash
-cd /home/user/microservices/<service>/cmd/worker && wire
+cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/worker && wire
 ```
 
 > ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.

@@ -17,7 +17,7 @@ Use this skill when the user needs to configure or update GitOps deployment file
 
 ## GitOps Directory Structure
 
-All GitOps configuration lives in `/home/user/microservices/gitops/`.
+All GitOps configuration lives in `/Users/tuananh/Desktop/myproject/microservice/gitops/`.
 
 ```
 gitops/apps/<service>/

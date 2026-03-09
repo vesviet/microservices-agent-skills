@@ -64,7 +64,7 @@ DROP TABLE IF EXISTS example;
 
 ### Step 1: Check Existing Migrations
 ```bash
-ls -la /home/user/microservices/<service>/migrations/
+ls -la /Users/tuananh/Desktop/myproject/microservice/<service>/migrations/
 ```
 Determine the next sequence number and understand the existing schema.
 

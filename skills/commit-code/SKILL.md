@@ -27,6 +27,7 @@ Use this skill when committing code changes to any microservice. It ensures all 
 8. **NEVER manually update `newTag`** in `gitops/apps/*/overlays/*/kustomization.yaml` — CI/CD pipeline automatically updates image tags after building
 9. **ALWAYS check and remove `bin` directories/files** before committing.
 10. **NEVER use Docker locally** — no `docker build`, no `make docker-build`, no `docker-compose`. CI/CD handles all image building and publishing.
+11. **NEVER commit the `docs` repository/directory** — ensure you do not add or commit files from the `docs` directory.
 
 ---
 
@@ -60,7 +61,7 @@ Use this skill when committing code changes to any microservice. It ensures all 
 
 ```bash
 # Check if common has uncommitted changes
-cd /home/user/microservices/common && git status
+cd /Users/tuananh/Desktop/myproject/microservice/common && git status
 
 # If common changed → go to "Process for Common" section below FIRST
 # If common is clean → continue with Step 2
@@ -69,7 +70,7 @@ cd /home/user/microservices/common && git status
 ### Step 2: Clean Dependencies
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 
 # 1. Check for forbidden replace directives
 grep 'replace gitlab.com/ta-microservices' go.mod
@@ -89,7 +90,7 @@ go mod tidy
 
 ```bash
 # Only if .proto files were modified
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 make api
 ```
 
@@ -102,14 +103,14 @@ This regenerates:
 
 ```bash
 # Only if wire.go or providers changed
-cd /home/user/microservices/<service>/cmd/<service> && wire
-cd /home/user/microservices/<service>/cmd/worker && wire  # if worker exists
+cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/<service> && wire
+cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/worker && wire  # if worker exists
 ```
 
 ### Step 5: Lint
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 golangci-lint run
 
 # Target: ZERO warnings
@@ -119,7 +120,7 @@ golangci-lint run
 ### Step 6: Build
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 go build ./...
 
 # Must pass with zero errors
@@ -144,7 +145,7 @@ Update `<service>/CHANGELOG.md` (create if not exists):
 ### Step 8: Commit
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 # ALWAYS Check and remove bin directory before committing
 rm -rf bin/
 git add -A
@@ -166,7 +167,7 @@ git commit -m "<type>(<scope>): <description>"
 ### Step 9: Push
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 git push origin main
 ```
 
@@ -176,7 +177,7 @@ git push origin main
 
 ```bash
 # Only if you changed files in gitops/ (e.g. gateway.yaml, configmap.yaml)
-cd /home/user/microservices/gitops
+cd /Users/tuananh/Desktop/myproject/microservice/gitops
 # ⚠️ ALWAYS pull before commit — gitops is shared across all services
 git pull --rebase origin main
 git add -A
@@ -193,7 +194,7 @@ git push origin main
 ### Step 1: Validate Common
 
 ```bash
-cd /home/user/microservices/common
+cd /Users/tuananh/Desktop/myproject/microservice/common
 
 # 1. Lint
 golangci-lint run
@@ -208,7 +209,7 @@ go test ./...
 ### Step 2: Check What Changed
 
 ```bash
-cd /home/user/microservices/common
+cd /Users/tuananh/Desktop/myproject/microservice/common
 git diff --stat
 
 # Determine version bump:
@@ -226,7 +227,7 @@ git diff --stat
 ### Step 4: Commit Common
 
 ```bash
-cd /home/user/microservices/common
+cd /Users/tuananh/Desktop/myproject/microservice/common
 # ALWAYS Check and remove bin directory before committing
 rm -rf bin/
 git add -A
@@ -236,7 +237,7 @@ git commit -m "<type>(common): <description>"
 ### Step 5: Tag Common
 
 ```bash
-cd /home/user/microservices/common
+cd /Users/tuananh/Desktop/myproject/microservice/common
 
 # Check current latest tag
 git tag --sort=-creatordate | head -5
@@ -255,7 +256,7 @@ Fixed:
 ### Step 6: Push Common + Tag
 
 ```bash
-cd /home/user/microservices/common
+cd /Users/tuananh/Desktop/myproject/microservice/common
 git push origin main
 git push origin v1.9.7  # push the specific tag
 ```
@@ -263,7 +264,7 @@ git push origin v1.9.7  # push the specific tag
 ### Step 7: Update Services to Use New Common
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 
 # Get the new common version
 go get gitlab.com/ta-microservices/common@v1.9.7
@@ -284,7 +285,7 @@ Then proceed with the normal service commit process (Step 2 onwards).
 # SCENARIO 1: Only service changed (common unchanged)
 # ═══════════════════════════════════════════════════════
 
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 
 # Validate
 grep 'replace gitlab.com/ta-microservices' go.mod  # must be empty
@@ -305,7 +306,7 @@ git push origin main
 # ═══════════════════════════════════════════════════════
 
 # 1. Common first
-cd /home/user/microservices/common
+cd /Users/tuananh/Desktop/myproject/microservice/common
 golangci-lint run && go build ./... && go test ./...
 rm -rf bin/ # Remove bin files/directories
 git add -A && git commit -m "feat(common): <description>"
@@ -313,7 +314,7 @@ git tag -a v1.9.7 -m "v1.9.7: <summary>"
 git push origin main && git push origin v1.9.7
 
 # 2. Then service
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 go get gitlab.com/ta-microservices/common@v1.9.7
 go mod tidy
 make api        # if proto changed

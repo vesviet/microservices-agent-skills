@@ -94,46 +94,46 @@ Pricing → pricing.price.deleted → Search Worker (remove ES price)
 ### Step 1: Identify the Event Topic
 Search for the event name in the common events library:
 ```bash
-grep -r "<event_name>" /home/user/microservices/common/events/
+grep -r "<event_name>" /Users/tuananh/Desktop/myproject/microservice/common/events/
 ```
 
 ### Step 2: Find the Publisher
 Search for where the event is published:
 ```bash
 # Search for Publish calls
-grep -rn "Publish" /home/user/microservices/<service>/internal/ --include="*.go" | grep -i "<topic>"
+grep -rn "Publish" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go" | grep -i "<topic>"
 
 # Search for event topic constant
-grep -rn "<TOPIC_NAME>" /home/user/microservices/<service>/internal/ --include="*.go"
+grep -rn "<TOPIC_NAME>" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go"
 ```
 
 ### Step 3: Find the Subscriber
 Search for where the event is consumed:
 ```bash
 # Search for Subscribe/Handler
-grep -rn "Subscribe\|HandleEvent\|OnEvent" /home/user/microservices/<service>/internal/ --include="*.go" | grep -i "<topic>"
+grep -rn "Subscribe\|HandleEvent\|OnEvent" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go" | grep -i "<topic>"
 
 # Check Dapr subscription config
-find /home/user/microservices/<service> -name "*.yaml" -exec grep -l "<topic>" {} \;
+find /Users/tuananh/Desktop/myproject/microservice/<service> -name "*.yaml" -exec grep -l "<topic>" {} \;
 ```
 
 ### Step 4: Check Event Structure
 Look at the event payload definition:
 ```bash
 # In common events library
-cat /home/user/microservices/common/events/<domain>_events.go
+cat /Users/tuananh/Desktop/myproject/microservice/common/events/<domain>_events.go
 
 # Or in the service itself
-grep -rn "type.*Event struct" /home/user/microservices/<service>/internal/ --include="*.go"
+grep -rn "type.*Event struct" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go"
 ```
 
 ### Step 5: Check Dapr Configuration
 ```bash
 # Dapr PubSub component (local)
-cat /home/user/microservices/dapr/components/pubsub.yaml
+cat /Users/tuananh/Desktop/myproject/microservice/dapr/components/pubsub.yaml
 
 # Dapr subscription config (K8s)
-find /home/user/microservices/gitops/apps/<service> -name "*dapr*" -o -name "*subscription*"
+find /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service> -name "*dapr*" -o -name "*subscription*"
 ```
 
 ## How to Add a New Event
@@ -235,7 +235,7 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl exec -n redis redis-0 -- redis-cli 
 ### Event Processing Failed
 ```bash
 # Look for DLQ (Dead Letter Queue) entries
-grep -rn "DLQ\|dead.letter\|retry" /home/user/microservices/<service>/internal/ --include="*.go"
+grep -rn "DLQ\|dead.letter\|retry" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go"
 ```
 
 ## Event Best Practices

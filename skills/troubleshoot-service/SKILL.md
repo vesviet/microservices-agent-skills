@@ -40,19 +40,19 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 
 # Copy third_party if missing
-cp -r /home/user/microservices/user/third_party /home/user/microservices/<service>/
+cp -r /Users/tuananh/Desktop/myproject/microservice/user/third_party /Users/tuananh/Desktop/myproject/microservice/<service>/
 ```
 
 ### Wire Generation
 ```bash
-cd /home/user/microservices/<service>/cmd/<service> && wire
+cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/<service> && wire
 # Common issues: missing provider, circular deps, interface not satisfied
 ```
 
 ### Database Connection
 ```bash
 # Check config
-cat /home/user/microservices/<service>/configs/config.yaml | grep -A5 database
+cat /Users/tuananh/Desktop/myproject/microservice/<service>/configs/config.yaml | grep -A5 database
 
 # Create DB if missing
 psql -h localhost -U ecommerce_user -d postgres -c "CREATE DATABASE <service>_db;"
@@ -64,14 +64,24 @@ DATABASE_URL="postgres://ecommerce_user:ecommerce_pass@localhost:5432/<service>_
   make migrate-up
 ```
 
-### Start Infrastructure
+### Access Infrastructure (K8s Dev Cluster)
+
+> ⚠️ **NEVER use Docker locally.** Infrastructure runs in the k3d/k3s cluster. Use `kubectl port-forward` to access.
+
 ```bash
-docker-compose up -d postgres redis consul
+# Port-forward PostgreSQL
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl port-forward -n infrastructure svc/postgresql 5432:5432 &"
+
+# Port-forward Redis
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl port-forward -n infrastructure svc/redis 6379:6379 &"
+
+# Port-forward Consul
+ssh tuananh@dev.tanhdev.com -p 8785 "kubectl port-forward -n infrastructure svc/consul 8500:8500 &"
 ```
 
 ### Build & Run Service
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 go mod tidy
 go build ./...
 go run ./cmd/<service>/...  # or: kratos run

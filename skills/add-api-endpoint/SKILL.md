@@ -138,7 +138,7 @@ message ExampleData {
 ### Step 2: Generate Proto Code
 
 ```bash
-cd /home/user/microservices/<service> && make api
+cd /Users/tuananh/Desktop/myproject/microservice/<service> && make api
 ```
 
 This generates:
@@ -287,7 +287,7 @@ var providerSet = wire.NewSet(
 
 Then regenerate wire:
 ```bash
-cd /home/user/microservices/<service>/cmd/<service> && wire
+cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/<service> && wire
 ```
 
 > ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.
@@ -311,7 +311,7 @@ pb.RegisterExampleServiceServer(grpcSrv, exampleService)
 ### Step 8: Build and Verify
 
 ```bash
-cd /home/user/microservices/<service> && go build ./...
+cd /Users/tuananh/Desktop/myproject/microservice/<service> && go build ./...
 ```
 
 ## HTTP Method Conventions

@@ -326,7 +326,7 @@ func TestHandlePaymentConfirmed_InvalidPayload(t *testing.T) {
 
 ```bash
 # Run all tests in a service
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 go test ./...
 
 # Run specific package tests
@@ -393,7 +393,7 @@ go tool cover -html=coverage.out
 
 **How to get coverage numbers:**
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 go test -cover ./internal/biz/... 2>&1 | grep -E "^ok|coverage"
 ```
 
@@ -442,7 +442,7 @@ Use this checklist for quick test writing workflow:
 **After completing all test work, you MUST commit and push using the `commit-code` skill.**
 
 ```bash
-cd /home/user/microservices/<service>
+cd /Users/tuananh/Desktop/myproject/microservice/<service>
 rm -rf bin/
 git add -A
 git commit -m "test(<service>): <description of test changes>"

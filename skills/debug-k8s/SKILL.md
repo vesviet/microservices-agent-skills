@@ -19,7 +19,7 @@ Use this skill when the user reports Kubernetes deployment issues, pod failures,
 - **Cluster**: k3d/k3s (remote dev server)
 - **SSH Access**: `ssh tuananh@dev.tanhdev.com -p 8785`
 - **Namespaces**: `<service>-dev` (e.g., `auth-dev`, `order-dev`)
-- **GitOps Repo (local)**: `/home/user/microservices/gitops/`
+- **GitOps Repo (local)**: `/Users/tuananh/Desktop/myproject/microservice/gitops/`
 - **GitOps structure**: `apps/<service>/base/` + `apps/<service>/overlays/dev/`
 
 ---
@@ -63,7 +63,7 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l ap
 
 ### Step 2: Fix in GitOps
 
-Edit the relevant file(s) in `/home/user/microservices/gitops/apps/<service>/`.
+Edit the relevant file(s) in `/Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/`.
 
 **GitOps File Map:**
 
@@ -103,13 +103,13 @@ Then add `- secrets.yaml` to `overlays/dev/kustomization.yaml` resources.
 ### Step 3: Verify kustomize builds clean
 
 ```bash
-kubectl kustomize /home/user/microservices/gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
+kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
 ```
 
 ### Step 4: Commit + Push
 
 ```bash
-cd /home/user/microservices/gitops \
+cd /Users/tuananh/Desktop/myproject/microservice/gitops \
   && git add -A \
   && git commit -m "fix: <service> <description>" \
   && git pull --rebase origin main \
@@ -172,7 +172,7 @@ If an image is missing, trigger a CI build in GitLab to build and update the ima
 
 ### kustomize build error — Duplicate YAML key / bad manifest
 ```bash
-kubectl kustomize /home/user/microservices/gitops/apps/<service>/overlays/dev 2>&1
+kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/overlays/dev 2>&1
 ```
 Fix the YAML error in the reported file → commit → push → sync.
 
@@ -192,9 +192,9 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl delete job <service>-migration -n <
 
 ```bash
 # Check kustomize build for ALL services at once
-for svc in $(ls /home/user/microservices/gitops/apps/); do
-  if [ -d "/home/user/microservices/gitops/apps/$svc/overlays/dev" ]; then
-    kubectl kustomize /home/user/microservices/gitops/apps/$svc/overlays/dev > /dev/null 2>&1 \
+for svc in $(ls /Users/tuananh/Desktop/myproject/microservice/gitops/apps/); do
+  if [ -d "/Users/tuananh/Desktop/myproject/microservice/gitops/apps/$svc/overlays/dev" ]; then
+    kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/$svc/overlays/dev > /dev/null 2>&1 \
       && echo "✅ $svc" || echo "❌ $svc"
   fi
 done

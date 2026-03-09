@@ -37,7 +37,7 @@ This project uses a consistent pattern across all services. See existing example
 
 **Always check existing clients first before creating new ones:**
 ```bash
-find /home/user/microservices/*/internal/client -name "*_grpc_client.go" 2>/dev/null
+find /Users/tuananh/Desktop/myproject/microservice/*/internal/client -name "*_grpc_client.go" 2>/dev/null
 ```
 
 ---
@@ -54,7 +54,7 @@ import targetV1 "gitlab.com/ta-microservices/<target-service>/api/<target-servic
 
 Update `go.mod`:
 ```bash
-cd /home/user/microservices/<source-service>
+cd /Users/tuananh/Desktop/myproject/microservice/<source-service>
 
 # Add dependency
 go get gitlab.com/ta-microservices/<target-service>@latest
@@ -291,7 +291,7 @@ var providerSet = wire.NewSet(
 
 Regenerate wire:
 ```bash
-cd /home/user/microservices/<source-service>/cmd/<service> && wire
+cd /Users/tuananh/Desktop/myproject/microservice/<source-service>/cmd/<service> && wire
 ```
 
 > ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.
