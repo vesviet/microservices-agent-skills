@@ -193,10 +193,10 @@ cat apps/<service>/base/kustomization.yaml | grep newTag
 
 ```bash
 # Check pods
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+$DEV_SSH "kubectl get pods -n <service>-dev"
 
 # Check logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service> --tail=50"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service> --tail=50"
 ```
 
 **8.3 Test the Feature**

@@ -138,7 +138,7 @@ message ExampleData {
 ### Step 2: Generate Proto Code
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service> && make api
+cd <service> && make api
 ```
 
 This generates:
@@ -193,11 +193,19 @@ func NewExampleUsecase(repo ExampleRepo, logger log.Logger) *ExampleUsecase {
 
 func (uc *ExampleUsecase) Create(ctx context.Context, example *Example) (*Example, error) {
 	// Add business validation here
-	return uc.repo.Create(ctx, example)
+	result, err := uc.repo.Create(ctx, example)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create example: %w", err)
+	}
+	return result, nil
 }
 
 func (uc *ExampleUsecase) Get(ctx context.Context, id string) (*Example, error) {
-	return uc.repo.Get(ctx, id)
+	result, err := uc.repo.Get(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get example %s: %w", id, err)
+	}
+	return result, nil
 }
 
 func (uc *ExampleUsecase) List(ctx context.Context, page, pageSize int) ([]*Example, int, error) {
@@ -238,13 +246,12 @@ func NewExampleRepo(data *Data, logger log.Logger) biz.ExampleRepo {
 }
 
 func (r *exampleRepo) Create(ctx context.Context, example *biz.Example) (*biz.Example, error) {
-	// GORM implementation
 	model := &ExampleModel{
 		Name:        example.Name,
 		Description: example.Description,
 	}
 	if err := r.data.db.WithContext(ctx).Create(model).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create example in db: %w", err)
 	}
 	return modelToEntity(model), nil
 }
@@ -257,6 +264,11 @@ func (r *exampleRepo) Create(ctx context.Context, example *biz.Example) (*biz.Ex
 ```go
 // Implement the proto-generated interface method
 func (s *<Service>Service) GetExample(ctx context.Context, req *pb.GetExampleRequest) (*pb.GetExampleReply, error) {
+	// Input validation at service boundary
+	if req.Id == "" {
+		return nil, errors.BadRequest("INVALID_ID", "id is required")
+	}
+
 	example, err := s.uc.Get(ctx, req.Id)
 	if err != nil {
 		return nil, err
@@ -285,9 +297,10 @@ var providerSet = wire.NewSet(
 )
 ```
 
-Then regenerate wire:
+Then regenerate Wire for **both binaries**:
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/<service> && wire
+cd <service>/cmd/<service> && wire
+cd <service>/cmd/worker && wire  # if worker exists
 ```
 
 > ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.
@@ -311,7 +324,7 @@ pb.RegisterExampleServiceServer(grpcSrv, exampleService)
 ### Step 8: Build and Verify
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service> && go build ./...
+cd <service> && go build ./...
 ```
 
 ## HTTP Method Conventions

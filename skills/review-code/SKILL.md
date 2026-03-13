@@ -156,7 +156,7 @@ This is the **definitive code review skill** that consolidates ALL review criter
 
 ```bash
 # Quick check: who imports this service's proto?
-grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' /Users/tuananh/Desktop/myproject/microservice/*/go.mod
+grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' */go.mod
 ```
 
 ##### 13.2 Event Schema Compatibility (P0 if broken)
@@ -270,263 +270,24 @@ Documentation, code style, low test coverage, naming.
 
 # Mode B: Full Service Review & Release
 
+> **This mode has been consolidated into the `review-service` skill** to avoid duplication. Use `review-service` for full service review and release processes.
+
 ## When to Use
 - User says "review service X" or "review and release X"
 - User references `service-review-release-prompt.md`
 - Full service readiness assessment needed
 
-## Process (6 Steps)
-
-### Step 1: Index & Review Codebase
-
-1. **Navigate the service** using `navigate-service` skill:
-   - `{serviceName}/` directory structure
-   - `cmd/` (main + worker entry points)
-   - `internal/biz/` (business logic)
-   - `internal/data/` (repositories)
-   - `internal/service/` (API handlers)
-   - `internal/client/` (outbound gRPC calls)
-   - `internal/events/` (event publishing)
-   - `internal/worker/` (event consumers, cron, outbox)
-   - `api/{serviceName}/v1/` (proto definitions)
-   - `internal/constants/` (constants)
-   - `migrations/` (database migrations)
-   - `configs/` (config files)
-
-2. **Review against ALL criteria** from Mode A checklist above (§1-§16)
-
-3. **Cross-service impact scan** (§13 — tech lead mandatory):
-   ```bash
-   # Who depends on this service's proto?
-   grep -r 'gitlab.com/ta-microservices/{serviceName}' --include='go.mod' /Users/tuananh/Desktop/myproject/microservice/*/go.mod
-   
-   # Who consumes this service's events?
-   grep -r 'Topic.*{serviceName}' /Users/tuananh/Desktop/myproject/microservice/common/constants/events.go
-   grep -r 'Topic.*{serviceName}' /Users/tuananh/Desktop/myproject/microservice/*/internal/ --include='*.go' -l
-   ```
-
-4. **Config/GitOps alignment check** (§15):
-   ```bash
-   # Env vars in code vs gitops
-   grep -rn 'os.Getenv\|envconfig' {serviceName}/internal/ --include='*.go'
-   cat gitops/apps/{serviceName}/base/configmap.yaml
-   ```
-
-5. **List P0/P1/P2 issues** with file:line references:
-
-| Severity | Definition | Examples |
-|----------|-----------|----------|
-| **P0 (Blocking)** | Security, data inconsistency, SQL injection, missing transactions, breaking backward compat | Biz calls DB directly, no auth check, raw SQL concat, proto field removed without `reserved` |
-| **P1 (High)** | Performance, missing observability, no timeouts/retries, config mismatch | N+1 queries, no circuit breaker, missing metrics, env var not in configmap |
-| **P2 (Normal)** | Documentation, code style, low test coverage | Missing comments, naming issues, TODO without ticket |
-
-### Step 2: Checklist & TODO
-
-1. **Track review findings** in the service doc:
-   ```
-   docs/03-services/<group>/{serviceName}-service.md
-   ```
-
-2. **Align items** with P0/P1/P2 from Step 1
-
-3. **Mark completed items**, add items for remaining work
-
-4. **Skip test-case tasks** (per project convention)
-
-### Step 3: Dependencies (Go Modules)
-
-1. **Check for `replace` directives**:
-   ```bash
-   grep 'replace gitlab.com/ta-microservices' {serviceName}/go.mod
-   ```
-
-2. **Remove replace directives** (if found):
-   ```bash
-   # Delete all replace lines for ta-microservices
-   # Then get latest versions:
-   cd {serviceName}
-   go get gitlab.com/ta-microservices/common@latest
-   go get gitlab.com/ta-microservices/<other-dep>@latest
-   go mod tidy
-   ```
-
-3. **Rule: NO `replace` for gitlab.com/ta-microservices** — always use `go get @latest`
-
-### Step 4: Lint & Build
-
-```bash
-cd /Users/tuananh/Desktop/myproject/microservice/{serviceName}
-
-# 1. Lint (target: zero warnings)
-golangci-lint run
-
-# 2. Generate proto (if changed)
-make api
-
-# 3. Build
-go build ./...
-
-# 4. Regenerate Wire (if DI changed)
-cd cmd/{serviceName} && wire
-cd ../worker && wire  # if worker exists
-```
-
-### Step 5: Documentation
-
-#### 5.1 Service Doc
-Create/update: **`docs/03-services/<group>/{serviceName}-service.md`**
-
-Groups:
-- `core-services`: order, catalog, customer, payment, auth, user
-- `operational-services`: notification, analytics, search, review
-- `platform-services`: gateway, common-operations
-
-Must include: Overview, Architecture, API Contract, Data Model, Configuration, Deployment, Monitoring, Development, Troubleshooting.
-
-#### 5.2 README.md
-Update **`{serviceName}/README.md`** with: Quick Start, Configuration, API, Testing, Build & Deploy, Troubleshooting.
-
-#### 5.3 Documentation Checklist
-- [ ] Current and accurate information
-- [ ] Working commands (tested)
-- [ ] Correct ports and endpoints
-- [ ] Up-to-date dependencies
-- [ ] Valid configuration examples
-- [ ] Troubleshooting section with real issues
-
-### Step 5.5: Deployment Readiness (Tech Lead Gate)
-
-Before release, verify operational readiness:
-
-```bash
-# 1. Check gitops config alignment
-cat gitops/apps/{serviceName}/base/deployment.yaml
-cat gitops/apps/{serviceName}/base/configmap.yaml
-
-# 2. Verify ports match
-grep -n 'containerPort\|port:' gitops/apps/{serviceName}/base/*.yaml
-grep -n 'Port\|port' {serviceName}/configs/*.yaml
-
-# 3. Check resource limits are set
-grep -A5 'resources:' gitops/apps/{serviceName}/base/deployment.yaml
-
-# 4. Verify health probes
-grep -A5 'livenessProbe\|readinessProbe' gitops/apps/{serviceName}/base/deployment.yaml
-
-# 5. Check HPA exists
-ls gitops/apps/{serviceName}/base/hpa.yaml 2>/dev/null || echo "⚠️ No HPA configured"
-```
-
-- [ ] Deployment config matches code config
-- [ ] Health probes configured and endpoints exist
-- [ ] Resource limits set (not unbounded)
-- [ ] Migration strategy safe for zero-downtime
-- [ ] Rollback plan documented
-
-### Step 6: Commit & Release
-
-1. **Conventional commits**:
-   ```
-   feat({serviceName}): add order history API
-   fix({serviceName}): fix race condition in order processing
-   docs({serviceName}): update service documentation
-   refactor({serviceName}): extract pricing logic to separate module
-   ```
-
-2. **If releasing** (creating a version):
-   ```bash
-   # Update CHANGELOG.md
-   git add .
-   git commit -m "docs({serviceName}): update changelog for v1.2.0"
-   
-   # Create annotated tag
-   git tag -a v1.2.0 -m "v1.2.0: Add order history API, fix race condition
-
-   Added:
-   - New gRPC method GetOrderHistory
-   - Support for order filtering by date range
-   
-   Fixed:
-   - Fixed race condition in order processing"
-   
-   # Push
-   git push origin main && git push origin v1.2.0
-   ```
-
-3. **If NOT releasing**: Push branch only: `git push origin <branch>`
-
-### Service Review Output Format
-
-```markdown
-## 🔍 Service Review: {serviceName}
-
-**Date**: YYYY-MM-DD
-**Reviewer**: AI Agent
-**Status**: ✅ Ready / ⚠️ Needs Work / ❌ Not Ready
-
-### Executive Summary
-Brief overview of service health and readiness.
-
-### 📊 Issue Summary
-
-| Severity | Count | Status |
-|----------|-------|--------|
-| P0 (Blocking) | X | Fixed / Remaining |
-| P1 (High) | X | Fixed / Remaining |
-| P2 (Normal) | X | Fixed / Remaining |
-
-### 🔴 P0 Issues (Blocking)
-1. **[ARCH]** file:line — Description
-2. **[SEC]** file:line — Description
-
-### 🟡 P1 Issues (High)
-1. **[PERF]** file:line — Description
-2. **[OBS]** file:line — Description
-
-### 🔵 P2 Issues (Normal)
-1. **[DOC]** file:line — Description
-2. **[STYLE]** file:line — Description
-
-### ✅ Completed Actions
-1. Fixed: description
-2. Updated: description
-
-### 📝 Remaining TODO
-1. TODO: description (P1)
-2. TODO: description (P2)
-
-### 📋 Checklist Status
-- Link to: `docs/03-services/<group>/{serviceName}-service.md`
-
-### Dependencies
-- `go.mod` clean (no replace directives): Yes / No
-- `common` version: vX.Y.Z
-
-### 🌐 Cross-Service Impact
-- Services that import this proto: [list]
-- Services that consume events: [list]
-- Backward compatibility: ✅ Preserved / ❌ Breaking changes detected
-- Event schema: ✅ Additive only / ❌ Breaking changes
-
-### Build Status
-- `golangci-lint`: ✅ 0 warnings / ❌ X warnings
-- `go build ./...`: ✅ Pass / ❌ Fail
-- `wire`: ✅ Generated / ❌ Needs regen
-- Generated Files: ✅ Not modified manually / ❌ Modified manually
-- `bin/` Files: ✅ Removed / ❌ Present
-
-### 🚀 Deployment Readiness
-- Health probes: ✅ Configured / ❌ Missing
-- Resource limits: ✅ Set / ❌ Missing
-- Config/GitOps aligned: ✅ Yes / ❌ Mismatch
-- Migration safety: ✅ Zero-downtime safe / ❌ Risky
-- Rollback plan: ✅ Documented / ❌ Missing
-
-### Documentation
-- Service doc: ✅ Updated / ❌ Missing
-- README.md: ✅ Updated / ❌ Missing
-- CHANGELOG.md: ✅ Updated / ❌ Missing
-```
+**→ Follow the `review-service` skill (`.agent/skills/review-service/SKILL.md`) which provides the complete 10-step service review process including:**
+1. Index & Review Codebase (using ALL Mode A criteria §1-§16 above)
+2. Cross-Service Impact Analysis
+3. Create Review Checklist
+4. Action Plan & Bug Fixes
+5. Test Coverage Check
+6. Dependencies (Go Modules)
+7. Lint & Build
+8. Deployment Readiness (GitOps)
+9. Documentation
+10. Commit & Release
 
 ---
 

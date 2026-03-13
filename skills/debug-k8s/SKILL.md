@@ -17,9 +17,9 @@ Use this skill when the user reports Kubernetes deployment issues, pod failures,
 ## Environment Details
 
 - **Cluster**: k3d/k3s (remote dev server)
-- **SSH Access**: `ssh tuananh@dev.tanhdev.com -p 8785`
+- **SSH Access**: `$DEV_SSH`
 - **Namespaces**: `<service>-dev` (e.g., `auth-dev`, `order-dev`)
-- **GitOps Repo (local)**: `/Users/tuananh/Desktop/myproject/microservice/gitops/`
+- **GitOps Repo (local)**: `gitops/`
 - **GitOps structure**: `apps/<service>/base/` + `apps/<service>/overlays/dev/`
 
 ---
@@ -46,24 +46,24 @@ Edit gitops file → commit → push → ArgoCD hard-refresh → verify
 
 ```bash
 # Pod status
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+$DEV_SSH "kubectl get pods -n <service>-dev"
 
 # Events (best first signal)
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get events -n <service>-dev --sort-by=.metadata.creationTimestamp | tail -20"
+$DEV_SSH "kubectl get events -n <service>-dev --sort-by=.metadata.creationTimestamp | tail -20"
 
 # Logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --tail=80 2>&1"
+$DEV_SSH "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --tail=80 2>&1"
 
 # Previous crash logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --previous --tail=50 2>&1"
+$DEV_SSH "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --previous --tail=50 2>&1"
 
 # Describe pod (for CreateContainerConfigError, probe failures)
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l app.kubernetes.io/name=<service> 2>&1 | tail -40"
+$DEV_SSH "kubectl describe pod -n <service>-dev -l app.kubernetes.io/name=<service> 2>&1 | tail -40"
 ```
 
 ### Step 2: Fix in GitOps
 
-Edit the relevant file(s) in `/Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/`.
+Edit the relevant file(s) in `gitops/apps/<service>/`.
 
 **GitOps File Map:**
 
@@ -95,21 +95,22 @@ metadata:
     app.kubernetes.io/environment: dev
 type: Opaque
 stringData:
-  <SERVICE>_DATA_DATABASE_SOURCE: "postgres://postgres:microservices@postgresql.infrastructure.svc.cluster.local:5432/<service>_db?sslmode=disable"
-  DATABASE_URL: "postgres://postgres:microservices@postgresql.infrastructure.svc.cluster.local:5432/<service>_db?sslmode=disable"
+  # Use actual secrets from SealedSecrets or Vault in production
+  <SERVICE>_DATA_DATABASE_SOURCE: "postgres://postgres:<DB_PASSWORD>@postgresql.infrastructure.svc.cluster.local:5432/<service>_db?sslmode=disable"
+  DATABASE_URL: "postgres://postgres:<DB_PASSWORD>@postgresql.infrastructure.svc.cluster.local:5432/<service>_db?sslmode=disable"
 ```
 Then add `- secrets.yaml` to `overlays/dev/kustomization.yaml` resources.
 
 ### Step 3: Verify kustomize builds clean
 
 ```bash
-kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
+kubectl kustomize gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
 ```
 
 ### Step 4: Commit + Push
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/gitops \
+cd gitops \
   && git add -A \
   && git commit -m "fix: <service> <description>" \
   && git pull --rebase origin main \
@@ -122,18 +123,18 @@ cd /Users/tuananh/Desktop/myproject/microservice/gitops \
 
 ```bash
 # Hard refresh (forces ArgoCD to pull latest git)
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl patch application <service>-dev -n argocd \
    --type merge \
    -p '{\"metadata\":{\"annotations\":{\"argocd.argoproj.io/refresh\":\"hard\"}}}'"
 
 # Check ArgoCD picked up the new revision
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl get application -n argocd <service>-dev \
    -o jsonpath='{.status.sync.revision} {.status.sync.status} {.status.health.status}' && echo ''"
 
 # If still OutOfSync, force sync via patch
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl patch application <service>-dev -n argocd \
    --type merge \
    -p '{\"operation\":{\"initiatedBy\":{\"username\":\"admin\"},\"sync\":{\"revision\":\"HEAD\",\"prune\":true}}}'"
@@ -143,13 +144,13 @@ ssh tuananh@dev.tanhdev.com -p 8785 \
 
 ```bash
 # Watch pods until Running
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+$DEV_SSH "kubectl get pods -n <service>-dev"
 
 # Rollout status
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl rollout status deployment/<service> -n <service>-dev --timeout=90s"
+$DEV_SSH "kubectl rollout status deployment/<service> -n <service>-dev --timeout=90s"
 
 # Confirm secret was created
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get secret <name> -n <service>-dev"
+$DEV_SSH "kubectl get secret <name> -n <service>-dev"
 ```
 
 ---
@@ -172,7 +173,7 @@ If an image is missing, trigger a CI build in GitLab to build and update the ima
 
 ### kustomize build error — Duplicate YAML key / bad manifest
 ```bash
-kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/overlays/dev 2>&1
+kubectl kustomize gitops/apps/<service>/overlays/dev 2>&1
 ```
 Fix the YAML error in the reported file → commit → push → sync.
 
@@ -182,7 +183,7 @@ Fix in `base/deployment.yaml` or `base/worker-deployment.yaml` → commit → pu
 
 ### Stuck Migration Job
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl delete job <service>-migration -n <service>-dev"
+$DEV_SSH "kubectl delete job <service>-migration -n <service>-dev"
 # Then sync to recreate
 ```
 
@@ -192,18 +193,18 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl delete job <service>-migration -n <
 
 ```bash
 # Check kustomize build for ALL services at once
-for svc in $(ls /Users/tuananh/Desktop/myproject/microservice/gitops/apps/); do
-  if [ -d "/Users/tuananh/Desktop/myproject/microservice/gitops/apps/$svc/overlays/dev" ]; then
-    kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/$svc/overlays/dev > /dev/null 2>&1 \
+for svc in $(ls gitops/apps/); do
+  if [ -d "gitops/apps/$svc/overlays/dev" ]; then
+    kubectl kustomize gitops/apps/$svc/overlays/dev > /dev/null 2>&1 \
       && echo "✅ $svc" || echo "❌ $svc"
   fi
 done
 
 # All pods across dev namespaces
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep '\-dev'"
+$DEV_SSH "kubectl get pods --all-namespaces | grep '\-dev'"
 
 # Find pods not Running
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods --all-namespaces | grep -v 'Running\|Completed\|NAME'"
+$DEV_SSH "kubectl get pods --all-namespaces | grep -v 'Running\|Completed\|NAME'"
 ```
 
 ---
@@ -257,3 +258,29 @@ Use this for rapid K8s debugging:
 - **commit-code**: Commit GitOps changes
 - **trace-event-flow**: Debug event communication issues
 - **review-service**: Full service review including deployment
+- **performance-profiling**: Profile service performance in K8s
+
+---
+
+## Persistent Volume Debugging (PVC/PV)
+
+If a pod is stuck in `Pending` due to storage:
+
+```bash
+# Check PVC status
+$DEV_SSH "kubectl get pvc -n <service>-dev"
+
+# Describe PVC for events
+$DEV_SSH "kubectl describe pvc <claim-name> -n <service>-dev"
+
+# Check available PVs
+$DEV_SSH "kubectl get pv | grep -E 'Available|Released'"
+
+# Check StorageClass
+$DEV_SSH "kubectl get storageclass"
+```
+
+Common fixes:
+- **No matching PV**: Check StorageClass exists and has provisioner
+- **PV in Released state**: Delete PV and let provisioner create new one
+- **Capacity mismatch**: Ensure PVC request ≤ PV capacity

@@ -25,6 +25,19 @@ Use this skill when investigating performance issues, optimizing hot paths, or c
 5. **Always baseline first** — measure before optimizing
 6. **Focus on biz layer** — most bottlenecks are in business logic, not framework
 
+### 🛡️ Production Profiling Safety
+
+> ⚠️ `/debug/pprof/` is exposed on the HTTP port. In production, this endpoint MUST be behind authentication or disabled.
+
+| Rule | Guideline |
+|------|-----------|
+| **Who approves** | Tech Lead or SRE must approve production profiling |
+| **CPU overhead** | pprof CPU profiling adds ~5% CPU overhead while active |
+| **Safe duration** | Max 30 seconds for CPU profiles; longer durations impact latency |
+| **Memory profiles** | Heap snapshots are safe (point-in-time, minimal overhead) |
+| **Goroutine profiles** | Safe but may block briefly on large goroutine counts |
+| **Endpoint security** | Production pprof should require auth middleware or be on a separate admin port |
+
 ---
 
 ## Tool 1: pprof (CPU & Memory Profiling)
@@ -49,7 +62,7 @@ srv.HandleFunc("/debug/pprof/heap", pprof.Handler("heap").ServeHTTP)
 
 ```bash
 # Port-forward the service HTTP port
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl port-forward -n <service>-dev svc/<service>-service 80XX:80XX &"
 
 # Capture 30-second CPU profile

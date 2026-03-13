@@ -85,6 +85,29 @@ Pricing → pricing.price.deleted → Search Worker (remove ES price)
   ↳ On price delete → check remaining prices → if none → has_price=false (hidden)
 ```
 
+### 8. Checkout Flow
+```
+Checkout → checkout.completed → Order Service (create order from cart)
+Checkout uses gRPC to: Pricing (calculate), Promotion (apply), Shipping (rates)
+```
+
+### 9. Return/Refund Flow
+```
+Order Service → order.return_requested → Return (initiate return)
+Return → return.approved → Warehouse (restock items)
+Return → return.approved → Payment (issue refund)
+Return → return.completed → Order Service (update order status)
+Return → return.completed → Notification (notify customer)
+```
+
+### 10. Loyalty/Rewards Flow
+```
+Order → order.completed → Loyalty (award points)
+Payment → payment.refunded → Loyalty (deduct points)
+Customer → customer.registered → Loyalty (create rewards account)
+Loyalty → rewards.tier_changed → Notification (notify tier upgrade)
+```
+
 > **GOTCHA**: Pricing uses the **outbox pattern** (`worker/outbox.go`). Events are
 > written to an outbox table in the same DB transaction, then a worker polls and
 > publishes via Dapr. This guarantees at-least-once delivery.
@@ -94,46 +117,46 @@ Pricing → pricing.price.deleted → Search Worker (remove ES price)
 ### Step 1: Identify the Event Topic
 Search for the event name in the common events library:
 ```bash
-grep -r "<event_name>" /Users/tuananh/Desktop/myproject/microservice/common/events/
+grep -r "<event_name>" common/events/
 ```
 
 ### Step 2: Find the Publisher
 Search for where the event is published:
 ```bash
 # Search for Publish calls
-grep -rn "Publish" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go" | grep -i "<topic>"
+grep -rn "Publish" <service>/internal/ --include="*.go" | grep -i "<topic>"
 
 # Search for event topic constant
-grep -rn "<TOPIC_NAME>" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go"
+grep -rn "<TOPIC_NAME>" <service>/internal/ --include="*.go"
 ```
 
 ### Step 3: Find the Subscriber
 Search for where the event is consumed:
 ```bash
 # Search for Subscribe/Handler
-grep -rn "Subscribe\|HandleEvent\|OnEvent" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go" | grep -i "<topic>"
+grep -rn "Subscribe\|HandleEvent\|OnEvent" <service>/internal/ --include="*.go" | grep -i "<topic>"
 
 # Check Dapr subscription config
-find /Users/tuananh/Desktop/myproject/microservice/<service> -name "*.yaml" -exec grep -l "<topic>" {} \;
+find <service> -name "*.yaml" -exec grep -l "<topic>" {} \;
 ```
 
 ### Step 4: Check Event Structure
 Look at the event payload definition:
 ```bash
 # In common events library
-cat /Users/tuananh/Desktop/myproject/microservice/common/events/<domain>_events.go
+cat common/events/<domain>_events.go
 
 # Or in the service itself
-grep -rn "type.*Event struct" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go"
+grep -rn "type.*Event struct" <service>/internal/ --include="*.go"
 ```
 
 ### Step 5: Check Dapr Configuration
 ```bash
 # Dapr PubSub component (local)
-cat /Users/tuananh/Desktop/myproject/microservice/dapr/components/pubsub.yaml
+cat dapr/components/pubsub.yaml
 
 # Dapr subscription config (K8s)
-find /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service> -name "*dapr*" -o -name "*subscription*"
+find gitops/apps/<service> -name "*dapr*" -o -name "*subscription*"
 ```
 
 ## How to Add a New Event
@@ -214,28 +237,28 @@ spec:
 ### Event Not Being Published
 ```bash
 # Check for errors in publisher service logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service --tail=200 | grep -i 'publish\|event\|dapr'"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service>-service --tail=200 | grep -i 'publish\|event\|dapr'"
 
 # Check Dapr sidecar logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service>-service -c daprd --tail=100"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service>-service -c daprd --tail=100"
 ```
 
 ### Event Not Being Received
 ```bash
 # Check subscriber service logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <subscriber-service>-dev -l app=<subscriber-service>-service --tail=200 | grep -i 'subscribe\|event\|handler'"
+$DEV_SSH "kubectl logs -n <subscriber-service>-dev -l app=<subscriber-service>-service --tail=200 | grep -i 'subscribe\|event\|handler'"
 
 # Check Dapr subscription config
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get subscription -n <service>-dev"
+$DEV_SSH "kubectl get subscription -n <service>-dev"
 
 # Check Redis streams directly
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl exec -n redis redis-0 -- redis-cli XLEN <topic>"
+$DEV_SSH "kubectl exec -n redis redis-0 -- redis-cli XLEN <topic>"
 ```
 
 ### Event Processing Failed
 ```bash
 # Look for DLQ (Dead Letter Queue) entries
-grep -rn "DLQ\|dead.letter\|retry" /Users/tuananh/Desktop/myproject/microservice/<service>/internal/ --include="*.go"
+grep -rn "DLQ\|dead.letter\|retry" <service>/internal/ --include="*.go"
 ```
 
 ## Event Best Practices
@@ -257,22 +280,8 @@ kubectl get component pubsub-redis -n <service>-dev
 ```
 If missing, create the component in that namespace (copy from `common-operations-dev`).
 
-### 2. Consumer Sees Event But Processing Fails
-Common causes:
-- **ES `document_parsing_exception`**: Check that all fields in the ES document match the mapping (see `mapping.go`). ES `dynamic: strict` rejects unmapped fields.
-- **ES `document_missing_exception`**: Product/document doesn't exist in ES yet. The search-worker's price consumer now handles this by fetching from catalog and indexing first.
-- **ES alias vs base index**: All CRUD operations must use `products_search` (alias), NOT `products` (base index). The sync job creates timestamped indexes and switches the alias.
-
-### 3. ES Index Name Conventions (Search Service)
-| Name | Use |
-|------|-----|
-| `products` | Base index name for `CreateProductIndex` (creates timestamped `products_YYYYMMDD_HHMMSS`) |
-| `products_search` | **Alias** pointing to current timestamped index — ALL CRUD operations must use this |
-
-### 4. Go Map Dotted Keys in ES Documents
-**NEVER** use dotted keys like `doc["name.suggest"]` in Go maps that get serialized to JSON for ES.
-Go serializes it as `{"name.suggest": value}` which ES interprets as nested path `name` → `suggest`, overwriting the `name` text field with an object and causing `document_parsing_exception`.
-ES multi-fields (e.g., `name.suggest`, `name.ngram`) are auto-indexed from the parent text value — no explicit handling needed.
+### 2. Elasticsearch Issues (Search Service Events)
+For ES-related event processing failures (`document_parsing_exception`, `document_missing_exception`, index naming, Go map dotted keys), see the **`troubleshoot-service`** skill — it contains the complete ES debugging reference with commands and solutions.
 
 ---
 

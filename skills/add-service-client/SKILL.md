@@ -20,7 +20,7 @@ Use this skill when a service needs to call another service's API (service-to-se
 
 - **Protocol**: gRPC only (strongly typed, high performance)
 - **Address**: K8s DNS `<service>-service.<service>-dev.svc.cluster.local:<grpc-port>`
-- **Security**: Insecure inside cluster (TLS configurable for production)
+- **Security**: Insecure inside cluster (network policies enforce trust boundary). **For cross-cluster or external calls, set `useTLS=true` with cert-manager certificates.**
 - **Resilience**: Circuit breaker + keepalive + gzip compression
 
 ## When to Use
@@ -37,7 +37,7 @@ This project uses a consistent pattern across all services. See existing example
 
 **Always check existing clients first before creating new ones:**
 ```bash
-find /Users/tuananh/Desktop/myproject/microservice/*/internal/client -name "*_grpc_client.go" 2>/dev/null
+find */internal/client -name "*_grpc_client.go" 2>/dev/null
 ```
 
 ---
@@ -54,7 +54,7 @@ import targetV1 "gitlab.com/ta-microservices/<target-service>/api/<target-servic
 
 Update `go.mod`:
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<source-service>
+cd <source-service>
 
 # Add dependency
 go get gitlab.com/ta-microservices/<target-service>@latest
@@ -291,7 +291,7 @@ var providerSet = wire.NewSet(
 
 Regenerate wire:
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<source-service>/cmd/<service> && wire
+cd <source-service>/cmd/<service> && wire
 ```
 
 > ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.

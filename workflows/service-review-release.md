@@ -375,10 +375,10 @@ cat apps/<service>/base/kustomization.yaml | grep newTag
 
 ```bash
 # Watch pods
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev -w"
+$DEV_SSH "kubectl get pods -n <service>-dev -w"
 
 # Check logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service> --tail=100 -f"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service> --tail=100 -f"
 ```
 
 **11.3 Verify Health**

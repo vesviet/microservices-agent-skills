@@ -58,6 +58,21 @@ go build ./...
 
 All checks must pass before proceeding.
 
+**1.2 Quick Code Review**
+
+> ⚠️ **Mandatory gate**: Run a quick review before deploying. Use the `review-code` skill (Mode A) to check for P0/P1 issues.
+
+```bash
+# Review changed files
+git diff --name-only HEAD~1
+
+# Check for common anti-patterns:
+# - Missing error wrapping
+# - Biz layer calling DB directly
+# - Unmanaged goroutines
+# - Missing input validation at service layer
+```
+
 **1.2 Check for Breaking Changes**
 
 If you made API changes:
@@ -166,13 +181,13 @@ cat apps/<service>/base/kustomization.yaml | grep newTag
 
 ```bash
 # Development
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev -w"
+$DEV_SSH "kubectl get pods -n <service>-dev -w"
 
 # Staging
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-staging -w"
+$DEV_SSH "kubectl get pods -n <service>-staging -w"
 
 # Production
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-prod -w"
+$DEV_SSH "kubectl get pods -n <service>-prod -w"
 ```
 
 Wait for:
@@ -184,10 +199,10 @@ Wait for:
 
 ```bash
 # Check for errors in new pods
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service> --tail=50"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service> --tail=50"
 
 # Follow logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service> --tail=50 -f"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service> --tail=50 -f"
 ```
 
 Look for:
@@ -311,7 +326,7 @@ git push origin main
 **Check**:
 ```bash
 # Describe pod
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod <pod-name> -n <service>-dev"
+$DEV_SSH "kubectl describe pod <pod-name> -n <service>-dev"
 
 # Common causes:
 # - Image pull error
@@ -327,13 +342,13 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod <pod-name> -n <service
 **Check**:
 ```bash
 # Check if pods are ready
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
+$DEV_SSH "kubectl get pods -n <service>-dev"
 
 # Check logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service> --tail=100"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service> --tail=100"
 
 # Check service
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get svc -n <service>-dev"
+$DEV_SSH "kubectl get svc -n <service>-dev"
 ```
 
 **Solution**: See [Troubleshooting Workflow](troubleshooting.md)

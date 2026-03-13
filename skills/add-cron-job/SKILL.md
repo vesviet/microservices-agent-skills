@@ -121,11 +121,17 @@ func (j *MyCleanupJob) execute(ctx context.Context) {
 	count, err := j.entityUsecase.CleanupStaleRecords(ctx, 500)
 	if err != nil {
 		j.log.WithContext(ctx).Errorf("Cleanup failed: %v", err)
+		// Emit error metric for observability
+		cronJobErrors.WithLabelValues("my-cleanup-job").Inc()
 		return
 	}
 
 	duration := time.Since(startTime)
 	j.log.WithContext(ctx).Infof("Cleanup completed in %v: %d records processed", duration, count)
+
+	// Emit duration metric for monitoring
+	cronJobDuration.WithLabelValues("my-cleanup-job").Observe(duration.Seconds())
+	cronJobRecordsProcessed.WithLabelValues("my-cleanup-job").Add(float64(count))
 }
 ```
 
@@ -234,3 +240,4 @@ cd <service> && go build ./...
 - **commit-code**: Commit worker changes
 - **write-tests**: Test cron job logic
 - **use-common-lib**: Use common worker utilities
+- **performance-profiling**: Profile cron job performance if duration degrades

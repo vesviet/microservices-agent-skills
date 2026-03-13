@@ -314,7 +314,7 @@ psql -h localhost -U ecommerce_user -d postgres -c "CREATE DATABASE <new-service
 **5.4 Run Migration**
 
 ```bash
-DATABASE_URL="postgres://ecommerce_user:ecommerce_pass@localhost:5432/<new-service>_db?sslmode=disable" \
+DATABASE_URL="postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<new-service>_db?sslmode=disable" \
   make migrate-up
 ```
 
@@ -338,7 +338,7 @@ server:
 data:
   database:
     driver: postgres
-    source: postgres://ecommerce_user:ecommerce_pass@localhost:5432/<new-service>_db?sslmode=disable
+    source: postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<new-service>_db?sslmode=disable
   redis:
     addr: localhost:6379
     read_timeout: 0.2s
@@ -360,7 +360,7 @@ vim .env
 ```
 
 ```bash
-DATABASE_URL=postgres://ecommerce_user:ecommerce_pass@localhost:5432/<new-service>_db?sslmode=disable
+DATABASE_URL=postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<new-service>_db?sslmode=disable
 REDIS_ADDR=localhost:6379
 CONSUL_ADDR=localhost:8500
 ```
@@ -577,10 +577,10 @@ cd /home/user/microservices/gitops && git pull origin main
 cat apps/<new-service>/base/kustomization.yaml | grep newTag
 
 # Check pods
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <new-service>-dev"
+$DEV_SSH "kubectl get pods -n <new-service>-dev"
 
 # Check logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <new-service>-dev -l app=<new-service> --tail=50"
+$DEV_SSH "kubectl logs -n <new-service>-dev -l app=<new-service> --tail=50"
 ```
 
 ### Checklist

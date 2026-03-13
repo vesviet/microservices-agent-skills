@@ -93,9 +93,9 @@ Paths and commands below use `<serviceName>`; replace it with the real service n
 
 ```bash
 # Pull latest for the service AND related repos
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName> && git pull origin main
-cd /Users/tuananh/Desktop/myproject/microservice/common && git pull origin main
-cd /Users/tuananh/Desktop/myproject/microservice/gitops && git pull origin main
+cd <serviceName> && git pull origin main
+cd common && git pull origin main
+cd gitops && git pull origin main
 ```
 
 ### Step 1: Index & Review Codebase
@@ -123,7 +123,7 @@ cd /Users/tuananh/Desktop/myproject/microservice/gitops && git pull origin main
 
 ```bash
 # Who depends on this service's proto?
-grep -r 'gitlab.com/ta-microservices/<serviceName>' --include='go.mod' /Users/tuananh/Desktop/myproject/microservice/*/go.mod
+grep -r 'gitlab.com/ta-microservices/<serviceName>' --include='go.mod' */go.mod
 ```
 
 - Proto field numbers preserved (use `reserved` for deleted fields)
@@ -135,7 +135,7 @@ grep -r 'gitlab.com/ta-microservices/<serviceName>' --include='go.mod' /Users/tu
 
 ```bash
 # Who consumes this service's events?
-grep -r 'Topic.*<serviceName>' /Users/tuananh/Desktop/myproject/microservice/*/internal/ --include='*.go' -l
+grep -r 'Topic.*<serviceName>' */internal/ --include='*.go' -l
 ```
 
 - Event struct changes are additive-only (removing/renaming fields = breaking)
@@ -202,7 +202,7 @@ For each P0/P1 issue found in Step 1–3, create a concrete action plan:
 #### 5.1 Run Coverage
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName>
+cd <serviceName>
 
 # Full coverage by package
 go test ./internal/... -count=1 -cover 2>&1 | grep -E '^ok|^FAIL'
@@ -239,13 +239,13 @@ Update `docs/10-appendix/checklists/test/TEST_COVERAGE_CHECKLIST.md` with:
 
 ```bash
 # If common has uncommitted changes, it MUST be committed + tagged FIRST
-cd /Users/tuananh/Desktop/myproject/microservice/common && git status
+cd common && git status
 ```
 
 **If `common` changed → commit, tag, and push `common` BEFORE touching the service:**
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 golangci-lint run && go build ./... && go test ./...
 rm -rf bin/ # ALWAYS check and remove bin directory before committing
 git add -A && git commit -m "<type>(common): <description>"
@@ -264,7 +264,7 @@ git push origin main && git push origin v1.x.y
 grep 'replace gitlab.com/ta-microservices' <serviceName>/go.mod
 
 # If found: remove replace lines, then get latest versions:
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName>
+cd <serviceName>
 go get gitlab.com/ta-microservices/common@latest
 go get gitlab.com/ta-microservices/<other-dep>@latest
 go mod tidy
@@ -273,7 +273,7 @@ go mod tidy
 #### 6.3 Update dependencies
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName>
+cd <serviceName>
 # Always get the latest version for common
 go get gitlab.com/ta-microservices/common@latest    # or @v1.x.y if just tagged
 
@@ -288,7 +288,7 @@ go mod tidy
 ### Step 7: Lint & Build
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName>
+cd <serviceName>
 
 # 1. Generate proto (if .proto files changed)
 make api
@@ -298,7 +298,7 @@ cd cmd/<serviceName> && wire
 cd ../worker && wire      # if worker binary exists
 
 # 3. Lint (target: zero warnings)
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName>
+cd <serviceName>
 golangci-lint run
 
 # 4. Build
@@ -320,7 +320,7 @@ Before release, verify config alignment between code and GitOps.
 
 ```bash
 # 0. Look up correct ports from standard
-grep '<serviceName>' /Users/tuananh/Desktop/myproject/microservice/gitops/docs/PORT_ALLOCATION_STANDARD.md
+grep '<serviceName>' gitops/docs/PORT_ALLOCATION_STANDARD.md
 
 # 1. Check env vars used in code
 grep -rn 'os.Getenv\|viper.Get\|envconfig' <serviceName>/internal/ --include='*.go'
@@ -393,7 +393,7 @@ Update **`<serviceName>/CHANGELOG.md`** (create if not exists) using conventiona
 #### 10.2 Commit
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<serviceName>
+cd <serviceName>
 rm -rf bin/ # ALWAYS check and remove bin directory before committing
 git add -A
 git commit -m "<type>(<serviceName>): <description>"
@@ -414,7 +414,7 @@ git push origin v1.0.7
 
 ```bash
 # Only if you changed files in gitops/ (e.g. gateway.yaml, configmap.yaml)
-cd /Users/tuananh/Desktop/myproject/microservice/gitops
+cd gitops
 # ⚠️ ALWAYS pull before commit — gitops is shared across all services
 git pull --rebase origin main
 git add apps/<serviceName>/

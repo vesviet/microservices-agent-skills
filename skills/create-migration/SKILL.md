@@ -64,7 +64,7 @@ DROP TABLE IF EXISTS example;
 
 ### Step 1: Check Existing Migrations
 ```bash
-ls -la /Users/tuananh/Desktop/myproject/microservice/<service>/migrations/
+ls -la <service>/migrations/
 ```
 Determine the next sequence number and understand the existing schema.
 
@@ -80,6 +80,7 @@ Create a new file in `<service>/migrations/` following the naming convention.
 
 #### UUID Primary Keys (preferred)
 ```sql
+-- Requires PostgreSQL 13+. For PG 12 or older, enable: CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 id UUID PRIMARY KEY DEFAULT gen_random_uuid()
 ```
 
@@ -96,10 +97,26 @@ customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE
 ```
 
 #### Indexes
+
+> ⚠️ **For large tables (10k+ rows)**: Use `CREATE INDEX CONCURRENTLY` to avoid table locks.
+> `CONCURRENTLY` cannot run inside a transaction — use `-- +goose NO TRANSACTION` annotation.
+
 ```sql
+-- Standard (OK for small tables / new tables in same migration)
 CREATE INDEX idx_orders_customer_id ON orders(customer_id);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE UNIQUE INDEX idx_users_email ON users(email);
+```
+
+**For large tables, create a separate migration file:**
+```sql
+-- +goose Up
+-- +goose NO TRANSACTION
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+
+-- +goose Down
+-- +goose NO TRANSACTION
+DROP INDEX CONCURRENTLY IF EXISTS idx_orders_customer_id;
 ```
 
 #### Enums (using VARCHAR with CHECK)

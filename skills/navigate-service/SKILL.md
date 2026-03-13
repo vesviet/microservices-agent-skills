@@ -18,7 +18,7 @@ Use this skill when the user asks to understand, explore, or navigate a specific
 
 All services follow the same **Clean Architecture + DDD** pattern built with the **Go Kratos Framework**.
 
-### Service Directories (relative to `/Users/tuananh/Desktop/myproject/microservice/`)
+### Service Directories (relative to ``)
 | Service | Directory | HTTP Port | gRPC Port |
 |---------|-----------|-----------|-----------|
 | Auth | `auth/` | 8000 | 9000 |

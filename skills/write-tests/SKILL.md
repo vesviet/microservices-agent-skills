@@ -194,6 +194,19 @@ func TestGetOrder_DatabaseError(t *testing.T) {
 
 ## Mock Patterns
 
+### Choosing the Right Mock Framework
+
+> ⚠️ Use ONE framework per test file. NEVER mix mockgen and testify/mock in the same file.
+
+| Criteria | `mockgen` (gomock) | `testify/mock` |
+|---|---|---|
+| Interface has **4+ methods** | ✅ Use this | ❌ Too verbose |
+| Interface has **1-3 methods** | ⚠️ Overkill | ✅ Use this |
+| **Cross-package** mocks (shared by multiple tests) | ✅ Use this → `internal/biz/mocks/` | ❌ Not recommended |
+| **Single-file** test helper | ❌ Too heavy | ✅ Use this → `*_test.go` |
+| Need **strict call order** verification | ✅ `InOrder()` | ⚠️ Limited |
+| Need **argument matching** flexibility | ✅ `gomock.Any()` | ✅ `mock.Anything` |
+
 ### Generated Mocks via mockgen (Project Standard)
 
 The project uses `go.uber.org/mock/mockgen` to generate mocks from interfaces.
@@ -326,7 +339,7 @@ func TestHandlePaymentConfirmed_InvalidPayload(t *testing.T) {
 
 ```bash
 # Run all tests in a service
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 go test ./...
 
 # Run specific package tests
@@ -393,7 +406,7 @@ go tool cover -html=coverage.out
 
 **How to get coverage numbers:**
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 go test -cover ./internal/biz/... 2>&1 | grep -E "^ok|coverage"
 ```
 
@@ -442,7 +455,7 @@ Use this checklist for quick test writing workflow:
 **After completing all test work, you MUST commit and push using the `commit-code` skill.**
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 rm -rf bin/
 git add -A
 git commit -m "test(<service>): <description of test changes>"

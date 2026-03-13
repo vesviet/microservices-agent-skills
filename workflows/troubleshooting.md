@@ -143,7 +143,7 @@ psql -h localhost -U ecommerce_user -d postgres -c "CREATE DATABASE <service>_db
 psql -h localhost -U ecommerce_user -d <service>_db -c "SELECT 1"
 
 # Run migrations
-DATABASE_URL="postgres://ecommerce_user:ecommerce_pass@localhost:5432/<service>_db?sslmode=disable" \
+DATABASE_URL="postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<service>_db?sslmode=disable" \
   make migrate-up
 ```
 
@@ -222,7 +222,7 @@ vim configs/config.yaml
 cat migrations/<timestamp>_<name>.sql
 
 # Check migration status
-DATABASE_URL="postgres://ecommerce_user:ecommerce_pass@localhost:5432/<service>_db?sslmode=disable" \
+DATABASE_URL="postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<service>_db?sslmode=disable" \
   goose -dir migrations status
 ```
 
@@ -378,10 +378,10 @@ go run ./cmd/<service>/... 2>&1 | tee service.log
 **Kubernetes**:
 ```bash
 # Pod logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app=<service> --tail=100"
+$DEV_SSH "kubectl logs -n <service>-dev -l app=<service> --tail=100"
 
 # Dapr sidecar logs
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev <pod-name> -c daprd --tail=100"
+$DEV_SSH "kubectl logs -n <service>-dev <pod-name> -c daprd --tail=100"
 ```
 
 #### Step 3: Check Configuration

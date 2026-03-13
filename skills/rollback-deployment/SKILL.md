@@ -50,7 +50,7 @@ When the code itself has a bug. CI/CD will rebuild and redeploy.
 ### Step 1: Identify the Bad Commit
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 git log --oneline -10
 ```
 
@@ -76,8 +76,8 @@ git push origin main
 ### Step 4: Verify
 
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-dev"
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --tail=20"
+$DEV_SSH "kubectl get pods -n <service>-dev"
+$DEV_SSH "kubectl logs -n <service>-dev -l app.kubernetes.io/name=<service> --tail=20"
 ```
 
 ---
@@ -90,11 +90,11 @@ When environment config (ConfigMap/Secret) is wrong.
 
 ```bash
 # Check recent gitops changes
-cd /Users/tuananh/Desktop/myproject/microservice/gitops
+cd gitops
 git log --oneline -5
 
 # Check pod events for clues
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l app.kubernetes.io/name=<service> | tail -30"
+$DEV_SSH "kubectl describe pod -n <service>-dev -l app.kubernetes.io/name=<service> | tail -30"
 ```
 
 ### Step 2: Fix the Config
@@ -108,13 +108,13 @@ ssh tuananh@dev.tanhdev.com -p 8785 "kubectl describe pod -n <service>-dev -l ap
 ### Step 3: Verify Kustomize Builds
 
 ```bash
-kubectl kustomize /Users/tuananh/Desktop/myproject/microservice/gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
+kubectl kustomize gitops/apps/<service>/overlays/dev > /dev/null 2>&1 && echo "✅ OK" || echo "❌ FAIL"
 ```
 
 ### Step 4: Commit, Push, Sync
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/gitops
+cd gitops
 git pull --rebase origin main
 git add -A
 git commit -m "fix(<service>): revert config change — <reason>"
@@ -124,7 +124,7 @@ git push origin main
 ### Step 5: Trigger ArgoCD Hard Refresh
 
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl patch application <service>-dev -n argocd \
    --type merge \
    -p '{\"metadata\":{\"annotations\":{\"argocd.argoproj.io/refresh\":\"hard\"}}}'"
@@ -140,21 +140,21 @@ When you need **immediate** rollback and can't wait for CI/CD cycle. This is a *
 
 ```bash
 # Check rollout history
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl rollout history deployment/<service>-service -n <service>-dev"
 
 # Rollback to previous revision
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl rollout undo deployment/<service>-service -n <service>-dev"
 
 # Verify
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl rollout status deployment/<service>-service -n <service>-dev --timeout=90s"
 ```
 
 > ⚠️ **ArgoCD will detect drift** and may re-sync the bad version. Temporarily disable auto-sync if needed:
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl patch application <service>-dev -n argocd \
    --type merge \
    -p '{\"spec\":{\"syncPolicy\":null}}'"
@@ -162,7 +162,7 @@ ssh tuananh@dev.tanhdev.com -p 8785 \
 
 > **Remember to re-enable auto-sync** after fixing through GitOps:
 ```bash
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl patch application <service>-dev -n argocd \
    --type merge \
    -p '{\"spec\":{\"syncPolicy\":{\"automated\":{\"prune\":true,\"selfHeal\":true}}}}'"
@@ -176,15 +176,15 @@ ssh tuananh@dev.tanhdev.com -p 8785 \
 
 ```bash
 # Port-forward the database
-ssh tuananh@dev.tanhdev.com -p 8785 \
+$DEV_SSH \
   "kubectl port-forward -n infrastructure svc/postgresql 5432:5432 &"
 
 # Check current migration status
-DATABASE_URL="postgres://postgres:microservices@localhost:5432/<service>_db?sslmode=disable" \
+DATABASE_URL="postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<service>_db?sslmode=disable" \
   goose -dir migrations postgres "$DATABASE_URL" status
 
 # Rollback last migration
-DATABASE_URL="postgres://postgres:microservices@localhost:5432/<service>_db?sslmode=disable" \
+DATABASE_URL="postgres://<DB_USER>:<DB_PASSWORD>@localhost:5432/<service>_db?sslmode=disable" \
   goose -dir migrations postgres "$DATABASE_URL" down
 ```
 

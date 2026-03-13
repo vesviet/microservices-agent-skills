@@ -27,7 +27,7 @@ Use this skill when committing code changes to any microservice. It ensures all 
 8. **NEVER manually update `newTag`** in `gitops/apps/*/overlays/*/kustomization.yaml` — CI/CD pipeline automatically updates image tags after building
 9. **ALWAYS check and remove `bin` directories/files** before committing.
 10. **NEVER use Docker locally** — no `docker build`, no `make docker-build`, no `docker-compose`. CI/CD handles all image building and publishing.
-11. **NEVER commit the `docs` repository/directory** — ensure you do not add or commit files from the `docs` directory.
+11. **NEVER commit the `docs` repository/directory** — `docs/` is a **separate git repository** (uses `master` branch). Service doc edits are written during reviews but committed independently by the user. Only `<service>/CHANGELOG.md` and `<service>/README.md` (inside the service repo) should be committed as part of service workflows.
 
 ---
 
@@ -61,7 +61,7 @@ Use this skill when committing code changes to any microservice. It ensures all 
 
 ```bash
 # Check if common has uncommitted changes
-cd /Users/tuananh/Desktop/myproject/microservice/common && git status
+cd common && git status
 
 # If common changed → go to "Process for Common" section below FIRST
 # If common is clean → continue with Step 2
@@ -70,7 +70,7 @@ cd /Users/tuananh/Desktop/myproject/microservice/common && git status
 ### Step 2: Clean Dependencies
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 
 # 1. Check for forbidden replace directives
 grep 'replace gitlab.com/ta-microservices' go.mod
@@ -88,10 +88,15 @@ go mod tidy
 
 ### Step 3: Regenerate Proto (if changed)
 
+> ⚠️ **Step order matters**: Dependencies (Step 2) → Proto (Step 3) → Wire (Step 4) → Lint (Step 5). Always complete Step 2 first — proto generation may fail if dependencies aren't resolved.
+
 ```bash
 # Only if .proto files were modified
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 make api
+
+# Quick validation: ensure build passes after proto regen
+go build ./...
 ```
 
 This regenerates:
@@ -102,15 +107,15 @@ This regenerates:
 ### Step 4: Regenerate Wire (if DI changed)
 
 ```bash
-# Only if wire.go or providers changed
-cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/<service> && wire
-cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/worker && wire  # if worker exists
+# Only if wire.go or providers changed — ALWAYS regen BOTH binaries
+cd <service>/cmd/<service> && wire
+cd <service>/cmd/worker && wire  # if worker exists
 ```
 
 ### Step 5: Lint
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 golangci-lint run
 
 # Target: ZERO warnings
@@ -120,7 +125,7 @@ golangci-lint run
 ### Step 6: Build
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 go build ./...
 
 # Must pass with zero errors
@@ -145,7 +150,7 @@ Update `<service>/CHANGELOG.md` (create if not exists):
 ### Step 8: Commit
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 # ALWAYS Check and remove bin directory before committing
 rm -rf bin/
 git add -A
@@ -167,7 +172,7 @@ git commit -m "<type>(<scope>): <description>"
 ### Step 9: Push
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 git push origin main
 ```
 
@@ -177,7 +182,7 @@ git push origin main
 
 ```bash
 # Only if you changed files in gitops/ (e.g. gateway.yaml, configmap.yaml)
-cd /Users/tuananh/Desktop/myproject/microservice/gitops
+cd gitops
 # ⚠️ ALWAYS pull before commit — gitops is shared across all services
 git pull --rebase origin main
 git add -A
@@ -194,7 +199,7 @@ git push origin main
 ### Step 1: Validate Common
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 
 # 1. Lint
 golangci-lint run
@@ -209,7 +214,7 @@ go test ./...
 ### Step 2: Check What Changed
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 git diff --stat
 
 # Determine version bump:
@@ -227,7 +232,7 @@ git diff --stat
 ### Step 4: Commit Common
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 # ALWAYS Check and remove bin directory before committing
 rm -rf bin/
 git add -A
@@ -237,7 +242,7 @@ git commit -m "<type>(common): <description>"
 ### Step 5: Tag Common
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 
 # Check current latest tag
 git tag --sort=-creatordate | head -5
@@ -256,7 +261,7 @@ Fixed:
 ### Step 6: Push Common + Tag
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 git push origin main
 git push origin v1.9.7  # push the specific tag
 ```
@@ -264,7 +269,7 @@ git push origin v1.9.7  # push the specific tag
 ### Step 7: Update Services to Use New Common
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 
 # Get the new common version
 go get gitlab.com/ta-microservices/common@v1.9.7
@@ -285,7 +290,7 @@ Then proceed with the normal service commit process (Step 2 onwards).
 # SCENARIO 1: Only service changed (common unchanged)
 # ═══════════════════════════════════════════════════════
 
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 
 # Validate
 grep 'replace gitlab.com/ta-microservices' go.mod  # must be empty
@@ -306,7 +311,7 @@ git push origin main
 # ═══════════════════════════════════════════════════════
 
 # 1. Common first
-cd /Users/tuananh/Desktop/myproject/microservice/common
+cd common
 golangci-lint run && go build ./... && go test ./...
 rm -rf bin/ # Remove bin files/directories
 git add -A && git commit -m "feat(common): <description>"
@@ -314,7 +319,7 @@ git tag -a v1.9.7 -m "v1.9.7: <summary>"
 git push origin main && git push origin v1.9.7
 
 # 2. Then service
-cd /Users/tuananh/Desktop/myproject/microservice/<service>
+cd <service>
 go get gitlab.com/ta-microservices/common@v1.9.7
 go mod tidy
 make api        # if proto changed

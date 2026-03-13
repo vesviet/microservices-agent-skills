@@ -36,10 +36,10 @@ If NO to all above → Use normal workflow, not hotfix
 
 ```bash
 # Check which service is affected
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -A | grep -v Running"
+$DEV_SSH "kubectl get pods -A | grep -v Running"
 
 # Check logs for errors
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-prod -l app=<service> --tail=100"
+$DEV_SSH "kubectl logs -n <service>-prod -l app=<service> --tail=100"
 ```
 
 **1.3 Determine Root Cause**
@@ -82,7 +82,7 @@ git push origin main
 
 ```bash
 # Scale down to 0 replicas temporarily
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl scale deployment <service> -n <service>-prod --replicas=0"
+$DEV_SSH "kubectl scale deployment <service> -n <service>-prod --replicas=0"
 
 # This gives time to fix without affecting other services
 ```
@@ -210,8 +210,8 @@ git push origin v1.2.4
 cd /home/user/microservices/gitops && git pull origin main
 
 # Verify staging
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-staging"
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-staging -l app=<service> --tail=50"
+$DEV_SSH "kubectl get pods -n <service>-staging"
+$DEV_SSH "kubectl logs -n <service>-staging -l app=<service> --tail=50"
 
 # Test in staging
 curl http://<service>-staging.tanhdev.com/api/v1/<endpoint>
@@ -244,20 +244,20 @@ git push origin main
 
 ```bash
 # Watch pods rolling out
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl rollout status deployment/<service> -n <service>-prod"
+$DEV_SSH "kubectl rollout status deployment/<service> -n <service>-prod"
 
 # Watch pod status
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl get pods -n <service>-prod -w"
+$DEV_SSH "kubectl get pods -n <service>-prod -w"
 ```
 
 **5.2 Check Logs**
 
 ```bash
 # Check for errors
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-prod -l app=<service> --tail=100 -f"
+$DEV_SSH "kubectl logs -n <service>-prod -l app=<service> --tail=100 -f"
 
 # Check all pods
-ssh tuananh@dev.tanhdev.com -p 8785 "kubectl logs -n <service>-prod -l app=<service> --all-containers=true --tail=50"
+$DEV_SSH "kubectl logs -n <service>-prod -l app=<service> --all-containers=true --tail=50"
 ```
 
 **5.3 Verify Fix**

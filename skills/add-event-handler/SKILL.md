@@ -277,13 +277,22 @@ func (c SourceConsumer) HandleXxx(ctx context.Context, e commonEvents.Message) e
         return fmt.Errorf("failed to decode event: %w", err)
     }
 
+    // 2. Idempotency check — prevent duplicate processing
+    if processed, _ := c.idempotencyService.IsProcessed(ctx, eventData.EntityID, eventData.EventType); processed {
+        c.log.WithContext(ctx).Infof("Event already processed, skipping: entity_id=%s", eventData.EntityID)
+        return nil  // ACK to prevent retry
+    }
+
     c.log.WithContext(ctx).Infof("Processing event: entity_id=%s", eventData.EntityID)
 
-    // 2. Process business logic
+    // 3. Process business logic
     if err := c.processXxx(ctx, &eventData); err != nil {
         c.log.WithContext(ctx).Errorf("Failed to process event: %v", err)
         return fmt.Errorf("failed to process event: %w", err)  // Returning error triggers retry
     }
+
+    // 4. Mark as processed (idempotency)
+    _ = c.idempotencyService.MarkProcessed(ctx, eventData.EntityID, eventData.EventType)
 
     c.log.WithContext(ctx).Infof("Successfully processed event: entity_id=%s", eventData.EntityID)
     return nil  // Returning nil = ACK the message
@@ -357,7 +366,7 @@ Ensure the dependent provider sets include `eventbus.ProviderSet` so the new con
 ### Step 7: Regenerate Wire
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/worker && wire
+cd <service>/cmd/worker && wire
 ```
 
 > ⚠️ **NEVER manually edit `wire_gen.go`** — it is auto-generated. Only edit `wire.go`, then run `wire` to regenerate.
@@ -424,6 +433,24 @@ func (c Consumer) Handle(ctx context.Context, e commonEvents.Message) error {
 ---
 
 ## Outbox Pattern (Alternative to Direct Publishing)
+
+> ⚠️ **MANDATORY DECISION**: Before publishing any event, determine which pattern to use:
+
+| Question | Direct Publishing | Outbox Pattern |
+|----------|:-----------------:|:--------------:|
+| Can the business tolerate this event being lost? | ✅ Yes | ❌ No |
+| Is this event critical to a multi-service workflow? | ❌ No | ✅ Yes |
+| Does this event trigger money movement (payment, refund)? | ❌ No | ✅ Yes |
+| Does this event mutate inventory or stock? | ❌ No | ✅ Yes |
+| Is this event for analytics/notifications only? | ✅ Yes | ❌ No |
+
+**Examples:**
+- `order.confirmed` → **Outbox** (triggers payment + fulfillment)
+- `payment.completed` → **Outbox** (triggers order status change)
+- `product.viewed` → **Direct** (analytics, loss is acceptable)
+- `notification.email_sent` → **Direct** (tracking, loss is acceptable)
+
+### Outbox Implementation:
 
 For guaranteed delivery, use the outbox pattern instead of direct publishing:
 

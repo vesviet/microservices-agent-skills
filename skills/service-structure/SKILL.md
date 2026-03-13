@@ -526,13 +526,13 @@ func newWorkers(
 ### Step 4: Regenerate Wire
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service>/cmd/worker && wire
+cd <service>/cmd/worker && wire
 ```
 
 ### Step 5: Build & Test
 
 ```bash
-cd /Users/tuananh/Desktop/myproject/microservice/<service> && go build ./...
+cd <service> && go build ./...
 ```
 
 ## Checklist
