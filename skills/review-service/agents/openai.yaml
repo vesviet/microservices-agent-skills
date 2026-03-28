@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Service"
+  short_description: "Help with Review Service tasks"
+  default_prompt: "Use $review-service to review this service for release readiness."

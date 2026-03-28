@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rollback Deployment"
+  short_description: "Help with Rollback Deployment tasks"
+  default_prompt: "Use $rollback-deployment to recover from this failed deployment safely."

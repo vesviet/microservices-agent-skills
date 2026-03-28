@@ -64,16 +64,16 @@ Skill tự chọn combo agents dựa trên **topic keywords**. 3 Core agents (A,
 
 1. **Parse user's request** — xác định vấn đề/module cần review
 2. **Auto-select panel** — chọn combo agents phù hợp theo bảng trên
-3. Nếu user chỉ nói chung chung (e.g. "review order service"), hỏi clarify:
+3. Nếu scope quá mơ hồ đến mức ảnh hưởng trực tiếp kết quả review, hỏi một câu clarify ngắn; nếu không thì tự đưa ra giả định hợp lý và tiếp tục:
    - Review toàn bộ service hay chỉ 1 phần?
    - Focus vào logic nào? (routing, event flow, data layer, security, performance...)
    - Có concern cụ thể nào không?
 
 ### Step 2: Index the Codebase
 
-1. **Identify target files** — dùng `find_by_name`, `list_dir` để tìm các file liên quan
-2. **Read key files** — dùng `view_file_outline` trước, rồi `view_file` cho các file quan trọng
-3. **Trace dependencies** — dùng `grep_search` để hiểu data flow và dependencies
+1. **Identify target files** — dùng repo search nhanh như `rg --files` hoặc directory listing để tìm các file liên quan
+2. **Read key files** — bắt đầu bằng file entry points và các file quan trọng nhất, rồi mở rộng dần theo dependency chain
+3. **Trace dependencies** — dùng `rg -n` hoặc các tìm kiếm code tương đương để hiểu data flow và dependencies
 4. **Check config** — đọc config files liên quan (yaml, proto, migrations)
 5. **Target coverage**: Đọc tối thiểu:
    - Entry point (`cmd/*/main.go`, `cmd/*/wire.go`)
@@ -85,6 +85,9 @@ Skill tự chọn combo agents dựa trên **topic keywords**. 3 Core agents (A,
    - Relevant docs (`docs/`)
 
 ### Step 3: Conduct the Meeting Review
+
+- Chỉ spawn subagents nếu user **explicitly** yêu cầu delegation / parallel agents.
+- Nếu user không yêu cầu, hãy **simulate panel discussion trong một output duy nhất** thay vì dùng subagents thật.
 
 Tạo một **Artifact (.md)** với cấu trúc sau. Mỗi section phải có **thảo luận thật sự giữa các agents** — không chỉ liệt kê issues mà phải có:
 - Agent tranh luận, phản bác nhau

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Navigate Service"
+  short_description: "Help with Navigate Service tasks"
+  default_prompt: "Use $navigate-service to understand how this microservice is structured and where logic lives."

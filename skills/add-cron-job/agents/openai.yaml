@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Cron Job"
+  short_description: "Help with Add Cron Job tasks"
+  default_prompt: "Use $add-cron-job to add a scheduled worker job in this microservice."

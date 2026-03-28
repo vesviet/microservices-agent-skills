@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Event Handler"
+  short_description: "Help with Add Event Handler tasks"
+  default_prompt: "Use $add-event-handler to add an event publisher or consumer in this microservice."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Upgrade Common Lib"
+  short_description: "Help with Upgrade Common Lib tasks"
+  default_prompt: "Use $upgrade-common-lib to roll out a new common library version across services."

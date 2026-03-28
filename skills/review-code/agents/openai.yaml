@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Code"
+  short_description: "Help with Review Code tasks"
+  default_prompt: "Use $review-code to review these code changes for bugs, risks, and architecture issues."

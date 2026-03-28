@@ -23,10 +23,10 @@ Use this skill when the user asks you to "create a task for agent", "assign task
 2. Look for the file in `docs/10-appendix/checklists/workflow/agent-tasks/`:
    - First try: `AGENT-XX.md` (empty slot)
    - Then try: `AGENT-XX-*.md` (existing file with suffix)
-3. Use `view_file` to read the current content of the file.
+3. Read the current content of the file directly before editing it.
 4. **CRITICAL UPDATE RULE**: If the user requests to **update** or **reassign** an existing agent task (even if it has old pending tasks), you MUST:
    - **CLEAN OLD TEXT**: Completely overwrite the file's old content with the new task requirements. Do not append to old, unrelated tasks.
-   - **RENAME FILE**: If the new task has a different topic, rename the file using `run_command` (e.g., `mv AGENT-XX-OLD-TOPIC.md AGENT-XX-NEW-TOPIC.md`).
+   - **RENAME FILE**: If the new task has a different topic, rename the file using a normal shell move/rename command (e.g., `mv AGENT-XX-OLD-TOPIC.md AGENT-XX-NEW-TOPIC.md`).
 5. If creating a new task in an empty slot, proceed to overwrite the empty template.
 
 ### Step 2: Understand the Work
@@ -34,7 +34,7 @@ Use this skill when the user asks you to "create a task for agent", "assign task
 1. Read the user's task description carefully.
 2. If the user references a **meeting review report**, **checklist**, or **review document**, read those source files to extract actionable issues.
 3. If the user provides a high-level description (e.g., "harden the payment service"), you MUST:
-   - Navigate the target service's codebase using `view_file_outline`, `grep_search`, `view_file`
+   - Navigate the target service's codebase using fast repo search and file reads (for example `rg --files`, `rg -n`, and direct file inspection)
    - Identify concrete issues (security gaps, missing error handling, N+1 queries, etc.)
    - Break them into specific, implementable tasks
 
@@ -71,7 +71,7 @@ cd <service> && go test ./path/... -run TestName -v
 
 ### Step 4: Clean and Write the Agent File
 
-1. **ALWAYS overwrite the entire file** — do NOT append to old template/content. Use `write_to_file` with `Overwrite: true`.
+1. **ALWAYS overwrite the entire file** — do NOT append to old template/content. Replace the file contents in one clean pass.
 2. Follow this exact file structure:
 
 ```markdown
@@ -155,7 +155,7 @@ If the file was an empty slot (`AGENT-XX.md`), rename it to include the topic:
 AGENT-XX.md → AGENT-XX-<TOPIC>.md
 ```
 
-Use `run_command` with `mv` to rename:
+Use a normal shell `mv` command to rename:
 ```bash
 mv docs/.../agent-tasks/AGENT-XX.md docs/.../agent-tasks/AGENT-XX-<TOPIC>.md
 ```

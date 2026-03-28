@@ -1,0 +1,4 @@
+interface:
+  display_name: "Meeting Review"
+  short_description: "Help with Meeting Review tasks"
+  default_prompt: "Use $meeting-review to run a structured multi-perspective review of this topic."

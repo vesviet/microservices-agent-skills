@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Migration"
+  short_description: "Help with Create Migration tasks"
+  default_prompt: "Use $create-migration to add a new Goose migration for this service."

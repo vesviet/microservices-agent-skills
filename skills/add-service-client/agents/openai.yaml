@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Service Client"
+  short_description: "Help with Add Service Client tasks"
+  default_prompt: "Use $add-service-client to add a gRPC client for service-to-service communication."

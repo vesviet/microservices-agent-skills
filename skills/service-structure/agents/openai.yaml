@@ -1,0 +1,4 @@
+interface:
+  display_name: "Service Structure"
+  short_description: "Help with Service Structure tasks"
+  default_prompt: "Use $service-structure to explain or apply the standard service architecture in this repo."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Process Agent Task"
+  short_description: "Help with Process Agent Task tasks"
+  default_prompt: "Use $process-agent-task to implement and validate the pending AGENT tasks."

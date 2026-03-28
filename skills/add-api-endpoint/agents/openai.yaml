@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add API Endpoint"
+  short_description: "Help with Add API Endpoint tasks"
+  default_prompt: "Use $add-api-endpoint to add a new REST or gRPC endpoint in this microservice."

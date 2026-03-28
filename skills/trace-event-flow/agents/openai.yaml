@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trace Event Flow"
+  short_description: "Help with Trace Event Flow tasks"
+  default_prompt: "Use $trace-event-flow to trace how events move between services."

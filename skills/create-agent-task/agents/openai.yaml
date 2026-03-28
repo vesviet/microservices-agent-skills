@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Agent Task"
+  short_description: "Help with Create Agent Task tasks"
+  default_prompt: "Use $create-agent-task to turn this request into a structured AGENT task file."

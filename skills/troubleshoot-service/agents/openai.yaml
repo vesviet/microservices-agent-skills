@@ -1,0 +1,4 @@
+interface:
+  display_name: "Troubleshoot Service"
+  short_description: "Help with Troubleshoot Service tasks"
+  default_prompt: "Use $troubleshoot-service to diagnose this service build, startup, or runtime issue."

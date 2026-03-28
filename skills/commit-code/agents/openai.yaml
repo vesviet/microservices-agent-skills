@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit Code"
+  short_description: "Help with Commit Code tasks"
+  default_prompt: "Use $commit-code to validate and prepare this microservice change for commit."

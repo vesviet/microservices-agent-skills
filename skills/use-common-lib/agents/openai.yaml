@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use Common Lib"
+  short_description: "Help with Use Common Lib tasks"
+  default_prompt: "Use $use-common-lib to check the shared common library before adding new utility code."

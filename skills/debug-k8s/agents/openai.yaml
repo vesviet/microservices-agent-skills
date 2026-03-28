@@ -1,0 +1,4 @@
+interface:
+  display_name: "Debug K8s"
+  short_description: "Help with Debug K8s tasks"
+  default_prompt: "Use $debug-k8s to investigate this Kubernetes or ArgoCD issue."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Setup Gitops"
+  short_description: "Help with Setup Gitops tasks"
+  default_prompt: "Use $setup-gitops to update the GitOps manifests for this service."

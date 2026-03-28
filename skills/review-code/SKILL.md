@@ -277,7 +277,7 @@ Documentation, code style, low test coverage, naming.
 - User references `service-review-release-prompt.md`
 - Full service readiness assessment needed
 
-**→ Follow the `review-service` skill (`.agent/skills/review-service/SKILL.md`) which provides the complete 10-step service review process including:**
+**→ Follow the `review-service` skill in this pack for the complete 10-step service review process, including:**
 1. Index & Review Codebase (using ALL Mode A criteria §1-§16 above)
 2. Cross-Service Impact Analysis
 3. Create Review Checklist

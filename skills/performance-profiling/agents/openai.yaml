@@ -1,0 +1,4 @@
+interface:
+  display_name: "Performance Profiling"
+  short_description: "Help with Performance Profiling tasks"
+  default_prompt: "Use $performance-profiling to investigate a performance bottleneck in this service."
