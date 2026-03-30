@@ -1,0 +1,4 @@
+interface:
+  display_name: "Debug OpenClaw Telegram"
+  short_description: "Help debug OpenClaw Telegram bot issues on the homelab server"
+  default_prompt: "Use $debug-openclaw-telegram to diagnose why the OpenClaw Telegram bot is failing or returning generic errors."
