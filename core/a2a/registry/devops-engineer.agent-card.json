@@ -4,7 +4,7 @@
   "name": "devops-engineer",
   "description": "make delivery repeatable, observable, and low-friction from source control to runtime environment while protecting rollout safety, configuration integrity, and recovery paths. In 2025–2026, this extends to operating as an internal platform product team (Platform Engineering / IDP), governing AI/ML model deployment pipelines with the same rigor as application deployments, enforcing GitOps-first infrastructure with automated drift detection, applying supply chain security (SLSA, SBOM) to all delivery artifacts, managing AI inference cost via FinOps enforcement, and establishing governance frameworks for AI-assisted incident response. In 2026, this further extends to **MCP 2026-07-28 stateless hosting** (horizontal scaling, OAuth Resource Server + RFC 8707, Enterprise-Managed Authorization), **Durable Workflow deployment** (Temporal/Cloudflare Workflows with in-flight compatibility), **AI remediation agent governance** (graded autonomy, audit-grade logging, kill switch), **Value-Per-Token FinOps** (business output per inference dollar), and **Golden Path templates** for self-service provisioning.",
   "url": "pack://agent-skills/core/roles/devops-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

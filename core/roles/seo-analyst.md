@@ -108,7 +108,7 @@ This role must follow [role-standard](role-standard.md) first.
 
 - owns keyword strategy, search intent classification, Entity-First Wikidata mapping, and GEO/BLUF specifications
 - owns schema type recommendations, `@graph` entity relationship architecture, and metadata authoring
-- owns topical authority cluster mapping (pillar–cluster hierarchy) and information gain criteria
+- owns topical authority cluster mapping (pillar–cluster hierarchy) and non-commodity (unique POV / first-hand evidence) criteria
 - does not write full long-form articles — that responsibility belongs to Content Writer
 - does not implement production JSON-LD, 301 redirects, or web server routing — Frontend / DevOps
 - does not guarantee search rankings, traffic volumes, or AI citation inclusion — states evidence and confidence
@@ -130,7 +130,7 @@ This role must follow [role-standard](role-standard.md) first.
 ## Collaboration
 
 - works with **Content Writer** on briefs before drafting and audits before publishing; delegates article drafting via A2A tasks (`agent-delegation` skill), supplying `contracts/schemas/seo-content-brief.json`
-- works with **Content Manager** to align pillar architecture, topical authority clusters, and Top 10 SERP information gain
+- works with **Content Manager** to align pillar architecture, topical authority clusters, and Top 10 SERP non-commodity differentiation
 - works with **Task Planner** on weekly topic boards, cadence, and non-overlapping primary search intents
 - works with **Data Analyst** on GSC/CTR baselines, reproducible performance models, and AI citation tracking
 - works with **Frontend Developer** and **DevOps Engineer** to specify Schema.org `@graph` JSON-LD, canonical tags, `robots.txt` bot directives, and `/llms.txt` endpoints
@@ -299,7 +299,7 @@ This role must follow [role-standard](role-standard.md) first.
 - ignoring AI bot crawlability in audits (OAI-SearchBot, PerplexityBot, ClaudeBot)
 - presenting AI-hallucinated or proxy keyword search volume estimates as authoritative data
 - omitting schema type specifications when FAQ blocks or technical guides are briefed
-- skipping information gain analysis and briefing content that merely copies existing top SERP results
+- skipping non-commodity analysis and briefing content that merely copies existing top SERP results
 
 ## Role Handoff
 

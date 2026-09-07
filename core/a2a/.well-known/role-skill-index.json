@@ -1,5 +1,5 @@
 {
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol": "A2A 1.0 + Antigravity",
   "root": ".",
   "stats": {
@@ -634,7 +634,7 @@
     "data-engineer": {
       "name": "data-engineer",
       "title": "Data Engineer",
-      "description": "design, build, and maintain deterministic, high-throughput data pipelines, lakehouse storage layers, and unified semantic layers so analysts, applications, and autonomous AI agents can consume reliable, timely, and governable data products. In 2026–2027, this extends to enforcing Open Data Contract Standard (ODCS v3) specifications at producer boundaries, architecting Modern Lakehouses with Apache Iceberg v3 and Delta Lake, ensuring strict idempotency and deterministic upsert MERGE semantics, deploying automated circuit-breakers with Dead-Letter Queue (DLQ) quarantine, practicing Data FinOps resource governance, and maintaining Zero-Trust data security under OWASP ASI03/ASI06.",
+      "description": "design, build, and maintain deterministic, high-throughput data pipelines, lakehouse storage layers, and unified semantic layers so analysts, applications, and autonomous AI agents can consume reliable, timely, and governable data products. In 2026–2027, this extends to enforcing Open Data Contract Standard (ODCS v3.1.0) specifications at producer boundaries, architecting Modern Lakehouses with Apache Iceberg v3 and Delta Lake, ensuring strict idempotency and deterministic upsert MERGE semantics, deploying automated circuit-breakers with Dead-Letter Queue (DLQ) quarantine, practicing Data FinOps resource governance, and maintaining Zero-Trust data security under OWASP ASI03/ASI06.",
       "file": "core/roles/data-engineer.md",
       "skills": [
         "build-data-pipeline",
@@ -834,7 +834,7 @@
     "researcher": {
       "name": "researcher",
       "title": "Researcher",
-      "description": "run deep, iterative investigation and deliver triangulated, structured findings that downstream roles can act on without re-researching the baseline. In 2025–2026, this means navigating an AI-saturated information landscape where LLM-generated content permeates the web — distinguishing primary human-verified sources from AI-synthesized aggregations, applying Chain-of-Verification for critical claims, and enabling information gain for downstream SEO and content roles.",
+      "description": "run deep, iterative investigation and deliver triangulated, structured findings that downstream roles can act on without re-researching the baseline. In 2025–2026, this means navigating an AI-saturated information landscape where LLM-generated content permeates the web — distinguishing primary human-verified sources from AI-synthesized aggregations, applying Chain-of-Verification for critical claims, and enabling non-commodity value for downstream SEO and content roles.",
       "file": "core/roles/researcher.md",
       "skills": [
         "conduct-research",
@@ -1377,7 +1377,7 @@
       "category": "content",
       "type": "core",
       "file": "core/skills/content/write-article/SKILL.md",
-      "description": "Plan, research, outline, and draft long-form articles and blog posts with explicit evidence discipline, answer-first structure, GEO/AEO execution, information gain quality gates, E-E-A-T experience signals, and SEO-brief alignment. Use for narrative content, guides, reviews, and announcements—not for API runbooks or pure technical reference docs."
+      "description": "Plan, research, outline, and draft long-form articles and blog posts with explicit evidence discipline, answer-first structure, GEO/AEO execution, non-commodity (unique POV/first-hand evidence) quality gates, E-E-A-T experience signals, and SEO-brief alignment. Use for narrative content, guides, reviews, and announcements—not for API runbooks or pure technical reference docs."
     },
     "configure-llms-txt": {
       "name": "configure-llms-txt",
@@ -1776,7 +1776,7 @@
       "category": "security-data",
       "type": "core",
       "file": "core/skills/security-data/build-data-pipeline/SKILL.md",
-      "description": "Design and implement transactional lakehouse pipelines (Iceberg/Delta), enforce ODCS v3 data contracts at producer boundaries, integrate Great Expectations/dbt-expectations quality gates, and isolate invalid records in DLQ quarantine with deterministic replayability. Use when the work requires an owned, repeatable data pipeline."
+      "description": "Design and implement transactional lakehouse pipelines (Iceberg/Delta), enforce ODCS v3.1.0 data contracts at producer boundaries, integrate Great Expectations/dbt-expectations quality gates, and isolate invalid records in DLQ quarantine with deterministic replayability. Use when the work requires an owned, repeatable data pipeline."
     },
     "database-maintenance": {
       "name": "database-maintenance",

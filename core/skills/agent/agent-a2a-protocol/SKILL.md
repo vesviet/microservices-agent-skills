@@ -17,10 +17,12 @@ Use this skill for **complete A2A 1.0** behavior beyond single-hop `agent-delega
 
 ## Core Rules
 
-- publish or consume **Agent Cards** (`agent-card.json`) before delegating
+- publish or consume **Agent Cards** at the IANA permanent well-known URI `/.well-known/agent-card.json` (renamed from `agent.json` in A2A v0.3.0); the pack registry mirror lives at `core/a2a/registry/<role>.agent-card.json`
 - use UUID v4 for `task_id` when targeting Antigravity AgentKit
-- drive tasks through states: `submitted` → `working` → (`input-required` optional) → terminal
-- terminal states: `completed`, `failed`, `canceled`
+- drive tasks through states: `TASK_STATE_SUBMITTED` → `TASK_STATE_WORKING` → (`TASK_STATE_INPUT_REQUIRED` optional) → terminal (`TASK_STATE_COMPLETED`, `TASK_STATE_FAILED`, `TASK_STATE_CANCELED`) — enums are `SCREAMING_SNAKE_CASE` per A2A v1.0; treat `submitted`/`working`/`input-required`/`completed`/`failed`/`canceled` as pack-local aliases
+- parse task payload parts using the unified v1.0 `Part` object (discriminate by `"text" in part`, `"file" in part`, `"data" in part` — no `kind` discriminator field)
+- return errors on wire transports as `google.rpc.Status` + `google.rpc.ErrorInfo` with `domain: "a2a-protocol.org"` (replaces RFC 9457 problem+json)
+- honor the `tenant` field for multi-tenant deployments: scope task lookup, artifacts, and progress events to the requesting tenant
 - stream long work via `a2a-task-progress.json` (SSE) when `interaction_mode` is `stream`
 - wrap HTTP calls in `a2a-jsonrpc-envelope.json` (JSON-RPC 2.0)
 - validate every artifact against the task's `output_schema_ref` using grammar-constrained decoding
@@ -30,6 +32,8 @@ Use this skill for **complete A2A 1.0** behavior beyond single-hop `agent-delega
 - publish streaming lifecycle events using the `event` enum in `contracts/schemas/a2a-task-progress.json`: `task.created`, `task.status`, `task.message`, `task.artifact`, `task.completed`, `task.failed`, `task.canceled`
 - validate webhook push notification callbacks against the credentials declared in the task's `PushNotificationConfig.authentication`, and validate the callback URL against private IP ranges and SSRF before registering it
 - implement three-layer error recovery: (1) schema-error reflection prompt for format errors, (2) exponential backoff with full jitter for transient RPC failures, and (3) circuit breaker escalation to HITL after $N=3$ failures
+- target the current protocol floor **A2A v1.0.1 (2026-05-26)** and treat governance references as **AAIF/Linux Foundation** (A2A joined the Agentic AI Foundation on 2026-08-27 alongside MCP, goose, AGENTS.md, and agentgateway)
+- when paginating coordinator dashboards, use `ListTasks` with cursor pagination instead of unbounded task dumps
 
 **Spec vs pack convention.** The A2A specification streams `TaskStatusUpdateEvent` and `TaskArtifactUpdateEvent` over SSE, with task states named `TASK_STATE_*`. The `task.*` event names and the `agent.invoke` / `agent.stream` JSON-RPC methods used throughout this pack are the **Antigravity adapter binding**, not spec wire names — the spec operations are `message/send`, `message/stream`, `tasks/get`, and `tasks/cancel`. When targeting a non-Antigravity A2A peer, use the spec names and treat this pack's names as a local alias layer.
 

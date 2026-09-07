@@ -4,7 +4,7 @@
   "name": "content-manager",
   "description": "direct the overall content portfolio strategy of a website — from designing content pillar architecture, governing the content lifecycle (production → distribution → measurement → refresh), to enforcing Top 10 SERP Information Gain, authenticating subject matter expert (SME) credentials, and optimizing for Generative Engine Optimization (GEO). Bridge business goals and day-to-day content operations; ensure every published asset delivers novel value, serves the right audience, on the right channel, at the right stage of website growth. In 2025–2026, this extends to governing AI-assisted content pipelines with mandatory human editorial gates, enforcing the Top 10 SERP Information Gain differential threshold (≥75/100, rejecting zero-gain skyscraper rewrites), managing a 3-tier content decay monitoring system (Algorithmic, GEO Citation, and Factual), authenticating real-world SME provenance, and enforcing semantic drift prevention across multi-channel distribution.",
   "url": "pack://agent-skills/core/roles/content-manager.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

@@ -207,8 +207,88 @@
       }
     },
     "edge_ai_integration": {
-      "type": "boolean",
-      "description": "True if this deployment includes Cloudflare Workers AI or Edge inference."
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object",
+          "description": "Workers AI + AI Gateway unified control plane details (2026-08 unification and later).",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "gateway_id": {
+              "type": "string",
+              "description": "AI Gateway ID used on env.AI.run calls; 'default' is the standard value."
+            },
+            "model_naming": {
+              "type": "string",
+              "description": "Model naming convention in cost logs, e.g. 'provider/model'."
+            },
+            "model_first_routing": {
+              "type": "string",
+              "description": "'pilot' | 'ga' | 'not-used' — provider-transparent model request routing status."
+            }
+          },
+          "required": [
+            "enabled",
+            "gateway_id"
+          ]
+        }
+      ]
+    },
+    "runtime_capabilities": {
+      "type": "object",
+      "description": "Workers runtime capabilities used by this deployment (2026-2027).",
+      "properties": {
+        "containers": {
+          "type": "boolean",
+          "description": "Cloudflare Containers (GA, DO-managed instances; inbound TCP/gRPC supported since Aug 2026)."
+        },
+        "sandbox_sdk": {
+          "type": "string",
+          "description": "'none' | 'stable' | '1.0-preview' — Cloudflare Sandbox SDK usage."
+        },
+        "durable_objects_sqlite": {
+          "type": "boolean",
+          "description": "Durable Objects with SQLite storage (GA, free plan supported)."
+        },
+        "dynamic_workers": {
+          "type": "boolean",
+          "description": "Dynamic Workers (concurrency raised 4 to 10 in Aug 2026)."
+        },
+        "access_for_workers": {
+          "type": "boolean",
+          "description": "Access policy attached directly to the Worker."
+        },
+        "worker_size_limit_mib": {
+          "type": "integer",
+          "description": "Uncompressed size limit in MiB (64 MiB for all plans since 2026-09-04)."
+        }
+      }
+    },
+    "mcp_handler": {
+      "type": "object",
+      "description": "MCP server exposure on this Worker per the 2026-07-28 stateless spec.",
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "'createMcpHandler' | 'McpAgent (obsolete)' | 'none' — plain Worker handler is the current pattern; McpAgent must be migrated."
+        },
+        "oauth_provider": {
+          "type": "string",
+          "description": "Workers OAuth Provider config; must include clientIdMetadataDocumentEnabled (CIMD) before DCR removal after summer 2027."
+        },
+        "header_routing": {
+          "type": "boolean",
+          "description": "Whether Mcp-Method/Mcp-Name headers are used for WAF/rate-limit routing."
+        },
+        "registry_published": {
+          "type": "boolean",
+          "description": "Whether server.json is published to the Official MCP Registry with verified reverse-DNS namespace."
+        }
+      }
     }
   },
   "required": [

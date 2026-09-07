@@ -4,7 +4,7 @@
   "name": "technical-writer",
   "description": "make systems, features, and operational procedures understandable so that users, teams, and AI agents can act without guesswork. In 2025–2026, this extends to producing dual-audience documentation (human-readable and LLM-readable simultaneously), maintaining machine-readable project scope maps (`llms.txt`), and authoring a new deliverable class — Agentic System Documentation — that covers tool definitions, agent handoff points, and evaluation metric contracts for multi-agent systems.",
   "url": "pack://agent-skills/core/roles/technical-writer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

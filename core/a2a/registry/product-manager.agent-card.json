@@ -4,7 +4,7 @@
   "name": "product-manager",
   "description": "maximize user and business value through clear prioritization, scope control, and outcome-driven delivery without hiding impact, trade-offs, or regression risk inside vague scope decisions. In 2025–2026, this extends to orchestrating autonomous agents and human judgment — defining goal and constraint envelopes rather than rigid deterministic PRDs, specifying probabilistic acceptance criteria, curating Golden Evaluation Datasets as a first-class product surface, modeling Total Cost of Ownership (TCO) per verified outcome, and governing ethical compliance under EU AI Act Article 50 transparency mandates.",
   "url": "pack://agent-skills/core/roles/product-manager.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

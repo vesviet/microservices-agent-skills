@@ -2,12 +2,27 @@
 
 Strict, portable conventions for Astro v5/6/7 projects deployed to Cloudflare Workers/Pages. These rules extend `core/rules/code.md`.
 
-## 2026 Version Context
+## 2027 Version Context
 
-- **Astro**: v6 (stable) / v7 (current) — Cloudflare-owned since Jan 2026
+- **Astro**: v6 (stable) / v7 (current line: 7.x) — Cloudflare-owned since Jan 2026
 - **Vite**: v8 + Rolldown (Rust bundler — use `rolldownOptions` instead of `rollupOptions`)
 - **TailwindCSS**: v4 CSS-first (no `tailwind.config.js`)
 - **Node.js**: 22+ required
+
+## 0. Deployment Target Mandate (2027)
+
+- **Cloudflare Workers + Static Assets is the only greenfield target** — Cloudflare's own docs now steer all new projects away from Pages ("Start new projects with Workers", banner updated 2026-08-25) and the Pages changelog has been frozen since April 2025.
+- **Pages→Workers migration checklist**: `pages_build_output_dir` → `assets.directory` (+ `not_found_handling`, `run_worker_first` pattern config, `.assetsignore`), `_worker.js` → `main`, Pages wrangler commands → `wrangler dev`/`wrangler deploy` + Workers Builds, previews via workers.dev URLs, `_headers`/`_redirects` supported natively by Static Assets. Known gaps (plan around them): custom domains outside Cloudflare zones are unsupported on Workers; per-environment (prod vs non-prod) bindings are not yet native.
+- **MCP servers on Workers (2026-07-28 spec)**: `McpAgent` is obsolete — use `createMcpHandler` from the official MCP TS SDK on a plain Worker (Durable Objects only when the app itself needs state); Workers OAuth Provider must enable `clientIdMetadataDocumentEnabled` (CIMD) before DCR removal after summer 2027; route by `Mcp-Method`/`Mcp-Name` headers for WAF/rate-limit rules.
+- **AI control plane**: route every `env.AI.run(...)` call through AI Gateway (`{ gateway: { id: 'default' } }` — unified Workers AI + AI Gateway binding and billing since 2026-08); log model names as `provider/model` in cost reports; model-first routing GA expected 2027.
+
+## 0a. Astro v7 Migration Notes (when moving from v5/v6)
+
+- **Rust compiler strictness** (oxc + Lightning CSS): unclosed tags are now errors — run a lint pass before upgrading; no HTML auto-correction; `compressHTML: 'jsx'` whitespace semantics is the default (use `compressHTML: 'true'` to preserve legacy output when visual regressions appear).
+- **Sätteri** is the default Markdown/MDX processor — audit the remark/rehype plugin inventory per site before upgrading (the unified pipeline is opt-in via `@astrojs/markdown-remark`).
+- **Advanced routing**: `src/fetch.ts` is a reserved Workers-style fetch entrypoint name — do not create a page file with that name unless it is the entrypoint; middleware ordering is explicit (auth before Actions); Hono composition via `astro/hono`.
+- **Route caching**: `Astro.cache`, `routeRules`, `cache.invalidate()` by tag/path are stable — adopt `cacheCloudflare()` from `@astrojs/cloudflare/cache` for SSR pages instead of hand-rolled cache headers; CDN cache providers auto-enable once out of experimental.
+- **Live Content Collections** (`defineLiveCollection()`/`getLiveEntry()`) for request-time freshness-critical listings (property/product feeds); keep build-time collections for SEO content; CSP API replaces hand-rolled CSP headers; `@astrojs/db` was removed in v7.
 
 ## 1. Component Architecture (Astro Islands)
 

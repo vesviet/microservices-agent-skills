@@ -10,6 +10,7 @@ For every published article, record:
 - **Live URL Slug**
 - **Pillar/Cluster Mapping**
 - **Internal Links Used** (Source and Target)
+- **Gen-AI impressions (first week)** — from Search Console's Generative AI report (worldwide since 2026-08-31); fill in ~7 days after publish
 
 ## 2. Schema Implementation Hand-off
 
@@ -19,12 +20,15 @@ For every published article, record:
 ## 3. Weekly AI Visibility Tracking (Rollup)
 
 Traditional SEO tracking (Google Search Console impressions/clicks) is no longer sufficient. 
-- **Weekly Task:** The `seo-analyst` must conduct a Weekly Rollup to track **AI Visibility**.
-- **Metrics to Track:** Verify if the newly published URLs are being cited or extracted in:
-  1. Google AI Overviews (SGE)
-  2. Perplexity AI Search
-  3. ChatGPT / SearchGPT
-- **Feedback Loop:** If visibility is low, adjust the `fact density` and `answer-first` structural rules for the next sprint.
+- **Weekly Task:** The `seo-analyst` must conduct a Weekly Rollup tracking **AI Visibility** across:
+  1. **Search Console Generative AI report** (AI Overviews + AI Mode impressions, pages, countries, devices) — first-class KPI alongside classic Performance and Discover
+  2. Google AI Overviews / AI Mode citation presence
+  3. Perplexity AI Search
+  4. ChatGPT / SearchGPT
+- **Repeated sampling rule**: LLM brand recommendations are unstable across repeated queries — never conclude cited/not-cited from a single run; log multiple runs across different dates before drawing conclusions
+- **Eligibility gate**: verify once that the site is included in "Search generative AI features" in Search Console (an opt-in gate for AI Overviews/AI Mode display)
+- **Attribution hygiene**: parse `chatgpt.com` / `perplexity.ai` referrers in analytics; treat third-party AI-rank trackers with skepticism (none have access to Google internal metrics)
+- **Feedback Loop:** If visibility is low, adjust `fact density` and `answer-first` structural rules for the next sprint — do NOT resort to information-distorting rewrites (they are now a detection target)
 
 ## Standard 2026 Alignment
 

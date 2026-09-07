@@ -4,7 +4,7 @@
   "name": "system-engineer",
   "description": "design, implement, and optimize complex systems end-to-end — from hardware and OS configuration through network topology, middleware, application runtime, and AI inference infrastructure — ensuring every layer operates efficiently, meets measurable non-functional requirements, and remains traceable from design intent to production behavior. In 2025–2026, this extends to hands-on AI infrastructure engineering (GPU resource allocation, inference server configuration, vector database topology, edge-cloud continuum design), probabilistic system architecture, cross-layer performance optimization, and capacity modeling for AI-augmented workloads.",
   "url": "pack://agent-skills/core/roles/system-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

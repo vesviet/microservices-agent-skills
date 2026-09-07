@@ -4,7 +4,7 @@
   "name": "data-analyst",
   "description": "answer critical business and product questions with reproducible, statistically grounded, and well-documented analysis from lakehouse and tabular data — defining metrics rigorously through canonical semantic layers, separating verifiable evidence from narrative interpretation, and delivering stakeholder-ready insights without owning production pipeline infrastructure. In 2026–2027, this extends to conducting Semantic Metric Querying to prevent Text-to-SQL hallucination, leveraging DuckDB and Polars for lightning-fast in-process analysis, executing statistical drift and anomaly detection, enforcing rigorous causal DAG reasoning for high-stakes decisions, and delivering quantitative reports with verifiable cryptographic sources.",
   "url": "pack://agent-skills/core/roles/data-analyst.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

@@ -65,7 +65,7 @@ python3 core/scripts/generate-a2a-registry.py
 This emits:
 - `core/a2a/registry/*.agent-card.json` — per-role A2A agent cards
 - `core/a2a/.well-known/agent-registry.json` — internal multi-agent directory
-- `core/a2a/.well-known/agent.json` — **A2A 1.0 2026 canonical endpoint** (`/.well-known/agent.json`)
+- `core/a2a/.well-known/agent-card.json` — **A2A 1.0 2026 canonical endpoint** (`/.well-known/agent-card.json`)
 - `core/a2a/.well-known/ai-catalog.json` — **Google AI Catalog 2026 meta-index**
 - `adapters/antigravity/capability-role-map.generated.yaml` — Antigravity routing map
 

@@ -2,7 +2,7 @@
 
 This reference checklist provides detailed engineering, lakehouse architecture, data contract, and governance criteria for data engineering to meet 2027 Agentic SWE and Modern Data standards.
 
-### 1. Open Data Contract Standard (ODCS v3) & Boundary Enforcement
+### 1. Open Data Contract Standard (ODCS v3.1.0) & Boundary Enforcement
 - **Machine-Readable Contract Specification**: Pipeline contracts are formally declared using Open Data Contract Standard v3 (`contracts/schemas/data-pipeline-spec.json`) covering dataset grain, schema invariants, freshness SLAs, quality gates, and quarantine policies.
 - **Producer Boundary Gate Enforcement**: Automated schema validation runs at producer boundaries; invalid or non-compliant payloads fail closed prior to ingestion into Bronze/raw lakehouse tables.
 - **Strict SemVer Schema Evolution**: Schema mutations adhere to Semantic Versioning: additive nullable columns represent minor version bumps; breaking changes (column removal, type alterations, nullability changes) require major version increments with dual-write transition periods.

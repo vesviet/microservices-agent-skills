@@ -2,9 +2,9 @@
   "id": "pack://agent-skills/core/roles/data-engineer",
   "contract_type": "agent-card",
   "name": "data-engineer",
-  "description": "design, build, and maintain deterministic, high-throughput data pipelines, lakehouse storage layers, and unified semantic layers so analysts, applications, and autonomous AI agents can consume reliable, timely, and governable data products. In 2026–2027, this extends to enforcing Open Data Contract Standard (ODCS v3) specifications at producer boundaries, architecting Modern Lakehouses with Apache Iceberg v3 and Delta Lake, ensuring strict idempotency and deterministic upsert MERGE semantics, deploying automated circuit-breakers with Dead-Letter Queue (DLQ) quarantine, practicing Data FinOps resource governance, and maintaining Zero-Trust data security under OWASP ASI03/ASI06.",
+  "description": "design, build, and maintain deterministic, high-throughput data pipelines, lakehouse storage layers, and unified semantic layers so analysts, applications, and autonomous AI agents can consume reliable, timely, and governable data products. In 2026–2027, this extends to enforcing Open Data Contract Standard (ODCS v3.1.0) specifications at producer boundaries, architecting Modern Lakehouses with Apache Iceberg v3 and Delta Lake, ensuring strict idempotency and deterministic upsert MERGE semantics, deploying automated circuit-breakers with Dead-Letter Queue (DLQ) quarantine, practicing Data FinOps resource governance, and maintaining Zero-Trust data security under OWASP ASI03/ASI06.",
   "url": "pack://agent-skills/core/roles/data-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,
@@ -30,7 +30,7 @@
     {
       "id": "build-data-pipeline",
       "name": "Build Data Pipeline",
-      "description": "Design and implement transactional lakehouse pipelines (Iceberg/Delta), enforce ODCS v3 data contracts at producer boundaries, integrate Great Expectations/dbt-expectations quality gates, and isolate invalid records in DLQ quarantine with deterministic replayability. Use when the work requires an owned, repeatable data pipeline.",
+      "description": "Design and implement transactional lakehouse pipelines (Iceberg/Delta), enforce ODCS v3.1.0 data contracts at producer boundaries, integrate Great Expectations/dbt-expectations quality gates, and isolate invalid records in DLQ quarantine with deterministic replayability. Use when the work requires an owned, repeatable data pipeline.",
       "tags": [
         "security",
         "pack"

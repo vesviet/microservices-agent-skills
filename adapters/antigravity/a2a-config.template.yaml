@@ -4,12 +4,12 @@
 a2a:
   enabled: true
   protocol_version: "1.0"
-  pack_version: "4.1.0"  # sync with VERSION file
+  pack_version: "5.0.0"  # sync with VERSION file
 
   discovery:
     registry: "core/a2a/.well-known/agent-registry.json"
     agent_card_pattern: "core/a2a/registry/{role}.agent-card.json"
-    well_known_path: "/.well-known/agent.json"
+    well_known_path: "/.well-known/agent-card.json"
 
   defaults:
     interaction_mode: stream

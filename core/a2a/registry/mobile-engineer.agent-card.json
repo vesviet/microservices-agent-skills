@@ -4,7 +4,7 @@
   "name": "mobile-engineer",
   "description": "deliver correct, performant, and accessible mobile experiences on iOS and Android by owning native app logic, platform integration, offline behavior, and release readiness without hiding device, OS version, or distribution risk. In 2025–2026, this extends to governing AI-generated mobile code with tiered trust validation (parallel to Frontend Developer standards), complying with App Store AI policies (Apple 4.3(b), Google Play AI disclosure), designing hybrid on-device/cloud LLM hosting architecture, and applying privacy-preserving ML patterns (federated learning + differential privacy) for on-device personalization.",
   "url": "pack://agent-skills/core/roles/mobile-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

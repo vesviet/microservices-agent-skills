@@ -4,7 +4,7 @@
   "name": "frontend-developer",
   "description": "build reliable, accessible, and maintainable user interfaces that correctly express product behavior, preserve business logic, and avoid regressions when features or bug fixes change system behavior. In 2025–2026, this extends to governing AI-generated UI code with tiered trust validation, owning rendering strategy decisions (SSR/CSR/partial hydration/islands/edge RSC) as architectural choices, treating Core Web Vitals (INP, LCP, CLS) as product quality requirements enforced by CI/CD performance budgets, enforcing automated accessibility gates (axe-core) in CI, architecting PWA service workers as agentic orchestration control-planes, implementing EU AI Act Article 50 disclosure UI components as a legal requirement (live from 2 August 2026), and sanitizing AI-generated content before DOM insertion using Trusted Types and DOMPurify.",
   "url": "pack://agent-skills/core/roles/frontend-developer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

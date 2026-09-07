@@ -2,7 +2,7 @@
 
 Use this adapter when running **Claude Code** (`claude` CLI or Claude Code IDE extension) with the agent-skills engineering pack.
 
-Pack version: **4.1.0** | A2A: **1.0** | OWASP ASI: **2026**
+Pack version: **5.0.0** | A2A: **1.0** | OWASP ASI: **2026**
 
 ---
 

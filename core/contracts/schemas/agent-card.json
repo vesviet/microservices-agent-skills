@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "agent-card",
   "title": "A2A Agent Card",
-  "description": "Self-describing manifest for agent discovery (A2A 1.0 / Antigravity). Publish at /.well-known/agent.json per role or use pack registry.",
+  "description": "Self-describing manifest for agent discovery (A2A 1.0 / Antigravity). Publish at /.well-known/agent-card.json per role or use pack registry.",
   "type": "object",
   "properties": {
     "name": {

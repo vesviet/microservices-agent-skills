@@ -115,3 +115,18 @@ Skip emission for routine single-entry additions that do not cross a role bounda
 
 - **RFC 9727 API Catalog implementation:** Publish `/.well-known/api-catalog` returning a `linkset+json` document with `anchor`, `href`, and `type: application/openapi+json` link relations for each API. This enables automated API discovery by agent orchestrators and developer tooling.
 - **API catalog versioning:** Each catalog entry should include a `version` field and a `deprecated` boolean flag. Automated clients (agents, SDKs) use the catalog to select the highest non-deprecated version without human intervention.
+
+## 2027: Three-Tier Agentic Discovery
+
+The 2027 discovery stack consolidates three well-known layers — publish all three when the service exposes each surface, and keep them consistent (an entry appearing in two layers must reference the same artifact):
+
+| Tier | Well-known path | Standard | Covers |
+|------|-----------------|----------|--------|
+| 1 — A2A | `/.well-known/agent-card.json` (IANA permanent) | A2A v1.0+ (AAIF) | Agent identity, skills, auth schemes, signatures (JCS RFC 8785 + JWS RFC 7515) |
+| 2 — Plain APIs | `/.well-known/api-catalog` | RFC 9727 Linkset | OpenAPI specs, docs, status — what this skill has always managed |
+| 3 — AI Catalog | `/.well-known/ai-catalog.json` | Linux Foundation Agent-Card/ai-catalog (adoption votes pending in MCP + A2A steering committees) | Typed umbrella container indexing MCP Server Cards (`application/mcp-server-card+json`), A2A Agent Cards (`application/a2a-agent-card+json`), plugins, datasets, model cards, nested catalogs |
+
+- AI Catalog entries are **media-type discriminated** and nestable; the catalog grows by adding typed entries, not new ad-hoc formats.
+- Include the optional **Trust Manifest** extension when artifacts need verifiable provenance: publisher identity (DID or SPIFFE SVID), attestations, and source provenance per entry.
+- Treat the AI Catalog as **emerging**: adoption votes are pending — publish it as an additive layer, and never make Tier 2 or Tier 3 the sole discovery path for a production API.
+- Keep `agent.json`-era references out: the A2A card URI was renamed in v0.3.0 (2025-07-30); stale references to `/.well-known/agent.json` must be treated as a discovery failure.

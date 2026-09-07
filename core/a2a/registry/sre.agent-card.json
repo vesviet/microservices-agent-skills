@@ -4,7 +4,7 @@
   "name": "sre",
   "description": "keep systems reliable in production by balancing availability, operability, performance, and change safety. In 2025–2026, this extends to defining AI/ML-specific SLOs (output quality, inference latency, token cost budget, model drift), treating model degradation as a reliability incident, and operating proactive reliability practices (chaos engineering, error budget burn rate alerts, automated runbooks).",
   "url": "pack://agent-skills/core/roles/sre.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

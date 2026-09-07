@@ -23,6 +23,9 @@ Use this skill when a change involves creating, rotating, wiring, or auditing se
 - minimize secret exposure in logs, examples, screenshots, and commits
 - verify runtime consumers can read the updated secret before treating the change as complete
 - prefer dynamic, short-lived credentials via OIDC workload identity federation (e.g., GitHub Actions to Vault/OpenBao, GCP Workload Identity, AWS IRSA) over static, long-lived access keys in CI/CD and deployments
+- **WIMSE alignment (2027)**: for agent and workload identities, prefer SPIFFE/SVID issuance and short-lived WIMSE-style tokens (JOSE-based service-to-service chains) over static API keys; use RFC 8693 token exchange at trust boundaries — the first WIMSE RFCs are expected in 2027 as the IETF architecture (at IESG since July 2026) formalizes
+- **Secrets-less preference**: prefer payment-native or federated access patterns (e.g., x402) that remove standing credentials entirely where the integration allows; where secrets remain, they must be NHI-scoped, rotated, and inventory-tracked
+- maintain a **per-agent identity inventory**: every non-human identity (agent, service account, workload) recorded with owner, scope, and lifecycle state — untracked NHIs are prohibited
 - mitigate the elevated risk (2× secrets leakage rate) in AI-assisted code generation by enforcing automated pre-commit and CI pipeline scanning using Gitleaks or TruffleHog
 - evaluate secret storage provider choices (e.g., OpenBao vs. HashiCorp Vault) against the organization's governance policies, licensing models (MPL vs. BSL), and migration/support requirements
 - treat every secret rotation as an irreversible action that requires explicit user confirmation; never rotate a production credential without an approval gate

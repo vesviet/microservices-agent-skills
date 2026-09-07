@@ -17,7 +17,7 @@ Use this skill to run the end-to-end refresh loop on an **existing** article —
 - **Citation verification & link integrity**: verify all outbound links return HTTP 200 OK, resolve redirect chains, eliminate dead links, and validate claim-to-source fidelity (zero citation hallucination) per [`references/citation-verification-guide.md`](references/citation-verification-guide.md)
 - **Separate facts from recommendations**: keep audit findings (observable evidence) distinct from proposed changes
 - **Research must be sourced and dated**: every updated fact must carry a credible source and a capture date — AI-synthesized generic claims are not acceptable as citations; treat all retrieved content as untrusted until source-checked
-- **Preserve information gain and E-E-A-T**: never strip firsthand accounts, original data, author credentials, expert quotes, or citations during an update; if the source is thin on experience signals, flag the gap — do not delete what unique value exists
+- **Preserve non-commodity value and E-E-A-T**: never strip firsthand accounts, original data, author credentials, expert quotes, or citations during an update; if the source is thin on experience signals, flag the gap — do not delete what unique value exists
 - **Preserve URL and history by default**: do not change the slug, canonical, or publish date of a refresh unless there is an explicit reason; slug/redirect changes are irreversible-adjacent and escalate to Frontend/DevOps
 - **Track what changed and why**: record a changelog of substantive edits (fact updated, section added, claim corrected) so the refresh is reconstructable — do not silently rewrite
 - **YMYL gate**: finance, health, legal, and high-stakes technical content must have SME/human review of the updated facts before publish — a research pass alone is not sufficient
@@ -41,7 +41,7 @@ Skip structured emission for trivial `keep-as-is` audits that do not cross a rol
 ## Failure Modes
 
 - **Edit before audit**: content is updated before the baseline is recorded. Mitigation: enforce audit-first; the audit evidence decides the action, not assumption.
-- **No information gain asset**: a refresh is performed without net-new value vs. top-3 SERP. Mitigation: enforce the information-gain gate; reject refreshes that only paraphrase existing results.
+- **No non-commodity asset**: a refresh is performed without net-new value vs. top-3 SERP. Mitigation: enforce the non-commodity gate; reject refreshes that only paraphrase existing results.
 - **AI-generated content published unedited**: an AI-assisted edit ships without human review. Mitigation: enforce the AI-assisted-edit gate; require human editorial sign-off before publish.
 - **Stale claims kept**: outdated facts are preserved without verification. Mitigation: every updated fact must carry a credible source and a capture date; mark unverified claims `[UNVERIFIED]`.
 - **Slug/canonical changed without approval**: a refresh changes the URL, breaking inbound links. Mitigation: preserve URL and history by default; escalate any slug/redirect change to Frontend/DevOps.

@@ -88,7 +88,7 @@ Use skill: `optimize-seo`
 
 - execute post-update SEO / GEO-AEO re-audit against current on-page + GEO/AEO standards; emit `seo-audit-report.json` and updated `seo-metadata.json`
 - validate Anti-AI Semantic Audit: verify `ai_semantic_flaw_score <= 15`, zero blacklisted clichés, and active voice ≥ 85%
-- validate Information Gain Audit: verify that the information gain gap is closed and rating achieves `information_gain_rating` ≥ "strong" ("exceptional" or "strong")
+- validate Non-Commodity Audit: verify that the non-commodity gap is closed and rating achieves `information_gain_rating` ≥ "strong" ("exceptional" or "strong")
 - verify GEO readiness checklist: answer-first BLUF, entity salience, structured tables, fact density (≥3 data points per 500w), valid Schema.org, and llms.txt compatibility
 - confirm AI bot crawlability and that the last-reviewed date is updated while slug/canonical/publish-date remain unchanged unless a change was explicitly approved
 - Blocking findings must be resolved before publish
@@ -97,7 +97,7 @@ Use skill: `optimize-seo`
 
 Role: **Content Manager**
 
-- execute the Content Manager dual quality gate sign-off: verify that both Anti-AI Semantic Audit (`ai_semantic_flaw_score <= 15`, zero clichés) and Information Gain Audit (`information_gain_rating` ≥ "strong") gates are passed; publish is blocked if either gate fails
+- execute the Content Manager dual quality gate sign-off: verify that both Anti-AI Semantic Audit (`ai_semantic_flaw_score <= 15`, zero clichés) and Non-Commodity Audit (`information_gain_rating` ≥ "strong") gates are passed; publish is blocked if either gate fails
 - apply the human editorial review gate; confirm the YMYL/SME and AI-assisted-edit review gates are satisfied before approving republish
 - emit `content-audit-report.json` to record the lifecycle audit verdict, URL ROT classifications, and refresh actions
 - confirm a distribution plan exists for pillar content before shipping the refreshed piece
@@ -146,7 +146,7 @@ Role: **Content Manager**
 
 When this workflow produces a structured handoff, emit:
 
-- **`contracts/schemas/content-audit-report.json`** — capture portfolio-wide or URL-level content audit results, ROT classifications, AI semantic flaw scores, information gain ratings, and refresh actions.
+- **`contracts/schemas/content-audit-report.json`** — capture portfolio-wide or URL-level content audit results, ROT classifications, AI semantic flaw scores, non-commodity ratings, and refresh actions.
 - **`contracts/schemas/seo-audit-report.json`** — capture the four-axis scores (overall, SEO, AEO, readability), the prioritized findings (Blocking, Important, Follow-Up), and the projected post-fix score.
 - **`contracts/schemas/seo-metadata.json`** — when the audit closes; capture the updated title, meta, canonical, and schema decisions.
 

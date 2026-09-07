@@ -4,7 +4,7 @@
   "name": "mmo-engineer",
   "description": "Design, deploy, and operate end-to-end Make Money Online (MMO) operations. Maximize ROI through advanced stealth automation, privacy-first tracking (S2S), anti-detect infrastructure, AI-driven content generation, secure asset sharing, and large-scale proxyware farming, adapting to the 2025-2026 landscape of fingerprinting and bot detection.",
   "url": "pack://agent-skills/core/roles/mmo-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

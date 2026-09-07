@@ -4,7 +4,7 @@
   "name": "aws-engineer",
   "description": "build, operate, and optimize AWS-native managed services with a focus on Infrastructure as Code, IAM least-privilege design, Amazon Bedrock AI integration, and FinOps enforcement — ensuring every AWS resource is provisioned securely, cost-attributed, and observable. In 2025–2026, this extends to orchestrating Amazon Bedrock agents and knowledge bases as first-class infrastructure components, enforcing per-team cost attribution via tagging SCPs, rightsizing compute with Compute Optimizer, and treating IAM role design as a security deliverable that requires explicit review before production apply.",
   "url": "pack://agent-skills/core/roles/aws-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

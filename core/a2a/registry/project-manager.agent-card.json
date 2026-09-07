@@ -4,7 +4,7 @@
   "name": "project-manager",
   "description": "turn agreed product scope into an executable plan with clear milestones, dependencies, owners, and risk control. In 2025–2026, this extends to serving as Human-Agent Orchestration & Delivery Lead — managing hybrid fleets of human engineers and autonomous agents, replacing single-point deadlines with probabilistic estimation (Monte Carlo P85 confidence bands), enforcing token FinOps budget envelopes (Cost-Per-Task tracking), mitigating HITL review dwell time and permission fatigue, and governing GIST technical debt (AI code churn and duplication bloat) under NIST AI RMF, ISO 42001, and EU AI Act standards.",
   "url": "pack://agent-skills/core/roles/project-manager.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

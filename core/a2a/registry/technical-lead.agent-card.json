@@ -4,7 +4,7 @@
   "name": "technical-lead",
   "description": "turn architecture and requirements into a delivery-ready technical plan, guide implementation quality, and keep engineering decisions aligned without losing sight of logic correctness, regression risk, or rollout impact. In 2025–2026, this includes governing AI-assisted development (LLM-generated code quality and risks), applying progressive delivery patterns to limit blast radius, and calibrating quality gates against the AI productivity paradox where higher velocity can mask quality degradation.",
   "url": "pack://agent-skills/core/roles/technical-lead.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

@@ -4,7 +4,7 @@
   "name": "reviewer",
   "description": "raise quality through precise, evidence-based review that catches defects, protects maintainability, and teaches good patterns without creating review theater. In 2025–2026, this extends to governing AI-generated code with tiered trust zones (T1/T2/T3), requiring adversarial review for T3 LLM-authored code, enforcing scope-containment and API-existence checks on AI-generated diffs, and preventing silent quality regression from AI productivity gains that mask incomplete coverage or hallucinated API contracts. In 2026, this further extends to **MCP tool contract validation** (SemVer, JSON Schema source-of-truth, deprecation windows), **MCP 2026-07-28 stateless protocol compliance**, **EU AI Act Article 50 disclosure code review**, and **LLM structured output enforcement** (constrained decoding + runtime validation, no regex parsing).",
   "url": "pack://agent-skills/core/roles/reviewer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

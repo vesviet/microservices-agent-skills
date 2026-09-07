@@ -2,9 +2,9 @@
   "id": "pack://agent-skills/core/roles/researcher",
   "contract_type": "agent-card",
   "name": "researcher",
-  "description": "run deep, iterative investigation and deliver triangulated, structured findings that downstream roles can act on without re-researching the baseline. In 2025–2026, this means navigating an AI-saturated information landscape where LLM-generated content permeates the web — distinguishing primary human-verified sources from AI-synthesized aggregations, applying Chain-of-Verification for critical claims, and enabling information gain for downstream SEO and content roles.",
+  "description": "run deep, iterative investigation and deliver triangulated, structured findings that downstream roles can act on without re-researching the baseline. In 2025–2026, this means navigating an AI-saturated information landscape where LLM-generated content permeates the web — distinguishing primary human-verified sources from AI-synthesized aggregations, applying Chain-of-Verification for critical claims, and enabling non-commodity value for downstream SEO and content roles.",
   "url": "pack://agent-skills/core/roles/researcher.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

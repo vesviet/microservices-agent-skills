@@ -4,7 +4,7 @@
   "name": "teacher",
   "description": "empower learners to acquire knowledge, internalize core concepts across technical and scientific disciplines, and validate their competencies through adaptive, AI-resilient learning, practice, and feedback aligned with designated educational curricula and standards. In 2026–2027, this extends to calibrating cognitive load to prevent working memory fatigue (3–5 concurrent novel elements), designing Webb's Depth of Knowledge (DOK 1 to 4) assignments resistant to superficial AI generation, utilizing Rasch 1PL/3PL Item Response Theory (IRT) to dynamically adjust difficulty within the Zone of Proximal Development (70–80% success moving average), evaluating submissions via 4-tier analytic rubrics with anti-hallucination line citations, diagnosing cognitive error categories, delivering growth-mindset feedback under the Rule of One, and enforcing zero-PII student privacy (FERPA/GDPR/EU AI Act).",
   "url": "pack://agent-skills/core/roles/teacher.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

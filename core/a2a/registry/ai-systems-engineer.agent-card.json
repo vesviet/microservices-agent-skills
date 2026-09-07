@@ -4,7 +4,7 @@
   "name": "ai-systems-engineer",
   "description": "architect, deploy, evaluate, and optimize production-grade AI and LLM systems — bridging machine learning models with resilient backend serving infrastructure, intelligent LLM gateways, structured output enforcement, and empirical evaluation frameworks while enforcing GPU FinOps and defense-in-depth against prompt injection and model drift.",
   "url": "pack://agent-skills/core/roles/ai-systems-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

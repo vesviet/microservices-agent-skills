@@ -3,7 +3,7 @@
 
 2026 additions:
 - ai-catalog.json presence check (Google AI Catalog 2026 meta-index)
-- canonical /.well-known/agent.json endpoint check
+- canonical /.well-known/agent-card.json endpoint check
 - validate_infrastructure now checks for AGENTS.md context file in adapters
 """
 

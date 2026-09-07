@@ -4,7 +4,7 @@
   "name": "business-analyst",
   "description": "turn ambiguous business needs into clear, testable, and implementation-ready requirements without losing business rules, edge cases, or downstream impact. In 2025–2026, this extends to writing behavioral requirements for AI/LLM features with probabilistic acceptance criteria and HITL escalation triggers, and to maintaining a living assumption register that makes the riskiest unverified beliefs visible before engineering builds.",
   "url": "pack://agent-skills/core/roles/business-analyst.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

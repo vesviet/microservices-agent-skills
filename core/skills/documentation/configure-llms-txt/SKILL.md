@@ -17,14 +17,14 @@ Use this skill to implement the `llms.txt` standard for any domain that serves d
 
 ## Core Rules
 
-- **Placement**: host at `/llms.txt` at the root of the domain — not in a subdirectory; scope sub-paths with `rel="describedby"` HTTP `Link` headers when hosting per-section manifests
-- **Format**: strictly follow the llmstxt.org v2 Markdown structure: `# Project Name` → `> blockquote summary` → `## Sections` → `- [Title](url.md): one-sentence description`; no HTML, no nav chrome, no promotional copy
-- **Token budget**: keep `/llms.txt` under **50 KB (~10K tokens)** to prevent context exhaustion in multi-turn agent sessions; defer full text to `/llms-full.txt`
-- **Required elements**: H1 heading, factual blockquote summary (no marketing language), curated content inventory with `.md` or clean-text endpoint URLs
-- **HTTP header discovery parity** (v2 spec): every served HTML page SHOULD emit `Link: </docs/page.md>; rel="alternate"; type="text/markdown"` and `Link: </llms.txt>; rel="describedby"` response headers so agents discover the manifest without a separate crawl
+- **Placement**: host at `/llms.txt` at the root of the domain — not in a subdirectory; v2 additionally allows per-subpath `llms.txt` files covering everything beneath that path
+- **Format**: strictly follow the llmstxt.org v2 (August 2026) Markdown structure: `# Project Name` → `> blockquote summary` → `## Sections` → `- [Title](url.md): one-sentence description`; no HTML, no nav chrome, no promotional copy
+- **Token budget**: keep `/llms.txt` small and curated (in-context, not exhaustive); defer full text to `/llms-full.txt`
+- **v2 link relations**: serve per-page Markdown twins (`page.html.md` or `page.md`) and emit `Link: </docs/page.md>; rel="alternate"; type="text/markdown"` plus `Link: </llms.txt>; rel="describedby"` on served HTML (or the HTTP `Link:` header) so agents discover the manifest and page-level Markdown without guessing URLs
+- **Scope honestly — agents only, no Google effect**: llms.txt serves agent consumers (OpenAI, Anthropic, and Gemini all publish their own; Chrome Lighthouse audits for one as an agentic-browsing check) — Google Search explicitly ignores llms.txt (neither helps nor harms rankings); never present llms.txt as an AI-Overviews/AI-Mode ranking lever
 - **Not a permissions file**: `llms.txt` manages discoverability — use `robots.txt` for access control; never conflate them
 - **Automated maintenance via CI**: treat `llms.txt` as a living document; a CI pipeline must validate every linked URL resolves to a clean Markdown endpoint and auto-commit updates when docs change
-- **DUAL-AUDIENCE LOCK**: for any system with AI agent interfaces, `llms.txt` is a mandatory deliverable; link `/.well-known/api-catalog` (RFC 9727), `/.well-known/agent-card.json` (A2A 1.0), and MCP server cards when present — HTML-only documentation without `llms.txt` is a documentation failure
+- **DUAL-AUDIENCE LOCK**: for any system with AI agent interfaces, `llms.txt` is a mandatory deliverable; link `/.well-known/api-catalog` (RFC 9727), `/.well-known/agent-card.json` (A2A 1.0), `/.well-known/ai-catalog.json` (AI Catalog), and MCP server cards when present — HTML-only documentation without `llms.txt` is a documentation failure
 
 ## File Structure Specification (llmstxt.org)
 

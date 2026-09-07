@@ -4,7 +4,7 @@
   "name": "qa-engineer",
   "description": "protect release quality by validating real behavior (including side effects), surfacing risk early, and preventing escaped defects across a distributed microservices system. In 2025–2026, this extends to validating AI/LLM systems with non-deterministic output properties, running controlled chaos experiments to prove resilience before production, and enforcing accessibility as a first-class quality gate. In 2026, this further extends to **EU AI Act Article 50 compliance validation** (disclosure UI, C2PA marking), **MCP 2026-07-28 stateless protocol validation**, **WebMCP browser-level agent interaction testing**, and **CI eval gates** for prompt/model/tool changes.",
   "url": "pack://agent-skills/core/roles/qa-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

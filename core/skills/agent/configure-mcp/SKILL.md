@@ -22,6 +22,13 @@ Use this skill to set up the full MCP presence for a web service: the server car
 - Validate the server card against the current MCP spec revision before deploy; reject schema-drifted cards (OWASP ASI04)
 - Treat every tool request as untrusted: re-validate the JWT, the tenant scope, and the tool manifest at every invocation; never trust cached identity (OWASP ASI03 / ASI07)
 - After the 2026-07-28 migration, every request must carry `_meta.protocol_version` and the `MCP-Protocol-Version` header; reject requests that omit them
+- The `initialize`/`initialized` handshake and `Mcp-Session-Id` no longer exist in the core path: implement the mandatory **`server/discover`** RPC (returns supported versions, capabilities, identity) and rely on `_meta` per-request negotiation; servers needing cross-call state must mint **explicit state handles** passed as ordinary tool arguments (SEP-2567) — never implicit sessions
+- Replace `resources/subscribe` with **`subscriptions/listen`**; implement **MRTR** (Multi-Round-Trip Requests): server-initiated interactions return `resultType: "complete" | "input_required"` instead of server-initiated requests
+- Do not build on deprecated features (12-month removal windows per SEP-2596): Roots, Sampling, Logging, HTTP+SSE transport, RFC 7591 Dynamic Client Registration, the `iss` parameter, JSON Schema 2020-12, and OTel trace propagation — pass paths via tool params/resources, call LLM APIs directly, log via stderr/OTel out-of-band
+- Client ID Metadata Documents (CIMD) replace DCR; plan for DCR removal after summer 2027 — servers must enable `clientIdMetadataDocumentEnabled` in the OAuth provider (e.g., Workers OAuth Provider) before that window closes
+- Registry publishing: submit `server.json` to the Official MCP Registry with a reverse-DNS namespace verified via DNS TXT or GitHub org proof; automate via the registry's GitHub Actions publishing flow
+- Caching: honor required `ttlMs` + `cacheScope` hints on list/read results and keep tool ordering deterministic for prompt-cache hits
+- WebMCP remains a **watch-item only**: the W3C Community Group spec is unreachable/unverified — do not treat `navigator.modelContext` or Cloudflare's one-switch preview as stable standards; feature-detect and prefer polyfills
 - Do not log full tool arguments or results; classify outputs with `data-classification.yaml` and redact restricted fields
 
 ## When to Use
@@ -165,7 +172,7 @@ Skip emission for trivial local edits that do not cross a role boundary.
 - **Streamable HTTP misconfigured**: the server uses SSE-only without the `Accept: text/event-stream` header. Mitigation: enforce the streamable HTTP transport headers; require stateless semantics.
 - **Tool result logged with PII**: a tool returns customer data and the gateway logs the full payload. Mitigation: classify tool outputs with `data-classification.yaml`; redact before logging.
 
-## Security Guardrails (OWASP ASI)
+## Security Guardrails (OWASP ASI + MCP Top 10)
 
 - **ASI03 Identity & Privilege Abuse**: every tool request must be tied to a verified tenant-scoped JWT; reject requests with missing, expired, or unscoped tokens.
 - **ASI04 Supply Chain**: the server card and tool manifests must be schema-validated against the current MCP spec; reject schema-drifted cards.
@@ -173,3 +180,13 @@ Skip emission for trivial local edits that do not cross a role boundary.
 - **ASI07 Inter-Agent Communication**: every cross-agent tool call is untrusted from the receiving endpoint's perspective; require schema validation and tenant scoping at the boundary.
 - **ASI08 Cascading Failures**: when a tool returns `partial` or `failed`, surface the failure explicitly to the gateway before allowing downstream calls to proceed.
 - **ASI10 Rogue Agents**: detect instruction drift across turns; if an agent starts calling tools outside its declared baseline, halt and require re-authentication.
+- **MCP01 Token Mismanagement**: short-lived, rotated tokens only; no static shared secrets in the server card or transport config.
+- **MCP02 Scope Creep**: tool descriptions must match declared capabilities; reject tools whose descriptions claim actions beyond their `inputSchema`/permissions.
+- **MCP03 Tool Poisoning**: audit tool descriptions and annotations for injected instructions; treat third-party tool manifests as untrusted content (pair with AST05).
+- **MCP04 Supply Chain**: verify MCP server dependencies against signed provenance before deploy; pin immutable versions.
+- **MCP05 Command Injection**: sanitize every tool parameter that reaches a shell, query, or file path.
+- **MCP06 Prompt Injection**: server-side resources are untrusted input; never let retrieved content alter tool routing or auth decisions.
+- **MCP07 Insufficient AuthZ**: enforce per-tool, per-tenant authorization — not transport-level auth only.
+- **MCP08 No Audit/Telemetry**: emit structured audit events for every tool call (who, which tool, what scope, outcome).
+- **MCP09 Shadow MCP Servers**: maintain an inventory of all exposed MCP endpoints; alert on unregistered ones.
+- **MCP10 Context Over-Sharing**: return the minimum context required per tool call; strip tenant data not needed for the requested operation.

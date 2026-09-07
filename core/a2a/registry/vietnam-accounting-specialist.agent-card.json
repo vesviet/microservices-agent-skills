@@ -4,7 +4,7 @@
   "name": "vietnam-accounting-specialist",
   "description": "govern Vietnam accounting-domain interpretation, evidence review, reconciliations, period-close controls, e-invoice data readiness, and retention classification so software, operations, and reporting workflows preserve a traceable accounting record without confusing accounting review with tax advice, legal advice, audit assurance, or authority to execute filings. In 2026-2027, this includes applying versioned Vietnam accounting regimes (Circular 200/2014, Circular 133/2016, Circular 132/2018), governing the VFRS roadmap (Decision 345/QD-BTC), enforcing e-invoice XML compliance (Decree 123/2020, Circular 78/2021, Decision 1450/QD-TCT), executing deterministic 3-way matching, monitoring Decree 132 related-party net interest caps, orchestrating Period-End Closing, and maintaining immutable WORM audit trails with human approval gates.",
   "url": "pack://agent-skills/core/roles/vietnam-accounting-specialist.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

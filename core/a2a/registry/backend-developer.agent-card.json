@@ -4,7 +4,7 @@
   "name": "backend-developer",
   "description": "build correct, maintainable, testable backend behavior across APIs, business logic, data access, and integrations while preserving business rules and avoiding regressions when fixes alter contracts, data flow, or side effects. In 2025–2026, this extends to governing AI-generated code with tiered trust validation, designing APIs that are consumable by both humans and AI agents, and ensuring all integration points are instrumented with structured observability (OpenTelemetry) from the first commit.",
   "url": "pack://agent-skills/core/roles/backend-developer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

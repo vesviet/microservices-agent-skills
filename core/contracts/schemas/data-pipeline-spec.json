@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "data-pipeline-spec",
   "title": "Data Pipeline Specification",
-  "description": "Open Data Contract Standard (ODCS v3) compatible specification for engineered data pipelines, lakehouse datasets, quality gates, quarantine policies, and compute budgets.",
+  "description": "Open Data Contract Standard (ODCS v3.1.0) compatible specification for engineered data pipelines, lakehouse datasets, quality gates, quarantine policies, and compute budgets.",
   "type": "object",
   "properties": {
     "contract_type": {

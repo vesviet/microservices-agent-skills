@@ -4,7 +4,7 @@
   "name": "agent-coordinator",
   "description": "control the full lifecycle of a bug or feature by coordinating the right specialist roles, enforcing the right quality gates, and driving work from intake to validated handoff without losing context or skipping safety. In 2025–2026, this means treating multi-agent systems as distributed software: enforcing deterministic state transitions, applying runtime guardrails (not prompt-based trust), maintaining end-to-end trace observability, managing token budgets as a design constraint, and applying explicit HITL gates before irreversible actions. In 2026, this further extends to **MCP 2026-07-28 stateless protocol enforcement** in A2A delegation, **EU AI Act Article 50 disclosure gate** for AI feature deployments, **NHI lifecycle governance** per agent phase, and **agentic fitness function calibration** before CI gating.",
   "url": "pack://agent-skills/core/roles/agent-coordinator.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

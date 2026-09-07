@@ -45,7 +45,7 @@
 #
 # Available roles: core/roles/README.md
 #
-# === A2A 1.0, GRAPH, ANTIGRAVITY (pack 4.1.0) ===
+# === A2A 1.0, GRAPH, ANTIGRAVITY (pack 5.0.0) ===
 # - Antigravity: read adapters/antigravity/ANTIGRAVITY.md; use core/a2a/.well-known/agent-registry.json for discovery.
 # - Full A2A lifecycle: agent-a2a-protocol (task, progress, status, artifact, cancel); JSON-RPC via a2a-jsonrpc-envelope.json.
 # - Coordinator: agent-a2a-protocol + agent-graph-orchestration + coordination-plan.json per phase.

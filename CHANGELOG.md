@@ -2,6 +2,135 @@
 
 All notable changes to the agent-skills engineering pack.
 
+## [5.0.0] - 2026-09-07
+
+Standards-2027 alignment release, grounded in a five-track deep research pass
+(protocol, data, content, security, platform — sources dated through
+September 2026). Breaking changes are listed first.
+
+### Breaking / renamed standards
+
+- A2A well-known URI: `/.well-known/agent.json` is now
+  `/.well-known/agent-card.json` (IANA permanent; rename dates to A2A
+  v0.3.0). The pack's canonical endpoint file, `ai-catalog.json`, the
+  registry generator, the 2026-compliance validator, the Antigravity
+  adapter template, and the agent-card schema description all reference
+  the correct URI, and `generate-a2a-registry.py` now emits
+  `agent-card.json` instead of `agent.json` (the old file is removed).
+- A2A v1.0.x wire conventions adopted: `SCREAMING_SNAKE_CASE` task states,
+  unified `Part` object (no `kind`), `google.rpc.Status` errors with
+  `domain: "a2a-protocol.org"`, Agent Card signature verification
+  (JCS RFC 8785 + JWS RFC 7515), multi-tenancy `tenant` field, `ListTasks`
+  cursor pagination. Protocol floor noted as v1.0.1 (2026-05-26); governance
+  references updated to AAIF/Linux Foundation.
+- ODCS version strings bumped from "v3" to **v3.1.0** (the single surviving
+  data-contract standard — the Data Contract Specification is deprecated
+  with CLI support ending 2026-12-31). Media type
+  `application/odcs+yaml;version=3.1.0`.
+
+### Protocol & discovery (Phase 1)
+
+- `configure-mcp`: full stateless-era rewrite of Core Rules — mandatory
+  `server/discover`, `_meta` per-request versioning, MRTR
+  (`resultType: input_required`), `subscriptions/listen`, explicit state
+  handles (SEP-2567), deprecation guardrails (Roots/Sampling/Logging/
+  HTTP+SSE/DCR), CIMD migration before DCR removal after summer 2027,
+  MCP Registry publishing (`server.json`, reverse-DNS verification), and
+  required cache hints (`ttlMs`/`cacheScope`). Security Guardrails extended
+  with the full OWASP MCP Top 10 (MCP01-MCP10). WebMCP downgraded to a
+  watch-item (primary spec unreachable).
+- `manage-api-catalog`: new "2027 Three-Tier Agentic Discovery" section —
+  A2A `agent-card.json` / RFC 9727 `api-catalog` / AI Catalog
+  `ai-catalog.json` (typed container, Trust Manifest, adoption votes
+  pending).
+- `configure-agent-commerce`: rail-selection decision matrix (x402
+  stablecoin vs MPP/SPTs card rails), execution-time authorization
+  (execution-finality alignment: signed instruction ≠ settlement), and
+  agent-spend guardrails (caps, velocity, settlement attestations).
+
+### Security & compliance (Phase 2)
+
+- `role-standard.md`: new Universal Agentic Skill Security Standard
+  (OWASP AST10 v1.0-2026 — skill-layer governance after the 2026
+  skill-supply-chain incidents) with four new locks
+  (SKILL-PROVENANCE, IDENTITY-FILE-PROTECTION, EGRESS-ALLOWLIST,
+  EXECUTION-TIME-AUTHZ), WIMSE/NHI federation alignment (SPIFFE/SVID,
+  RFC 8693 token exchange, secrets-less preference), and the
+  execution-time authorization principle.
+- `supply-chain-security`: SLSA v1.2 Build Environment + Dependency tracks
+  (L3 Screened), unsigned-undeployable gate with Cosign/Sigstore
+  verification, immutable hash pinning.
+- `manage-secrets`: WIMSE alignment, per-agent identity inventory,
+  secrets-less preference.
+- `ai-risk-assessment`: full 2027-2028 EU AI Act runway (GPAI legacy-model
+  cliff 2027-08-02, CSAM/NCII prohibitions 2026-12-02, post-market
+  monitoring guidance 2027-09-02, sandboxes 2027-08-02).
+
+### Data stack (Phase 3)
+
+- `data-engineer` role + `build-data-pipeline`: catalog-as-control-plane
+  rules (Iceberg REST protocol: scan planning, ETag freshness,
+  Idempotency-Key commits, credential vending), Iceberg v4 readiness
+  (metadata-only restructuring; never data rewrites), Variant as the
+  canonical semi-structured path, Spark 4.1+ floor, Flink 2.3 sinks,
+  native table encryption (KMS), DLQ triggers wired to contract SLA
+  fields, OpenLineage explicit lineage facets.
+- `analyze-data`: Text-to-SQL prevention recast as architecture
+  (semantic-layer-first, show-the-definition policy, `agent_accessible`
+  flags, read-only personas, MCP as the controlled channel), Apache Ossie
+  interchange, agent query costs as a FinOps line item, DuckDB v2.0
+  readiness (breaking storage format, VARIANT, Quack server mode).
+
+### Platform & Astro (Phase 4)
+
+- `overlays/astro-cloudflare`: Workers + Static Assets mandated as the only
+  greenfield target (Pages in maintenance-only mode since April 2025),
+  Pages→Workers migration checklist, MCP-on-Workers rewrite
+  (`createMcpHandler` replaces obsolete `McpAgent`; CIMD before DCR
+  removal), AI Gateway unified control plane
+  (`{ gateway: { id: 'default' } }` on every `env.AI.run`), Astro v7
+  migration notes (Rust compiler strictness, Sätteri, `src/fetch.ts`,
+  `cacheCloudflare()`, Live Content Collections, CSP API).
+- `edge-deployment-spec.json`: new `runtime_capabilities` (Containers,
+  Sandbox SDK, DO SQLite, 64 MiB limit, Access), structured
+  `edge_ai_integration` (gateway ID, model naming, model-first routing),
+  and `mcp_handler` fields.
+- `add-telemetry-instrumentation`: GenAI semconvs sourced from the
+  dedicated `semantic-conventions-genai` repository including agent spans
+  (`invoke_agent`, `execute_tool`) and MCP spans.
+
+### Content & SEO (Phase 5)
+
+- `optimize-seo`: GEO/AEO reframed as **AI-surface SEO** per Google's
+  official guidance (no chunking, no AI-specific schema, no rewrite-for-AI);
+  information-gain gate retooled into a **non-commodity / unique-POV gate**;
+  GEO over-optimization guard (information-distorting rewrites are a
+  detection target); repeated citation sampling rule (LLM brand
+  recommendations unstable); Gen AI performance report as a first-class
+  weekly KPI; "Search generative AI features" eligibility check; spam-policy
+  risk rules (no page-per-variant sprawl, authorship requirements, AI
+  disclosure when substantial).
+- `write-article` / `audit-content` / `seo-analyst` / `content-manager` /
+  `researcher` / `content-writer` roles and the `seo-keyword-brief` /
+  `content-audit` workflows: non-commodity language synced from
+  `optimize-seo` (single source of truth preserved). Schema field names
+  (`information_gain*`) are unchanged for contract compatibility; only
+  prose and descriptions moved.
+- `configure-llms-txt`: v2 format (per-subpath files, `.md` twins,
+  `rel="describedby"`), honest scoping ("agents only, no Google effect"),
+  AI Catalog added to the dual-audience link set.
+- `seo-weekly-board.json` + `content-handoff.json`: new gen-AI visibility
+  fields (`gen_ai_report`, `gen_ai_visibility` with impressions,
+  citation samples, authorship block, eligibility flag).
+
+### Notes
+
+- No new skills, roles, or workflows were added in this release; counts
+  remain 34 roles / 107 skills / 24 workflows / 50 contracts.
+- Watch-items intentionally NOT built into rules: WebMCP primary spec,
+  AI Catalog adoption votes, Flink Agents (0.3.x), "SLSA for data"
+  (does not exist as a standard), AAIF memory-interop WGs.
+
 ## [4.1.0] - 2026-09-01
 
 Standard 2026 consistency upgrade release. No breaking changes; every upgrade

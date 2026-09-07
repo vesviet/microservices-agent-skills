@@ -1,9 +1,9 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "agents": [
     {
       "type": "a2a",
-      "url": "/.well-known/agent.json"
+      "url": "/.well-known/agent-card.json"
     },
     {
       "type": "registry",

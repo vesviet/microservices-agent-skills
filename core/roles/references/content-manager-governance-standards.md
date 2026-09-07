@@ -6,7 +6,7 @@ This reference document defines the operational governance standards for [`conte
 
 ## 1. Top 10 SERP Information Gain Differential Matrix
 
-Modern generative search engines (Google AI Overviews, SearchGPT, Perplexity) reward primary sources and discard commodity rewrites. Merely compiling or paraphrasing existing search results ("skyscraper content") produces zero information gain, resulting in algorithmic devaluation or extraction suppression.
+Modern generative search engines (Google AI Overviews, SearchGPT, Perplexity) reward primary sources and discard commodity rewrites. Merely compiling or paraphrasing existing search results ("skyscraper content") produces zero non-commodity value, resulting in algorithmic devaluation or extraction suppression.
 
 ### 1.1 The 5 Information Gain Vectors
 
@@ -145,7 +145,7 @@ Before signing off on any draft:
 1. Verify the Writer's Anti-Slop Gate is fully documented with `gate_passed: true`.
 2. Spot-check the lead paragraph: reject if it opens with generic context-setting ("In today's fast-paced world...").
 3. Spot-check the conclusion: reject if it merely restates the introduction without an actionable takeaway.
-4. Verify the Information Gain Score meets or exceeds 75/100 against top 10 search competitors.
+4. Verify the Non-Commodity Score meets or exceeds 75/100 against top 10 search competitors.
 
 ---
 

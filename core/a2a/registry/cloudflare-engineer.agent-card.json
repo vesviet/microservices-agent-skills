@@ -4,7 +4,7 @@
   "name": "cloudflare-engineer",
   "description": "own Cloudflare edge delivery — Wrangler, Pages/Workers deploy paths, runtime bindings, DNS/cache/Turnstile configuration, and edge incident recovery — so application teams ship safely on Cloudflare without platform guesswork. In 2025–2026, this extends to governing Workers AI inference at the edge (latency, caching, cost budgets), routing agentic requests safely across LLM and tool-call boundaries, injecting RFC 8288 Agent Discovery headers at the edge layer, and enforcing security boundaries for AI-augmented edge workloads. In 2026, this further extends to **MCP 2026-07-28 stateless protocol compliance** (no session/handshake, HTTP default), **LLM Gateway integration** for token budgeting and provider failover at the edge, **Durable Workflows** (Cloudflare Workflows) deployment with in-flight execution compatibility, and **AI evaluation gates** in CI/CD before edge deploy.",
   "url": "pack://agent-skills/core/roles/cloudflare-engineer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

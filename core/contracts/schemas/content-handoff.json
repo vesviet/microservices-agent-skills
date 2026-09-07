@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "content-handoff",
   "title": "Content Handoff",
-  "description": "Structured handoff from Content Writer to editor, SEO Analyst, or publisher upon completing an article, post, or content piece. Consumed by SEO Analyst (for post-draft audit), Reviewer (for editorial check), and the publishing workflow. Pairs with seo-metadata.json for final publication metadata. Includes GEO/AEO execution evidence, typed information gain, E-E-A-T signals, and aligned source credibility per the research-report.json source hierarchy.",
+  "description": "Structured handoff from Content Writer to editor, SEO Analyst, or publisher upon completing an article, post, or content piece. Consumed by SEO Analyst (for post-draft audit), Reviewer (for editorial check), and the publishing workflow. Pairs with seo-metadata.json for final publication metadata. Includes GEO/AEO execution evidence, typed non-commodity value (unique POV / first-hand evidence; schema field names keep the information_gain prefix for compatibility), E-E-A-T signals, and aligned source credibility per the research-report.json source hierarchy.",
   "type": "object",
   "properties": {
     "contract_type": {
@@ -28,7 +28,12 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft_ready", "needs_revision", "approved", "published"],
+      "enum": [
+        "draft_ready",
+        "needs_revision",
+        "approved",
+        "published"
+      ],
       "description": "Content status at time of handoff."
     },
     "primary_keyword": {
@@ -60,21 +65,31 @@
           },
           "credibility": {
             "type": "string",
-            "enum": ["Primary", "Secondary", "Tertiary", "AI-generated"],
+            "enum": [
+              "Primary",
+              "Secondary",
+              "Tertiary",
+              "AI-generated"
+            ],
             "description": "Source tier: Primary (gov/official/peer-reviewed), Secondary (reputable news/expert/industry), Tertiary (Wikipedia/reference), AI-generated (query-use only — never cite)."
           }
         },
-        "required": ["url", "credibility"]
+        "required": [
+          "url",
+          "credibility"
+        ]
       }
     },
     "unverified_claims": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Claims that could not be fully verified and may need fact-checking before publication."
     },
     "information_gain": {
       "type": "object",
-      "description": "Typed information gain gate — documents what unique value this article adds beyond existing top SERP results. Mandatory quality gate; not optional.",
+      "description": "Typed non-commodity value (unique POV/first-hand evidence) gate — documents what unique value this article adds beyond existing top SERP results. Mandatory quality gate; not optional.",
       "properties": {
         "type": {
           "type": "string",
@@ -86,7 +101,7 @@
             "unique_framework",
             "contrarian_perspective"
           ],
-          "description": "Primary type of information gain this article delivers."
+          "description": "Primary type of non-commodity value (unique POV / first-hand evidence) this article delivers."
         },
         "description": {
           "type": "string",
@@ -94,10 +109,14 @@
         },
         "gate_passed": {
           "type": "boolean",
-          "description": "True when information gain is documented and the draft is not merely a rewrite of existing SERP content."
+          "description": "True when non-commodity value (unique POV / first-hand evidence) is documented and the draft is not merely a rewrite of existing SERP content."
         }
       },
-      "required": ["type", "description", "gate_passed"]
+      "required": [
+        "type",
+        "description",
+        "gate_passed"
+      ]
     },
     "geo_aeo_fields_applied": {
       "type": "object",
@@ -109,19 +128,29 @@
         },
         "query_fanout_covered": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "PAA-sourced and LLM-suggested sub-questions addressed in the article body."
         },
         "query_fanout_missed": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Sub-questions from brief that were not covered — flagged for SEO Analyst review."
         },
         "answer_formats_used": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["definition_block", "numbered_steps", "comparison_table", "bullet_list", "faq_block"]
+            "enum": [
+              "definition_block",
+              "numbered_steps",
+              "comparison_table",
+              "bullet_list",
+              "faq_block"
+            ]
           },
           "description": "Answer formats applied per section, matching the seo-content-brief.json specification."
         },
@@ -194,19 +223,29 @@
     },
     "internal_links_added": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Internal page paths linked from this content (minimum 3 when seo-content-brief.json specifies)."
     },
     "open_questions": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Open editorial or fact-checking questions for the next reviewer."
     },
     "recommended_next_roles": {
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["seo-analyst", "reviewer", "publisher", "editor", "technical-writer"]
+        "enum": [
+          "seo-analyst",
+          "reviewer",
+          "publisher",
+          "editor",
+          "technical-writer"
+        ]
       },
       "description": "Roles that should act on this content next. technical-writer when content must align with technical source-of-truth docs."
     },
@@ -239,7 +278,9 @@
         },
         "cliches_detected": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "List of specific AI clichés detected in the text."
         },
         "burstiness_std_dev": {
@@ -317,6 +358,43 @@
         "quotable_fact_density_met",
         "all_gates_cleared"
       ]
+    },
+    "gen_ai_visibility": {
+      "type": "object",
+      "description": "AI-surface visibility fields captured at/after publish (2027 reframe).",
+      "properties": {
+        "non_commodity_element": {
+          "type": "string",
+          "description": "The unique POV / first-hand evidence element that makes this piece non-commodity (replaces raw information-gain phrasing)."
+        },
+        "gen_ai_impressions_first_week": {
+          "type": "integer",
+          "description": "Search Console Gen AI report impressions for this URL in its first week post-publish (0 if not yet available)."
+        },
+        "citation_samples": {
+          "type": "integer",
+          "description": "Number of repeated citation sampling runs logged before any cited/not-cited conclusion (single-run conclusions are invalid)."
+        },
+        "authorship": {
+          "type": "object",
+          "properties": {
+            "byline_present": {
+              "type": "boolean"
+            },
+            "author_page_url": {
+              "type": "string"
+            },
+            "ai_assistance_disclosed": {
+              "type": "boolean",
+              "description": "Whether AI assistance is disclosed when reasonably expected."
+            }
+          }
+        },
+        "included_in_gen_ai_features": {
+          "type": "boolean",
+          "description": "Site confirmed included in 'Search generative AI features' eligibility in Search Console."
+        }
+      }
     }
   },
   "required": [
@@ -387,7 +465,12 @@
           "Bảo hành máy lạnh Funiki bao lâu?"
         ],
         "query_fanout_missed": [],
-        "answer_formats_used": ["definition_block", "comparison_table", "bullet_list", "faq_block"],
+        "answer_formats_used": [
+          "definition_block",
+          "comparison_table",
+          "bullet_list",
+          "faq_block"
+        ],
         "fact_density_met": true,
         "faq_implemented": true,
         "heading_hierarchy_clean": true
@@ -406,7 +489,9 @@
         "/may-lanh/huong-dan-chon-may-lanh-theo-dien-tich"
       ],
       "open_questions": [],
-      "recommended_next_roles": ["seo-analyst"],
+      "recommended_next_roles": [
+        "seo-analyst"
+      ],
       "source_data": "seo-content-brief/danh-gia-may-lanh-funiki-2026-06-10",
       "publish_log_updated": false
     }

@@ -2,7 +2,7 @@
 """Generate A2A Agent Cards and registry from role definitions.
 
 2026 upgrades:
-- Emits /.well-known/agent.json (canonical A2A 1.0 endpoint, replaces agent-card.json)
+- Emits /.well-known/agent-card.json (IANA permanent A2A 1.0 well-known URI; renamed from agent.json in A2A v0.3.0)
 - Emits /.well-known/ai-catalog.json (Google AI Catalog 2026 meta-index)
 - Adds 'data' to inputModes per A2A 1.0 spec update
 - protocol_version stays "1.0" (donated to Linux Foundation, no version bump)
@@ -22,9 +22,9 @@ from common import CORE_ROOT, ROOT, SKILLS_ROOT, collect_skill_names, parse_fron
 ROLE_ROOT = CORE_ROOT / "roles"
 REGISTRY_ROOT = CORE_ROOT / "a2a" / "registry"
 WELL_KNOWN = CORE_ROOT / "a2a" / ".well-known" / "agent-registry.json"
-# A2A 1.0 2026 canonical single-agent endpoint (/.well-known/agent.json)
-WELL_KNOWN_AGENT = CORE_ROOT / "a2a" / ".well-known" / "agent.json"
-# Google AI Catalog 2026: meta-index pointing to agent.json, mcp.json, OpenAPI
+# A2A 1.0 canonical single-agent endpoint (/.well-known/agent-card.json — IANA permanent URI)
+WELL_KNOWN_AGENT = CORE_ROOT / "a2a" / ".well-known" / "agent-card.json"
+# AI Catalog meta-index pointing to agent-card.json, mcp.json, OpenAPI
 AI_CATALOG = CORE_ROOT / "a2a" / ".well-known" / "ai-catalog.json"
 PACK_VERSION_PATH = ROOT / "VERSION"
 SCHEMAS_ROOT = CORE_ROOT / "contracts" / "schemas"
@@ -191,7 +191,7 @@ def main() -> int:
         json.dumps(registry, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
-    # /.well-known/agent.json — A2A 1.0 2026 canonical single-agent card endpoint
+    # /.well-known/agent-card.json — A2A canonical single-agent card endpoint (IANA permanent)
     # Represents the pack itself as an orchestrating agent
     canonical_card = {
         "name": "agent-skills-pack",
@@ -220,11 +220,11 @@ def main() -> int:
         json.dumps(canonical_card, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
-    # /.well-known/ai-catalog.json — Google AI Catalog 2026 meta-index
+    # /.well-known/ai-catalog.json — AI Catalog meta-index (LF Agent-Card/ai-catalog shape)
     ai_catalog = {
-        "version": "1.0",
+        "version": "1.1",
         "agents": [
-            {"type": "a2a", "url": "/.well-known/agent.json"},
+            {"type": "a2a", "url": "/.well-known/agent-card.json"},
             {"type": "registry", "url": "/.well-known/agent-registry.json"},
         ],
         "mcp": [],

@@ -4,7 +4,7 @@
   "name": "solution-architect",
   "description": "translate business goals, stakeholder constraints, and existing capability into a structured solution design that engineering roles can execute without guessing the intent — making build-vs-buy, platform, integration, and vendor trade-offs explicit before requirements are locked or architecture decisions are made. In 2025–2026, this extends to evaluating AI/agentic solution patterns, assessing feasibility of LLM-augmented workflows as business solutions, and surfacing compliance obligations (EU AI Act, GDPR) as solution-level constraints before engineering commits.",
   "url": "pack://agent-skills/core/roles/solution-architect.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

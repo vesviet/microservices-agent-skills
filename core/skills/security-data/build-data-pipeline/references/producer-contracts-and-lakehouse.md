@@ -1,14 +1,14 @@
 # Producer Contracts & Modern Lakehouse Storage — Reference
 
-This reference documents standards and implementation procedures for enforcing Open Data Contract Standard (ODCS v3) specifications at producer boundaries and managing transactional lakehouse architectures (Apache Iceberg and Delta Lake).
+This reference documents standards and implementation procedures for enforcing Open Data Contract Standard (ODCS v3.1.0) specifications at producer boundaries and managing transactional lakehouse architectures (Apache Iceberg and Delta Lake).
 
 ---
 
-## 1. Open Data Contract Standard (ODCS v3) at Producer Boundary
+## 1. Open Data Contract Standard (ODCS v3.1.0) at Producer Boundary
 
 Modern agentic data architectures replace fragile, undocumented data handoffs with explicit, machine-readable data contracts negotiated between data producers and consumers.
 
-### 1.1 ODCS v3 Contract Specification
+### 1.1 ODCS v3.1.0 Contract Specification
 Every ingested dataset must possess an active contract specifying four foundational pillars:
 
 ```yaml

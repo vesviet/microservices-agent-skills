@@ -1,6 +1,6 @@
 # Agent Skills — Global Engineering Pack (Claude Code)
 
-Pack version: **4.1.0** | Protocol: **A2A 1.0** | Adapter: `adapters/claude/`
+Pack version: **5.0.0** | Protocol: **A2A 1.0** | Adapter: `adapters/claude/`
 
 This repository contains a reusable, language-agnostic engineering skill pack for software delivery.
 

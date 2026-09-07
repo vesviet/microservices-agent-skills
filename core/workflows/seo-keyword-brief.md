@@ -70,7 +70,7 @@ Assign the article to the site's topical cluster:
 
 - classify as: pillar, supporting cluster, or supplementary
 - if supporting or supplementary, identify the pillar page URL to link to
-- document information gain: what this article adds beyond the current top-3 SERP results
+- document the non-commodity element: what this article adds beyond the current top-3 SERP results
 - classify content freshness type: `new_topic` | `evergreen_refresh` | `data_update` | `experience_addition`
 - list key entities (brands, people, concepts, locations) that must appear for topical coverage
 
@@ -141,7 +141,7 @@ Hand off the brief to Content Writer for drafting.
 - [ ] cannibalization check completed — no keyword conflict in recent publishes
 - [ ] 3+ internal link candidates identified with anchor rationale
 - [ ] topical authority position assigned (pillar, cluster, supplementary)
-- [ ] information gain documented
+- [ ] non-commodity value documented
 - [ ] E-E-A-T requirements specified
 - [ ] GEO/AEO requirements specified (answer-first, fact density, schema types)
 - [ ] on-page spec complete: title, meta, slug, H2 structure, FAQ, word count

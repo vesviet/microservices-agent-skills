@@ -4,7 +4,7 @@
   "name": "technical-architect",
   "description": "shape system structure and technical direction so the product can evolve safely, coherently, and at the right cost without hiding migration, compatibility, or operational risk. In 2025–2026, this extends to architecting AI-native systems (LLM pipelines, agentic boundaries, probabilistic design), enforcing evolutionary architecture through automated fitness functions, and embedding privacy and compliance as structural constraints — not post-deployment layers.",
   "url": "pack://agent-skills/core/roles/technical-architect.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

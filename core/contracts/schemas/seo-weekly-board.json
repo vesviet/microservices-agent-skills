@@ -466,7 +466,7 @@
     },
     "ai_visibility_check": {
       "type": "object",
-      "description": "Weekly AI search visibility report. Manual check by SEO Analyst. Filled in weekly rollup.",
+      "description": "Weekly AI search visibility report. Manual check by SEO Analyst. Filled in weekly rollup. Citation presence is unstable across repeated LLM runs — record multiple samples across dates before concluding cited/not_cited (2027 rule).",
       "properties": {
         "checked_at": {
           "type": "string",
@@ -564,6 +564,41 @@
               "action_next_week": {
                 "type": "string"
               }
+            }
+          }
+        },
+        "gen_ai_report": {
+          "type": "object",
+          "description": "Search Console Generative AI performance report data (AI Overviews + AI Mode; worldwide since 2026-08-31).",
+          "properties": {
+            "site": {
+              "type": "string"
+            },
+            "period": {
+              "type": "string",
+              "description": "Report period, e.g. '2026-W36'."
+            },
+            "impressions_total": {
+              "type": "integer",
+              "description": "Total gen-AI impressions for the period."
+            },
+            "top_pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "impressions": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "included_in_gen_ai_features": {
+              "type": "boolean",
+              "description": "Whether the site is included in 'Search generative AI features' eligibility in Search Console."
             }
           }
         }

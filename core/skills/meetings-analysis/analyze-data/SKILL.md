@@ -21,7 +21,10 @@ Use this skill for **analyst** work: exploring datasets, defining metrics, runni
 
 - treat source files and production databases as strictly **read-only**
 - query canonical metrics via **Semantic Metric Catalogs**; never construct ad-hoc SQL joins across unverified models
-- run analytical exploration in **DuckDB / Polars** with strict memory caps (`SET max_memory = '4GB'`)
+- **Text-to-SQL prevention is architectural, not prompt-level (2027)**: prefer semantic-layer-first answers (metrics, not raw SQL); attach the SQL/metric definition behind every NL answer ("show-the-definition" policy); honor `agent_accessible` metric flags as allowlists; use read-only agent personas; route agent data access through MCP as the controlled channel (dbt MCP, Polaris MCP Server, Unity Catalog)
+- treat **Apache Ossie** (0.1.x, ASF incubating) as the semantic-model interchange format alongside MetricFlow/Cube definitions — export/accept `osi_document.json` for portability
+- track **agent query costs** as a Data FinOps line item: token spend and query spend for agentic analytics are budgeted, metered, and reported like compute
+- run analytical exploration in **DuckDB / Polars** with strict memory caps (`SET max_memory = '4GB'`); DuckDB v2.0 (October 2026) notes: storage format v2.0.0 is breaking for persisted datasets — plan re-exports; VARIANT type is end-to-end for semi-structured data; Quack/`CONNECT` server mode for governed multi-tenant use only
 - evaluate **statistical distribution drift**: compute Population Stability Index (PSI) and flag shifts when PSI > 0.10
 - separate **facts from interpretation** in all deliverables using structured tables of evidence
 - reconcile findings against **independent control totals**: ensure 0.00% variance on financial totals

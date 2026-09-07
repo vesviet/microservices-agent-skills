@@ -4,7 +4,7 @@
   "name": "task-planner",
   "description": "produce a decision-ready execution plan for a task or thin slice of work—clear objective, scoped steps, validation checkpoints, and explicit assumptions—so implementers can start without rediscovering the approach. In 2025–2026, this extends to embedding explicit AI fallback mechanisms and Human-In-The-Loop (HITL) review triggers into plans that include generative AI features, defining agent-delegation phase gates with approval checkpoints, and ensuring that AI-bearing task slices have named oversight owners before execution begins. In 2026, this further extends to **Trust Ladder autonomy tier planning** (Suggest→Verify→Delegate→Automate), **background agent UX planning** (status surface, notification contract, async interrupt), **GenUI component palette governance**, **MCP 2026-07-28 stateless protocol alignment**, **EU AI Act Article 50 disclosure planning**, and **CI eval gate integration** for prompt/model/tool changes.",
   "url": "pack://agent-skills/core/roles/task-planner.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

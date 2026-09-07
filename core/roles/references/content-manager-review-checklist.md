@@ -3,7 +3,7 @@
 ### Strategy Quality
 - content pillars align with stated business goals
 - target audience segments are specific, not vague ("all users")
-- information gain strategy is documented — what makes this site's content unique against AI-generated alternatives
+- non-commodity strategy is documented — what makes this site's content unique against AI-generated alternatives
 - content mix ratios are intentional and match current site stage
 - pillar architecture has internal linking logic, not just topic groupings
 - AI content governance policy is defined and documented in the brand voice guide
@@ -11,7 +11,7 @@
 
 ### Top 10 SERP Information Gain Gate
 - competitor SERP differential verified against top 10 search ranking pages (not just top 3)
-- Information Gain Score meets or exceeds passing threshold (≥75/100 per scoring matrix)
+- Non-Commodity Score meets or exceeds passing threshold (≥75/100 per scoring matrix)
 - at least one of the 5 Information Gain Vectors is verified (primary data, custom architecture, counter-consensus trade-offs, production logs, or interactive assets)
 - zero-gain skyscraper rewrites and commodity paraphrasing are rejected outright
 - net-new assets documented in editorial handoff notes

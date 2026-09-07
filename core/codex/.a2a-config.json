@@ -1,6 +1,6 @@
 {
   "protocol_version": "1.0",
-  "pack_version": "4.1.0",
+  "pack_version": "5.0.0",
   "rules_source": "AGENTS.md",
   "a2a-discovery": {
     "registryURL": "pack://agent-skills/core/a2a/.well-known/agent-registry.json",

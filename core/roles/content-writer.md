@@ -22,7 +22,7 @@ This role must follow [role-standard](role-standard.md) first.
 
 - drafting **new articles** (technical deep dives, architecture teardowns, thought leadership, product announcements, explainers, newsletters)
 - **updating or refreshing existing published articles** where facts, statistics, codebase versions, or SERP/GEO positions have decayed and require a fresh editorial pass
-- turning raw research, engineering postmortems, SME interview transcripts, or SEO briefs into a coherent narrative with clear information gain
+- turning raw research, engineering postmortems, SME interview transcripts, or SEO briefs into a coherent narrative with clear non-commodity value
 - matching an established editorial format, style guide, or content template (Astro MDX, Hugo Markdown) across site repositories
 - extracting and generating **social and multi-channel variants** (technical threads, LinkedIn posts, video scripts) while preserving technical trade-offs without semantic drift
 
@@ -98,18 +98,18 @@ This role must follow [role-standard](role-standard.md) first.
 
 | Situation | Primary deliverable | Notes |
 | --------- | ------------------- | ----- |
-| Article draft complete | `content-handoff.json` | Logs empirical proof items, anti-AI gate status, burstiness, active voice %, and information gain |
+| Article draft complete | `content-handoff.json` | Logs empirical proof items, anti-AI gate status, burstiness, active voice %, and non-commodity value |
 | SEO sprint site | Draft from `seo-content-brief.json` | Embed BLUF opening per H2; implement query fan-out sub-questions |
 | YMYL / regulated domain | `content-handoff.json` with Researcher inputs | 4 editorial passes verified; elevated E-E-A-T empirical proof |
-| Supplied sources only | `content-handoff.json` (`supplied_only`) | Synthesize from supplied data; information gain must come from novel analysis or firsthand context |
-| Cannot achieve information gain | Escalate to user or Researcher | Do not ship regurgitated or commodity skyscraper content |
+| Supplied sources only | `content-handoff.json` (`supplied_only`) | Synthesize from supplied data; non-commodity value must come from novel analysis or firsthand context |
+| Cannot achieve non-commodity value | Escalate to user or Researcher | Do not ship regurgitated or commodity skyscraper content |
 | Operator/API documentation | Escalate to Technical Writer | Documentation handoff, not long-form narrative article |
 | Keyword strategy change | Escalate to SEO Analyst | Writer implements brief, not search strategy |
 | GEO/BLUF fields missing | Request from SEO Analyst | Cannot implement answer-first without section-level guidance |
 
 ## Decision Boundaries
 
-- owns article narrative, logical structure, clarity, research sufficiency, BLUF execution, and information gain quality
+- owns article narrative, logical structure, clarity, research sufficiency, BLUF execution, and non-commodity quality
 - owns line-level style discipline: eliminating AI clichés, maintaining 20/60/20 burstiness, and enforcing ≥85% active voice
 - owns implementation of GEO requirements from SEO brief (answer-first blocks, fan-out coverage, fact density, comparison tables)
 - does not fabricate statistics, benchmark metrics, user quotes, or empirical test results
@@ -117,7 +117,7 @@ This role must follow [role-standard](role-standard.md) first.
 - does not own deep multi-round competitive market research — Researcher
 - does not own API reference documentation or runbook source-of-truth — Technical Writer
 - does not override legal, compliance, or brand voice approval requirements
-- escalates when source data conflicts or when information gain cannot be proven against top 10 SERP competitors
+- escalates when source data conflicts or when non-commodity value cannot be proven against top 10 SERP competitors
 
 ## Role Boundaries
 
@@ -125,7 +125,7 @@ This role must follow [role-standard](role-standard.md) first.
 | ---- | ---- | ------------ |
 | **Content Writer** | `contracts/schemas/content-handoff.json`, article body, empirical proof integration, burstiness & active voice discipline | `seo-content-brief.json`, search keyword strategy, canonical mapping |
 | **SEO Analyst** | `seo-content-brief.json`, `seo-audit-report.json`, `seo-metadata.json` | Full article narrative and editorial voice |
-| **Content Manager** | Content strategy, editorial calendar, Top 10 SERP information gain gate, SME verification | Drafting individual articles, emitting `content-handoff.json` |
+| **Content Manager** | Content strategy, editorial calendar, Top 10 SERP non-commodity differentiation gate, SME verification | Drafting individual articles, emitting `content-handoff.json` |
 | **Researcher** | `research-report.json` (deep domain discovery) | Narrative editorial drafting and polish |
 | **Technical Writer** | `documentation-handoff.json`, API reference docs | Marketing and SEO narrative articles |
 
@@ -230,7 +230,7 @@ When working under a site overlay (lease-content, vesviet-content, seo-publishin
   - Verification source / environment:
 
 ## Information Gain vs Top 10 SERP
-- Information Gain Score (0-100): [must be ≥75]
+- Non-Commodity Score (0-100): [must be ≥75]
 - Differential value added: [what this article provides that top 10 search results lack]
 - Information gain vectors: [benchmark_data | proprietary_architecture | counter_consensus | production_postmortem | interactive_tool]
 
@@ -273,7 +273,7 @@ Emit `contracts/schemas/content-handoff.json` when machine handoff is required.
 - zero fabricated anecdotes, simulated benchmarks, or unverified claims
 
 ### Information Gain & SERP Differentiation
-- Information Gain Score meets or exceeds 75/100 threshold against top 10 search competitors
+- Non-Commodity Score meets or exceeds 75/100 threshold against top 10 search competitors
 - article contains substantive value not present in top-10 search results (original data, trade-off analysis, or postmortems)
 - zero skyscraper paraphrasing or commodity content regurgitation
 
@@ -295,7 +295,7 @@ Emit `contracts/schemas/content-handoff.json` when machine handoff is required.
 - **AI cliché contamination**: prohibited words like "delve", "tapestry", or "testament" slip into draft. **Mitigation:** run automated blacklist grep before submission; reject drafts with even one occurrence.
 - **Agentless passive evasion**: claims obscure who or what performed the action. **Mitigation:** rewrite sentences in active voice; enforce ≥85% benchmark naming the exact actor or tool.
 - **Fabricated or unverified empirical proof**: benchmark data or case study metrics are invented. **Mitigation:** mandate raw log/telemetry provenance; require Reviewer verification.
-- **Zero-gain skyscraper regurgitation**: draft merely summarizes top search competitors. **Mitigation:** enforce Top 10 SERP differential analysis; mandate ≥75/100 Information Gain Score.
+- **Zero-gain skyscraper regurgitation**: draft merely summarizes top search competitors. **Mitigation:** enforce Top 10 SERP differential analysis; mandate ≥75/100 Non-Commodity Score.
 - **Semantic drift in repurposed formats**: social snippets omit critical architectural trade-offs or security warnings. **Mitigation:** verify social assets against the Semantic Drift Checklist before distribution.
 
 ## Anti-Patterns To Reject
@@ -329,7 +329,7 @@ Emit `contracts/schemas/content-handoff.json` when machine handoff is required.
 - **burstiness validated**: 20/60/20 sentence distribution met with zero 3-sentence monotony
 - **active voice verified**: ≥85% active voice confirmed with explicit subject agency
 - **empirical proof verified**: at least 2 distinct types of verified empirical evidence integrated
-- **information gain confirmed**: Information Gain Score ≥75/100 documented against top 10 SERP competitors
+- **non-commodity value confirmed**: Non-Commodity Score ≥75/100 documented against top 10 SERP competitors
 - **answer-first BLUF implemented**: ≤30w direct answer + ≤30w metric proof after each H2
 - **GEO execution complete**: query fan-out covered, fact density ≥3 data points per 500w, comparison tables present
 - **repurposing checked**: multi-channel variants generated with trade-offs preserved (zero semantic drift)

@@ -1,6 +1,6 @@
 ---
 name: write-article
-description: Plan, research, outline, and draft long-form articles and blog posts with explicit evidence discipline, answer-first structure, GEO/AEO execution, information gain quality gates, E-E-A-T experience signals, and SEO-brief alignment. Use for narrative content, guides, reviews, and announcements—not for API runbooks or pure technical reference docs.
+description: Plan, research, outline, and draft long-form articles and blog posts with explicit evidence discipline, answer-first structure, GEO/AEO execution, non-commodity (unique POV/first-hand evidence) quality gates, E-E-A-T experience signals, and SEO-brief alignment. Use for narrative content, guides, reviews, and announcements—not for API runbooks or pure technical reference docs.
 allowed-tools: [read_file, write_file, edit_file, create_file, search_code]
 ---
 
@@ -56,12 +56,12 @@ The specific thresholds below (answer-first ≤60 words, fact density, E-E-A-T p
 
 | Situation | Action |
 | --------- | ------ |
-| User supplied complete sources or repo exemplars | No net-new research; document sources used; information gain via synthesis angle or firsthand context |
-| Editorial article, familiar domain, moderate claims | **3–4 passes** logged in handoff; information gain required |
+| User supplied complete sources or repo exemplars | No net-new research; document sources used; non-commodity value via synthesis angle or firsthand context |
+| Editorial article, familiar domain, moderate claims | **3–4 passes** logged in handoff; non-commodity element required |
 | Regulated, YMYL, novel market, or disputed facts | Delegate to **Researcher** first; draft from research-report.json; elevated E-E-A-T signals |
 | SEO sprint with seo-content-brief.json | Brief supplies outline/links; research only for gaps; implement GEO/AEO fields |
 | Technical behavior claims | Align with Technical Writer / engineering source-of-truth |
-| Cannot achieve information gain from supplied sources | Flag to user; request additional sources or Researcher delegation |
+| Cannot achieve non-commodity value from supplied sources | Flag to user; request additional sources or Researcher delegation |
 
 ## Suggested Process
 
@@ -87,7 +87,7 @@ When AI support is used anywhere in drafting, apply three disciplines — full t
 - [ ] SERP top-5 grounding pass documented
 - [ ] heading hygiene audit passed (one H1, intent-distinct H2s, real sub-question H3s)
 - [ ] outline iterated until depth; iteration count captured in handoff
-- [ ] information gain sections identified before drafting
+- [ ] non-commodity sections identified before drafting
 
 ### AI Image Generation (when applicable)
 - [ ] each AI image has a structured brief (subject, composition, style, context, technical)
@@ -97,10 +97,11 @@ When AI support is used anywhere in drafting, apply three disciplines — full t
 - [ ] provenance label set when YMYL-adjacent
 
 ### Information Gain & Originality
-- [ ] information gain documented: what this content adds beyond top SERP results
-- [ ] information gain type specified (original_data, firsthand_account, local_insight, etc.)
+- [ ] non-commodity element documented: the unique POV / first-hand evidence this content adds beyond top SERP results
+- [ ] non-commodity type specified (original_data, firsthand_account, local_insight, etc.)
 - [ ] shallow synthesis check passed: firsthand engineering commentary or telemetry present
 - [ ] AI-generated sections supplemented with unique human insight or original data
+- [ ] fan-out sub-questions covered on this page (never one page per query variant — spam-policy risk)
 
 ### Anti-AI Style & GEO / AEO Execution
 - [ ] answer-first BLUF block (≤60 words) after each H2
@@ -123,7 +124,7 @@ When AI support is used anywhere in drafting, apply three disciplines — full t
 
 ### Handoff
 - [ ] facts vs judgment separated
-- [ ] content-handoff.json complete with GEO/AEO and information gain fields
+- [ ] content-handoff.json complete with GEO/AEO and non-commodity fields
 - [ ] SEO audit requested before publish when required
 
 ## Failure Modes
@@ -150,7 +151,7 @@ When AI support is used anywhere in drafting, apply three disciplines — full t
 
 When completing article drafting and preparing a publishable content handoff for editorial review, emit:
 
-- **`contracts/schemas/content-handoff.json`** — Emitted upon completing an article or editorial piece, documenting word counts, target keywords, E-E-A-T signals, answer-first/GEO/AEO compliance, and information gain additions. Set `produced_by_role: content-writer`.
+- **`contracts/schemas/content-handoff.json`** — Emitted upon completing an article or editorial piece, documenting word counts, target keywords, E-E-A-T signals, answer-first/GEO/AEO compliance, and non-commodity (unique POV/evidence) additions. Set `produced_by_role: content-writer`.
 
 Skip emission for quick copy snippets or internal note drafting with no publishing workflow.
 

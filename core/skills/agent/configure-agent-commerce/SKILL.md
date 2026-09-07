@@ -30,6 +30,9 @@ These standards are complementary layers, not interchangeable, and they do not i
 - treat every payment proof, mandate, and checkout session as a signed artifact; verify the signature against the issuer's published keys before granting access (OWASP ASI04 / ASI07)
 - never log full payment credentials, mandate contents, or PII; classify any output through `data-classification.yaml` and redact restricted fields
 - confirm the agent customer is operating under a verified identity (DID or scope-bound token) before honoring delegated purchase authority; reject anonymous or unverified agents at the mandate layer (OWASP ASI03)
+- **Rail selection is a per-transaction decision**: x402 (stablecoin, HTTP-native, min ~$0.01, EVM/Solana) vs MPP/Shared Payment Tokens (card rails via Stripe, min $0.50, Link Agent Wallet issuer). Choose by buyer capability and settlement preference; 2027 convergence runs x402-as-transport with card-rail settlement options (Visa/Mastercard sit inside the x402 Foundation alongside Stripe/Adyen/Google)
+- **Execution-time authorization (IETF execution-finality alignment)**: a signed instruction is not settlement, and tool selection is not execution — every consequential payment must pass a server-side authorization check at execution time (amount against mandate, velocity against limit, idempotency against replay cache), never solely at tool-selection time
+- Enforce agent-spend guardrails by default: per-agent transaction caps, daily/velocity budgets, human-in-the-loop confirmation above thresholds, and settlement-attestation logging with refund/cancellation receipt retention
 
 **Pack-local conventions (not protocol requirements).** The DID + JWT identity pattern below is a reasonable engineering default, but it is *not* mandated by ACP, UCP, MPP, x402, or AP2. Adopt it only when the repo has no existing agent-identity scheme, and document it as a local decision:
 

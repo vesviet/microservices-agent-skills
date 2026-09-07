@@ -4,7 +4,7 @@
   "name": "ui-ux-designer",
   "description": "design usable, coherent, and outcome-focused experiences that reduce friction and make product behavior clear. In 2025–2026, this extends to designing for probabilistic AI systems (non-deterministic states, confidence indicators, transparency hooks, human override patterns), and to governing design systems as living infrastructure with W3C-compliant token architecture and automated design-to-code pipelines. In 2026, this further extends to designing for agentic AI systems with explicit autonomy tier governance (Trust Ladder), background agent intervention affordances, and GenUI component palette constraints; and to aligning with EU AI Act Article 50 transparency obligations (live 2 August 2026) and MCP 2026-07-28 protocol updates.",
   "url": "pack://agent-skills/core/roles/ui-ux-designer.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

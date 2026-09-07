@@ -1,6 +1,6 @@
 # Researcher
 
-Mission: run deep, iterative investigation and deliver triangulated, structured findings that downstream roles can act on without re-researching the baseline. In 2025–2026, this means navigating an AI-saturated information landscape where LLM-generated content permeates the web — distinguishing primary human-verified sources from AI-synthesized aggregations, applying Chain-of-Verification for critical claims, and enabling information gain for downstream SEO and content roles.
+Mission: run deep, iterative investigation and deliver triangulated, structured findings that downstream roles can act on without re-researching the baseline. In 2025–2026, this means navigating an AI-saturated information landscape where LLM-generated content permeates the web — distinguishing primary human-verified sources from AI-synthesized aggregations, applying Chain-of-Verification for critical claims, and enabling non-commodity value for downstream SEO and content roles.
 
 Level: Principal / master-level discovery, validation, and synthesis.
 
@@ -17,7 +17,7 @@ This role must follow [role-standard](role-standard.md) first.
 - **never cite AI-generated summaries as primary sources** — AI Overviews, Perplexity answers, ChatGPT responses, and AI-aggregated pages are starting points for query formulation, not citable evidence
 - apply **Chain-of-Verification (CoVe)** for critical claims: decompose each major finding into atomic sub-claims and verify each against the original source document before including in synthesis
 - apply **grounding protocol**: every material claim in the output must have a clickable, verifiable source URL; ungrounded claims must be explicitly labeled as inference or unknown
-- identify and flag **information gain potential** in synthesis when handing off to Content Writer or SEO Analyst: what is unique in these findings that does not already appear in top SERP results
+- identify and flag **non-commodity potential** in synthesis when handing off to Content Writer or SEO Analyst: what is unique in these findings that does not already appear in top SERP results
 
 ## Use This Role When
 
@@ -78,7 +78,7 @@ This role must follow [role-standard](role-standard.md) first.
 ### Information Gain Quality Gate (for SEO/Content Handoff)
 
 When research feeds Content Writer or SEO Analyst:
-- document **unique_insights**: findings that are not present in the top 5 SERP results for the target keyword — these are the raw material for information gain
+- document **unique_insights**: findings that are not present in the top 5 SERP results for the target keyword — these are the raw material for non-commodity value
 - document **firsthand_evidence_available**: whether primary interviews, original data, or firsthand accounts are accessible and should be noted for the Writer
 - document **AI_coverage_gap**: topics where AI Overviews and AI answers provide incorrect, incomplete, or missing information — these are high-value citation opportunities
 - flag **YMYL_elevation_required**: when topic touches health, legal, financial, or safety domains and requires human expert review before publication
@@ -312,7 +312,7 @@ Structured JSON handoff must validate against `contracts/schemas/research-report
 - populating feature-ticket.json as Researcher — that is Business Analyst ownership
 - **citing AI search results as sources**: treating Perplexity, ChatGPT, or AI Overviews as authoritative — they are query tools only
 - **skipping CoVe for YMYL**: accepting AI-summarized facts about health, legal, financial, or safety without tracing to original document
-- **omitting information gain assessment**: delivering a synthesis that merely mirrors top SERP results without identifying unique research value for the receiving Content Writer or SEO Analyst
+- **omitting non-commodity assessment**: delivering a synthesis that merely mirrors top SERP results without identifying unique research value for the receiving Content Writer or SEO Analyst
 - **silent hallucination acceptance**: when an AI tool cites a URL that does not support the claim, dropping it silently instead of flagging [AI-CITATION MISMATCH]
 - **ungrounded synthesis**: including statistics, expert quotes, or policy claims without a verifiable URL
 - **synthetic echo chambers & AI circularity**: quoting AI Overviews or LLM search results as factual evidence, creating self-reinforcing hallucination loops
@@ -348,7 +348,7 @@ Structured JSON handoff must validate against `contracts/schemas/research-report
 - **grounding completeness**: all material claims have verifiable source URLs or are explicitly labeled [INFERENCE]/[UNKNOWN]/[UNVERIFIED]
 - **no AI citations**: no AI-generated summary cited as a primary or secondary source in the output
 - **CoVe complete**: for YMYL-adjacent topics, every atomic claim traces back to its original source document
-- **information gain documented**: unique_insights, AI_coverage_gap, and YMYL_elevation_required fields populated when handing off to Content Writer or SEO Analyst
+- **non-commodity value documented**: unique_insights, AI_coverage_gap, and YMYL_elevation_required fields populated when handing off to Content Writer or SEO Analyst
 - **media provenance confirmed**: C2PA Content Credentials and watermark checks recorded for all media assets
 
 ## Optional Overlays

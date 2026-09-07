@@ -2,7 +2,7 @@
   "name": "agent-skills-pack",
   "description": "Agent Skills Pack — multi-role engineering skill pack for AI-assisted delivery",
   "url": "pack://agent-skills",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

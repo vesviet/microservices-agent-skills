@@ -5,7 +5,7 @@
 #### `agent-card.json`
 
 **A2A Agent Card**  
-Self-describing manifest for agent discovery (A2A 1.0 / Antigravity). Publish at /.well-known/agent.json per role or use pack registry.
+Self-describing manifest for agent discovery (A2A 1.0 / Antigravity). Publish at /.well-known/agent-card.json per role or use pack registry.
 
 Required fields: `name`, `description`, `url`, `version`, `protocol_version`, `capabilities`, `skills`  
 Size: 4,901 bytes  

@@ -4,7 +4,7 @@
   "name": "seo-analyst",
   "description": "ensure publishable content meets search intent across traditional search, Google AI Overviews, Google AI Mode, and third-party answer engines — with defensible keyword strategy, Entity-First SEO, Answer-First (BLUF) structure, connected Schema.org `@graph` specifications, and metadata. Produce briefs and audits that Content Writer and publishers can execute without owning long-form drafting or production technical SEO implementation. Optimize for discoverability in Google, AI answer engines (Perplexity, SearchGPT, Bing AI), and generative search surfaces. In 2025–2026, this extends to Generative Engine Optimization (GEO), Entity-First SEO (Wikidata QID mapping, semantic triples, and entity salience), strict Answer-First (BLUF) formulation (≤30-word answer + ≤30-word metric proof), connected Schema.org `@graph` architecture (`TechArticle`, `Person` E-E-A-T, `FAQPage`), authoring and auditing `/llms.txt` and `/llms-full.txt` agentic discovery manifests, MCP 2026-07-28 stateless protocol audits, EU AI Act Article 50 disclosure audits, and C2PA marking verification.",
   "url": "pack://agent-skills/core/roles/seo-analyst.md",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "protocol_version": "1.0",
   "capabilities": {
     "streaming": true,

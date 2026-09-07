@@ -1,6 +1,6 @@
 {
   "contract_type": "agent-registry",
-  "pack_version": "4.1.0",
+  "pack_version": "5.0.0",
   "protocol_version": "1.0",
   "generated_from": "core/roles",
   "agents": [

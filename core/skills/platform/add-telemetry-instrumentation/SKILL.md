@@ -23,6 +23,7 @@ Use this skill when code changes need matching observability so operators can un
 - avoid high-cardinality labels unless the repo explicitly supports them
 - never log secrets, credentials, tokens, or unnecessary sensitive data
 - use stable OpenTelemetry GenAI conventions (opt in via `OTEL_SEMCONV_STABILITY_OPT_IN=genai`) for LLM/agent tracking; required attributes: `gen_ai.system`, `gen_ai.request.model`, `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`
+- source GenAI conventions from the **dedicated `open-telemetry/semantic-conventions-genai` repository** (the old location in `semantic-conventions` is a moved-notice): include **agent spans** (`invoke_agent`, `execute_tool`) and **MCP spans** (`gen-ai-mcp`) for agent and MCP-server work; emit `gen_ai.response.finish_reasons` and opt-in content capture (`gen_ai.input.messages`) only when classification policy allows
 - design hierarchical trace spans using `create_agent` operation types and step attributes (`agent.name`, `agent.step_type`) for agent reasoning
 - configure Cloudflare Workers native observability using the `observability` block in `wrangler.jsonc` and OTLP push
 - capture GPU infrastructure metrics prefixed with `hw.gpu.*` via OTel Collector and DCGM exporter integration
