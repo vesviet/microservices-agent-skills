@@ -2,7 +2,7 @@
 
 Packs describe how to assemble the portable core with zero or more overlays for a target team. Each pack has a `manifest.yaml` that declares which `core` and `overlays/` to include, along with 2026 governance metadata.
 
-## Available Packs (14)
+## Available Packs (13)
 
 | Pack | Manifest | Composition | Capabilities |
 |------|----------|-------------|-------------|
@@ -16,10 +16,9 @@ Packs describe how to assemble the portable core with zero or more overlays for 
 | `sport-team` | [manifest.yaml](sport-team/manifest.yaml) | `core` + `overlays/astro-cloudflare` + `overlays/sport-icm` | Astro v6+, Cloudflare, SEO |
 | `ecommerce-team` | [manifest.yaml](ecommerce-team/manifest.yaml) | `core` + `overlays/go-microservices` + `overlays/ecommerce-microservices` | Go 1.25, Kratos v3, ConnectRPC |
 | `data-analyst-team` | [manifest.yaml](data-analyst-team/manifest.yaml) | `core` + `overlays/data-analyst-stack` | DuckDB, dbt 1.9, Iceberg, Metabase |
-| `data-engineer-team` | [manifest.yaml](data-engineer-team/manifest.yaml) | `core` + `overlays/data-engineer-rabity` | dbt 1.9, Iceberg, Kafka, Spark |
 | `content-sprint-team` | [manifest.yaml](content-sprint-team/manifest.yaml) | `core` + `overlays/seo-publishing` | GEO/AEO, AI Overviews, publishing cadence |
 | `donthan-team` | [manifest.yaml](donthan-team/manifest.yaml) | `core` + `overlays/donthan-web` | Frontend, UX, livestream, PWA |
-| `retail-warehouse-team` | [manifest.yaml](retail-warehouse-team/manifest.yaml) | `core` + `overlays/retail-data-warehouse` | DuckDB Single-Writer, MISA AMIS ERP, Blind Recount, PII Masking |
+| `retail-warehouse-team` | [manifest.yaml](retail-warehouse-team/manifest.yaml) | `core` + `overlays/retail-data-warehouse` (incl. `learning/` track) | DuckDB Single-Writer, MISA AMIS ERP, Blind Recount, PII Masking, dbt 1.9/Iceberg/Kafka learning roadmap |
 
 ## 2026 Manifest Schema (v2)
 

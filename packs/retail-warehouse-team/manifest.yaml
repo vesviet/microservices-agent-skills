@@ -1,9 +1,9 @@
 schema_version: "2"
 
 name: retail-warehouse-team
-display_name: Retail Data Warehouse & Stock Audit Team
-description: Global engineering core plus retail data warehouse overlay for omnichannel retail platforms. Covers DuckDB 1.5+ Single-Writer concurrency with AsyncCrossProcessLock, MISA AMIS ERP accounting under VAS 14, blind recount physical stocktaking, and PII masking via Salted SHA-256 / Pseudonymization under Decree 13/2023/ND-CP.
-version: 4.0.0
+display_name: Retail Data Warehouse & Data Engineering Team
+description: Global engineering core plus retail data warehouse overlay for omnichannel retail platforms. Covers DuckDB 1.5+ Single-Writer concurrency with AsyncCrossProcessLock, MISA AMIS ERP accounting under VAS 14, blind recount physical stocktaking, PII masking via Salted SHA-256 / Pseudonymization under Decree 13/2023/ND-CP, and the Rabity data-engineering learning track (DuckDB, dbt Core 1.9 microbatch, Apache Iceberg REST Catalog, Kafka, Spark, Airflow).
+version: 4.1.0
 
 tags:
   - core
@@ -14,6 +14,8 @@ tags:
   - stocktake
   - pii-masking
   - python
+  - data-engineering
+  - learning
 author: user
 maintained_by: platform-team
 license: MIT
@@ -37,6 +39,30 @@ capabilities:
   - pipeline-development
   - backend
   - testing
+  - data-engineering
+  - etl-elt
+  - sql
+  - data-architecture
+  - streaming
+
+team_composition:
+  primary_roles:
+    - data-engineer
+    - data-analyst
+    - vietnam-accounting-specialist
+    - backend-developer
+    - devops-engineer
+    - qa-engineer
+    - technical-lead
+  learning_track:
+    persona: rabity
+    subtree: overlays/retail-data-warehouse/learning/
+    roadmap: 10-phase (SQL -> Python -> DuckDB/Polars -> ETL -> Airflow -> dbt 1.9 -> Kafka -> Iceberg Lakehouse -> Observability -> Portfolio)
+    toolchain: ["DuckDB", "dbt Core 1.9", "Apache Iceberg REST Catalog", "Kafka", "Spark 3.5", "Airflow 2.9+", "Great Expectations v1"]
+  platform_index:
+    - data-warehouse/docs/PLATFORM_INDEX.md
+    - data-warehouse/CODEBASE_INDEX.md
+    - data-warehouse/docs/INDEX.md
 
 data_classification: confidential
 
@@ -47,12 +73,19 @@ activation:
     - libs/core/locks.py
     - pipeline/channels/
     - apps/stock-audit-svc/
+    - dbt_project.yml
+    - airflow/
+    - progress.md
   glob_patterns:
     - "pipeline/**/*.py"
     - "apps/**/*.py"
     - "libs/**/*.py"
     - "store/**/*.duckdb"
     - "specs/**/*.json"
+    - "phase-*/**/*.py"
+    - "phase-*/**/*.sql"
+    - "dags/**/*.py"
+    - "**/*.ipynb"
   exclude_patterns:
     - "store/archive/**"
     - "raw_data/pii/**"
@@ -70,6 +103,7 @@ governance:
       - export_pii_data
       - approve_stocktake_variance
       - sync_amis_accounting
+      - deploy_pipeline
   data_policy: core/policies/data-classification.yaml
   action_policy: core/policies/action-boundaries.yaml
   review_cadence: quarterly

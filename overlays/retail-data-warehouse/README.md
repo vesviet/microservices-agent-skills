@@ -1,6 +1,6 @@
 # Retail Data Warehouse Overlay
 
-Omnichannel retail data warehouse overlay extending `core/roles/data-engineer.md`, `core/roles/data-analyst.md`, `core/roles/vietnam-accounting-specialist.md`, and `core/roles/backend-developer.md`. Establishes the architectural standards, concurrency controls, Vietnamese statutory accounting compliance (VAS 14 / MISA AMIS ERP), physical store stocktake tolerance engine, and PII sanitization (Decree 13/2023/ND-CP) for multi-channel retail operations (physical POS, Shopee, TikTok Shop).
+Omnichannel retail data warehouse overlay extending `core/roles/data-engineer.md`, `core/roles/data-analyst.md`, `core/roles/vietnam-accounting-specialist.md`, and `core/roles/backend-developer.md`. Establishes the architectural standards, concurrency controls, Vietnamese statutory accounting compliance (VAS 14 / MISA AMIS ERP), physical store stocktake tolerance engine, and PII sanitization (Decree 13/2023/ND-CP) for multi-channel retail operations (physical POS, Shopee, TikTok Shop). Also hosts the Rabity data-engineering learning track (`learning/`).
 
 ## Technology Map (2026/2027)
 
@@ -74,6 +74,20 @@ Omnichannel retail data warehouse overlay extending `core/roles/data-engineer.md
 - `rules/stocktake-tolerance.md` — Offline Vanilla JS PWA + hardware HID barcode scanner buffering to IndexedDB & SQLite WAL, mathematical variance formulas, blind recount trigger thresholds, multi-tier approval workflow, and variance suspense accounting (TK 1381 / TK 3381).
 - `rules/pii-scrubbing.md` — Decree 13/2023/ND-CP compliance at Bronze -> Silver Lakehouse boundary, salted HMAC-SHA256 phone hashing with `RETAIL_PII_SALT`, pseudonymization, and address generalization.
 
+## Learning Subtree (merged from `overlays/data-engineer-rabity`)
+
+- `learning/learning-conventions.md` — session protocol, phase gates, output standards, skill unlock map.
+- `learning/phase-roadmap.md` — 10-phase curriculum (SQL → Python → DuckDB/Polars → ETL → Airflow → dbt 1.9 → Kafka → Iceberg Lakehouse → Observability → Portfolio).
+- `learning/progress.md` — phase completion tracker; the agent reads it to enforce phase gates.
+- Persona-scoped: applies only for Rabity's data engineering self-study practice.
+
+## Platform Index
+
+The overlay targets the `data-warehouse` repo (5-container microservices, ~26k LOC Python). Canonical indexes:
+- `data-warehouse/docs/PLATFORM_INDEX.md` — architecture, modules, marts, business rules
+- `data-warehouse/CODEBASE_INDEX.md` — deep component inventory + API directory
+- `data-warehouse/docs/INDEX.md` — documentation catalog by role
+
 ## Activation
 
 ```
@@ -116,4 +130,4 @@ consistent Standard 2026 pointer.
 
 <!-- Standard 2026 Alignment: Deterministic execution, Single-Writer DuckDB governance, VAS 14 revenue recognition, Decree 13/2023/ND-CP PII protection. See core/rules/code.md. -->
 
-Last updated: 2026-09-05
+Last updated: 2026-09-08

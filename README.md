@@ -46,7 +46,7 @@ Current overlays:
 - `astro-cloudflare`: Astro v5 on Cloudflare Pages/Workers conventions
 - `data-analyst-stack`: DuckDB + Metabase + Excel/BI workflow conventions
 - `go-microservices`: Go service and gRPC conventions
-- `data-engineer-rabity`: data engineering conventions for the Rabity stack
+- `retail-data-warehouse`: omnichannel retail conventions (DuckDB Single-Writer, MISA AMIS, VAS 14, PWA stocktake) with the `learning/` data-engineering track
 - `donthan-web`: web content/SEO helpers for Don Than site
 - `golf-icm`: Golf catalog conventions for the ICM Cloudflare site
 - `icm-main`: ICM Factory main site conventions
@@ -57,7 +57,6 @@ Current overlays:
 - `seo-publishing`: SEO publishing cadence and board conventions
 - `sport-icm`: Sport catalog conventions for the ICM Cloudflare site
 - `ui-design-system`: shared UI/design-system conventions
-- `retail-data-warehouse`: retail data warehouse conventions (DuckDB Single-Writer, MISA AMIS ERP, Blind Recount, PII Masking)
 
 Overlay-specific skills are intentionally kept out of the global core inventory.
 
