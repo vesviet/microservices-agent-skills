@@ -1,21 +1,21 @@
 # Hub-and-Spoke Internal Link Topology
 
-This rule defines the mandatory internal linking architecture for `vesviet` to ensure optimal link equity distribution and eliminate orphan pages.
+This rule defines the mandatory internal linking architecture for `vesviet` (and, in adapted form, `learn`) to ensure optimal link equity distribution and eliminate orphan pages.
 
 ## Core Principle
 All content must be organized into a Hub-and-Spoke architecture. No page should exist in isolation (Zero Orphan Policy).
 
 ## The 10 Anchor Pillar Hubs
-There are 10 core hubs that anchor the site:
-1. `go-microservices.md` — Go & Microservices Architecture Hub
-2. `architecting-21-service-ecommerce-golang-ddd.md` — System Design & E-Commerce Hub
-3. `aws-eks-vs-ecs-comparison.md` — Cloud Native & Container Infrastructure Hub
-4. `banking-microservices-architecture.md` — FinTech & Core Banking Systems Hub
-5. `cloudflare-d1-durable-objects-realtime-cart.md` — Edge Serverless & Cloudflare Hub
-6. `deploying-astro-on-cloudflare-full-stack-edge-architecture.md` — AI Frontend & Edge Hub
-7. `generative-ui-with-mcp-ai-native-frontend.md` — Generative UI & MCP Engineering Hub
-8. `alipay-double-11-architecture-tps.md` — Distributed Systems & High Concurrency Hub
-9. `reading-map.md` — Sitewide Curated Learning Directory Hub
+There are 10 core hubs that anchor the site (all under `content/`):
+1. `posts/go-microservices.md` — Go & Microservices Architecture Hub
+2. `posts/architecting-21-service-ecommerce-golang-ddd.md` — System Design & E-Commerce Hub
+3. `posts/aws-eks-vs-ecs-comparison.md` — Cloud Native & Container Infrastructure Hub
+4. `posts/banking-microservices-architecture.md` — FinTech & Core Banking Systems Hub
+5. `posts/cloudflare-d1-durable-objects-realtime-cart.md` — Edge Serverless & Cloudflare Hub
+6. `posts/deploying-astro-on-cloudflare-full-stack-edge-architecture.md` — AI Frontend & Edge Hub
+7. `posts/generative-ui-with-mcp-ai-native-frontend.md` — Generative UI & MCP Engineering Hub
+8. `posts/alipay-double-11-architecture-tps.md` — Distributed Systems & High Concurrency Hub
+9. `reading-map.md` — Sitewide Curated Learning Directory Hub (6 pillars)
 10. `hire.md` — Commercial Architecture Consulting Conversion Hub
 
 ## Link Injection Requirements
@@ -23,8 +23,21 @@ There are 10 core hubs that anchor the site:
 - **Hubs to Spokes**: Hub pages must curate and link down to their respective spokes.
 - **Cross-Linking**: Use contextually relevant anchor text. Avoid repetitive boilerplate links (e.g., diversify "Hire Me" anchor text with "Consult on Go Microservices").
 
+## Twin Topology (learn)
+
+- On `learn`, the equivalent backbone is `content/series/_index.md` (25-series library index), pillar per-topic `posts/`, and `content/reading-map.md`.
+- Vietnamese series parts link laterally to sibling chapters via the standard `🔗 **Next Step:**` CTA and up to the series `_index.md`.
+- The **only** sanctioned outbound-from-learn link pattern for twins is the up-to-flagship callout defined in `rules/content-brand.md`.
+
+## One-Way Authority Flow (learn → vesviet)
+
+- Authority flows one direction only: `learn.tanhdev.com` → `tanhdev.com`.
+- 0 `learn.tanhdev.com` links may appear in `vesviet/content/**`. Adding one is a gate failure, not a style nit.
+- Rationale: `tanhdev.com` is the consolidated E-E-A-T authority site; backlinks from the notes twin would leak equity and duplicate topical signals.
+
 ## Orphan Elimination
 - The SEO Analyst must run crawler verifications before publishing to ensure **0 orphan pages** remain in the repository.
+- Use `vesviet/reports/check_posts.py` as the in-repo verification entry point; refresh `vesviet/content-audit-report.json` after every batch (last full scan predates the Batch 4–5 growth: 275 files scanned vs 367 current).
 
 ## Standard 2026 Alignment
 
@@ -57,4 +70,4 @@ overlay rule file in the pack.
 
 See `core/skills/content/optimize-seo/SKILL.md` and the `seo-metadata.json` schema.
 
-Last updated: 2026-09-01
+Last updated: 2026-09-08

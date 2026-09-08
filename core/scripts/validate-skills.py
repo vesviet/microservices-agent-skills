@@ -40,6 +40,7 @@ OVERLAY_SKILL_ROLES: dict[str, list[str]] = {
     "integrate-r3f-three-legacy": ["3d-graphics-engineer"],
     "optimize-3d-assets": ["3d-graphics-engineer"],
     "write-vesviet-learn-content": ["content-writer"],
+    "audit-technical-article": ["seo-analyst"],
 }
 
 _TOOL_MAP_CACHE: dict[str, str] | None = None

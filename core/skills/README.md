@@ -2,7 +2,7 @@
 
 This directory contains the **portable core** skill inventory for the global engineering pack.
 
-**Counts:** 97 portable core skills under `core/skills/` + 10 overlay skills under `overlays/*/skills/` = **107 total** (run `validate-skills.py` for the live total, and `validate-indexes.py` to confirm this line matches disk).
+**Counts:** 97 portable core skills under `core/skills/` + 11 overlay skills under `overlays/*/skills/` = **108 total** (run `validate-skills.py` for the live total, and `validate-indexes.py` to confirm this line matches disk).
 
 ## Taxonomy
 

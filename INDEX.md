@@ -1,7 +1,7 @@
 # Agent-Skills Master Index & Router
 
 > **Location:** `core/` & `overlays/` | **Version:** `5.0.0` (A2A 1.0 + Antigravity)
-> **Total Catalog:** **34 Roles** | **107 Skills** (97 Core + 10 Overlays) | **24 Workflows** | **50 Data Contracts**
+> **Total Catalog:** **34 Roles** | **108 Skills** (97 Core + 11 Overlays) | **24 Workflows** | **50 Data Contracts**
 
 ---
 
@@ -69,7 +69,7 @@ When you mention `@<role>` and/or `@<skill>` in chat, Antigravity resolves them 
 
 ---
 
-## 🛠️ Skill Directory (107 Skills)
+## 🛠️ Skill Directory (108 Skills)
 
 ### Category: `agent` (22 skills)
 
@@ -236,10 +236,11 @@ When you mention `@<role>` and/or `@<skill>` in chat, Antigravity resolves them 
 | **`@integrate-r3f-three-legacy`** | Integrate or migrate between React Three Fiber and legacy imperative Three.js code by controlling sc... | [`overlays/r3f-stack/skills/integrate-r3f-three-legacy/SKILL.md`](./overlays/r3f-stack/skills/integrate-r3f-three-legacy/SKILL.md) |
 | **`@optimize-3d-assets`** | Optimize 3D assets and rendering inputs by reviewing model formats, geometry density, texture memory... | [`overlays/r3f-stack/skills/optimize-3d-assets/SKILL.md`](./overlays/r3f-stack/skills/optimize-3d-assets/SKILL.md) |
 
-### Category: `overlay/vesviet-content` (1 skills)
+### Category: `overlay/vesviet-content` (2 skills)
 
 | Skill Slug | Description | File |
 |:---|:---|:---|
+| **`@audit-technical-article`** | Audit a technical article or series part on vesviet/learn against the 7 Technical Content Gates 2027... | [`overlays/vesviet-content/skills/audit-technical-article/SKILL.md`](./overlays/vesviet-content/skills/audit-technical-article/SKILL.md) |
 | **`@write-vesviet-learn-content`** | Draft or update Hugo Markdown for the Vesviet portfolio site or the Learn notes site. Use when creat... | [`overlays/vesviet-content/skills/write-vesviet-learn-content/SKILL.md`](./overlays/vesviet-content/skills/write-vesviet-learn-content/SKILL.md) |
 
 ### Category: `platform` (16 skills)

@@ -4,7 +4,7 @@
   "root": ".",
   "stats": {
     "roles": 34,
-    "skills": 107,
+    "skills": 108,
     "workflows": 24,
     "schemas": 50
   },
@@ -1868,6 +1868,13 @@
       "type": "overlay",
       "file": "overlays/r3f-stack/skills/optimize-3d-assets/SKILL.md",
       "description": "Optimize 3D assets and rendering inputs by reviewing model formats, geometry density, texture memory, material strategy, compression, and loading behavior. Use when a 3D web experience suffers from heavy OBJ/GLTF assets, texture bloat, long load times, frame drops, or unnecessary GPU and memory pressure."
+    },
+    "audit-technical-article": {
+      "name": "audit-technical-article",
+      "category": "overlay/vesviet-content",
+      "type": "overlay",
+      "file": "overlays/vesviet-content/skills/audit-technical-article/SKILL.md",
+      "description": "Audit a technical article or series part on vesviet/learn against the 7 Technical Content Gates 2027 (answer-first, production-grade code, quantitative depth, Mermaid, production failure, trade-off framing, verifiable claims) and emit an seo-audit-report. Use when reviewing or upgrading technical posts and series parts before publish."
     },
     "write-vesviet-learn-content": {
       "name": "write-vesviet-learn-content",

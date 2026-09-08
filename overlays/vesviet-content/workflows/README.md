@@ -1,6 +1,11 @@
 # Vesviet Content Workflows
 
-Overlay-specific content publishing or maintenance workflows can live here.
+Overlay-specific content publishing or maintenance workflows:
+
+- `content-audit-refresh.md` — 4-sprint remediation for `vesviet`
+- `affiliate-publishing.md` — affiliate/hybrid SEO production for `learn`
+- `masterclass-batch-upgrade.md` — deep-research batch upgrades (100 rounds → 20 posts)
+- `publish-series.md` — bilingual series production across both sites
 
 ## Standard 2026 Alignment
 
@@ -22,4 +27,4 @@ consistent Standard 2026 pointer.
   follow the META-RULE in `core/rules/code.md` — no commit, no push, no
   publish without explicit user confirmation.
 
-Last updated: 2026-09-01
+Last updated: 2026-09-08

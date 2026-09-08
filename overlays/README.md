@@ -36,7 +36,7 @@ Use an overlay when:
 
 | Overlay | Domain | What it adds |
 |---------|-------|--------------|
-| [vesviet-content](vesviet-content/README.md) | Vesviet / Learn Hugo sites | Brand voice, content schema, `write-vesviet-learn-content` skill, series publishing workflow |
+| [vesviet-content](vesviet-content/README.md) | Vesviet / Learn Hugo twin sites (content + SEO) | Technical Article Standard 2027 (7 gates), twin SEO authority + AI-citation rules, hub-and-spoke topology, `write-vesviet-learn-content` + `audit-technical-article` skills, masterclass batch workflow |
 | [lease-content](lease-content/README.md) | Lease in Vietnam / Máy Lạnh Treo Tường (Astro) | Content schema, GEO/AEO baselines, `write-leaseinvietnam-maylanhtreotuong-data` skill |
 | [seo-publishing](seo-publishing/README.md) | Dual-site SEO sprint | 7-day topic boards, 2026 GEO/AI visibility tracking, cannibalization rules, cadence runbook |
 | [ui-design-system](ui-design-system/README.md) | UI design systems | Flow/component handoff conventions |

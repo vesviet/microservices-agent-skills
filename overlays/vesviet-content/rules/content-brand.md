@@ -12,8 +12,19 @@ Voice, style, structure, and publishing constraints for the Vesviet portfolio si
 
 Content on Vesviet must be organized into these three directories based on purpose:
 - **`posts/`**: In-depth technical articles and tutorials.
-- **`radar/`**: Periodic Tech Radar newsletters (e.g., industry news, tool updates).
+- **`radar/`**: Periodic Tech Radar newsletters (e.g., industry news, tool updates), filed as `content/radar/YYYY-MM/radar-YYYY-MM-DD[-slug].md`.
 - **`series/`**: Linked chains of articles on a specific topic.
+
+Content on Learn adds:
+- **`content/docs/`**: Hugo Book layout documentation (`overview.md`, `affiliate-website-report.md`).
+- **Deep-research batch reports**: published only on `learn` under `content/posts/deep-research-*.md` with `draft: true` and `noTranslation: true`; never mirrored to `vesviet`.
+
+## Masterclass Twin Model
+
+- Every flagship topic ships as a **Vietnamese twin on `learn`** (research notes, canonical for notes) and an **expanded English masterclass on `vesviet`** (authority site).
+- Masterclass quality bar (from the Batch 1–5 deep-research campaign): >20 KB, >2,500 words, production-grade code with zero pseudo-code, standardized Mermaid diagrams, quantitative comparison tables, ≥3 internal links.
+- When upgrading a batch: run deep research first (100 rounds → 5 clusters × 20 rounds), publish the report on `learn` as a draft, then upgrade the 20 target posts.
+- Batch reports and internal summaries stay `draft: true` — they are process artifacts, not public content.
 
 ## Frontmatter Requirements
 
@@ -62,6 +73,8 @@ To combat the commoditization of AI-generated content, all in-depth articles MUS
 - **Images**: Store all image files in `static/images/` or `assets/images/`.
 - **Image Links**: Use absolute root-relative paths in Markdown (e.g., `![Alt Text](/images/filename.png)`).
 - **Internal Links**: Use standard Markdown linking pointing directly to the slug (e.g., `[Link Text](/posts/magento-still-worth-investing-2026)`).
+- **Cross-Site Twin Links**: Only `learn` → `vesviet`. On `learn`, the Vietnamese article links up to the English flagship with the `> 🇬🇧 **Read the English version of this article on [tanhdev.com](https://tanhdev.com/posts/<slug>/)**` callout. `vesviet` must never link back to `learn.tanhdev.com` (one-way authority flow).
+- **Canonical URLs**: Every post declares `canonicalURL` on its own host. Never cross-canonicalize between twins — each twin is canonical on its own site.
 
 ## Series & Production Failure Rules
 
@@ -109,4 +122,4 @@ overlay rule file in the pack.
 
 See `core/skills/content/write-article/SKILL.md` and the `content-handoff.json` schema.
 
-Last updated: 2026-09-01
+Last updated: 2026-09-08

@@ -1,15 +1,19 @@
 schema_version: "2"
 
 name: vesviet-team
-description: Global engineering core plus Vesviet content overlay. Enforces 2026 AI-Governance, Hub-and-Spoke Topology, GEO/AEO Answer-First formatting, AI-generated content disclosure standards (FTC 2026), and Affiliate Marketing Compliance for vesviet and learn sites.
-version: 4.0.0
+description: Content + SEO team pack for the vesviet/learn twin Hugo sites. Composes the global core with the vesviet-content overlay to enforce the Technical Article Standard 2027 (7 gates - production-grade code, quantitative depth, Mermaid, Production Failure, trade-off framing, verifiable claims), twin SEO authority 2027 (one-way learn-to-vesviet flow, AI citation readiness, entity consistency, 2026-2027 spam-policy duplication rules), Hub-and-Spoke topology with 10 Anchor Pillar Hubs, GEO/AEO Answer-First formatting, Masterclass batch publishing (100 deep-research rounds per 20-post batch), and Affiliate Marketing Compliance on tanhdev.com and learn.tanhdev.com.
+version: 4.2.0
 
 tags:
   - core
   - content
+  - seo
   - geo-aeo
+  - ai-citation
   - hub-and-spoke
   - hugo
+  - masterclass
+  - deep-research
 author: user
 maintained_by: platform-team
 license: MIT
@@ -27,11 +31,61 @@ includes:
 capabilities:
   - content-strategy
   - content-generation
+  - technical-article-2027-standard
+  - seo-authority-management
   - seo
   - geo-aeo
+  - ai-citation-tracking
   - documentation
   - technical-writing
   - ai-search-optimization
+  - masterclass-batch-upgrade
+  - bilingual-twin-publishing
+
+content_focus:
+  primary_roles:
+    - content-writer
+    - seo-analyst
+    - content-manager
+    - task-planner
+  secondary_roles:
+    - reviewer
+    - agent-coordinator
+  drafting_skills:
+    - write-vesviet-learn-content
+    - write-article
+    - write-tech-radar
+  audit_skills:
+    - audit-technical-article
+    - optimize-seo
+    - audit-content
+  standards: ["vesviet-content rules: content-brand, technical-article-2027, seo-authority, link-topology"]
+  workflows:
+    - masterclass-batch-upgrade
+    - content-audit-refresh
+    - affiliate-publishing
+    - publish-series
+    - seo-content-lifecycle
+    - content-publishing
+
+corpus:
+  snapshot: "2026-09-08"
+  vesviet:
+    total_files: 367
+    posts: 66
+    series: 246
+    radar_editions: 26
+    pillar_hubs: 10
+  learn:
+    total_files: 440
+    posts: 86
+    series: 259
+    docs: 3
+    masterclass_batches_completed: 5
+    posts_upgraded: 70
+  indexes:
+    - learn/plan/CONTENT_INDEX.md
+    - vesviet/reports/CONTENT_INDEX.md
 
 data_classification: internal
 

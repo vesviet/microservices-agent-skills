@@ -17,13 +17,22 @@ Use this skill when new or updated articles must land in one of the two Hugo sit
 
 Both sites use the **PaperMod** theme, Vietnamese or English copy is acceptable when it matches sibling pages in the same folder.
 
+## Twin Model
+
+- Flagship topics ship twice: Vietnamese twin on `learn`, expanded English masterclass on `vesviet`.
+- Only `learn` links up to `vesviet` (one-way authority flow). `vesviet` never links to `learn.tanhdev.com`.
+- Corpus indexes: `learn/plan/CONTENT_INDEX.md` and `vesviet/reports/CONTENT_INDEX.md` — refresh them when adding posts or series.
+
 ## Core Rules
 
 - **Schema Completeness**: Every file MUST include `title`, `author`, `date`, `tags`, `categories`, and `cover` in strict inline YAML (e.g., `categories: ["Backend", "Golang"]`).
-- **GEO/AEO Answer-First**: Every article must open with `> **Answer-first:**` and a ≤60-word summary block immediately below the frontmatter.
+- **GEO/AEO Answer-First**: Every article must open with `> **Answer-first:**` and a ≤60-word summary block immediately below the frontmatter; each H2 opens with its own BLUF.
+- **Technical Article Standard 2027**: deep-dives must pass the 7 gates in `rules/technical-article-2027.md` — production-grade code (zero pseudo-code, version-pinned), ≥3 verifiable data points per 500 words, Mermaid diagrams with stated benchmark conditions, Production Failure story, rejected-alternative framing, primary-sourced claims.
 - **Hub-and-Spoke Linking (`vesviet`)**: Ensure zero orphans. Every new article must link up to at least one of the 10 Anchor Pillar Hubs (e.g., `go-microservices.md`).
 - **Affiliate Compliance (`learn`)**: All outbound affiliate links must use `rel="sponsored"`. Mandatory disclosures must be near recommendations.
 - **Content Depth & E-E-A-T**: Target ≥ 1,400 words for technical deep-dives and reviews. Do not rely on AI hallucinations; inject real-world experience, benchmarks, or "Production Failure" templates.
+- **Masterclass Bar**: upgraded flagships target >2,500 words / >20 KB with production-grade code, standardized Mermaid diagrams, and quantitative comparison tables.
+- **SEO Authority 2027**: citation-ready sentences (≤25 words, self-contained), entity consistency for the author across both hosts, per-engine citation tracking over multiple runs — see `rules/seo-authority.md`.
 
 ## Suggested Process
 
@@ -38,10 +47,13 @@ Decide `vesviet` (Technical Engineering) vs `learn` (Affiliate Marketing).
 - Ensure strict YAML frontmatter.
 - Start the body with the `> **Answer-first:**` block.
 - Inject E-E-A-T elements (diagrams, benchmarks, pros/cons, evaluation criteria).
+- Pass the 7 Technical Content Gates (`rules/technical-article-2027.md`) before handoff.
+- If drafting the Vietnamese twin, add the `> 🇬🇧 **Read the English version of this article on [tanhdev.com](https://tanhdev.com/posts/<slug>/)**` callout after the Answer-first block.
 
 ### 4. Wire Navigation & Topology
 - **`vesviet`**: Link your article to a Pillar Hub. Update `reading-map.md` if creating a new series.
 - **`learn`**: Internal link from Supporting articles to Money pages.
+- **Series**: every part opens with `> **Prerequisite:**` and closes with `🔗 **Next Step:**`.
 
 ### 5. Sanity Check
 Confirm `draft` flag, schema completeness, zero orphan status, and `rel="sponsored"` for affiliate links.
@@ -54,6 +66,8 @@ Confirm `draft` flag, schema completeness, zero orphan status, and `rel="sponsor
 - **Affiliate link without `rel="sponsored"` (learn)**: an outbound affiliate link is missing the required attribute. **Mitigation:** the Affiliate Compliance rule requires it; reject and add the attribute.
 - **Content depth below 1,400 words**: a deep-dive ships too short. **Mitigation:** the Content Depth rule requires the target; reject and add depth or move to the trust-page category.
 - **AI-hallucinated claim published**: a stat or quote appears without a verifiable source. **Mitigation:** the E-E-A-T rule forbids it; trace every claim to a primary source.
+- **Reverse authority link (vesviet → learn)**: an English article links to `learn.tanhdev.com`. **Mitigation:** the one-way authority rule forbids it; remove the link and point to the on-site twin instead.
+- **Batch report published**: a `deep-research-*` or audit-summary post ships with `draft: false`. **Mitigation:** internal reports stay `draft: true` on `learn`; reject the publish toggle.
 
 ## Output Contracts
 
@@ -76,8 +90,11 @@ Skip structured emission for trivial template edits that do not cross a role bou
 - [ ] Frontmatter uses strict inline YAML and contains all 6 mandatory fields (`title`, `author`, `date`, `tags`, `categories`, `cover`).
 - [ ] Article opens with `> **Answer-first:**` summary block (≤60 words).
 - [ ] Content depth targets ≥ 1,400 words (unless explicit programmatic/trust page).
+- [ ] 7 Technical Gates passed (`rules/technical-article-2027.md`): code grade, data density, diagrams, failure story, trade-offs, verifiable claims.
 - [ ] **`vesviet`**: Internal link points to an Anchor Pillar Hub (zero orphans).
 - [ ] **`learn`**: Affiliate links use `rel="sponsored"` and include disclosure.
+- [ ] **`learn` twin**: up-callout to the English flagship on `tanhdev.com` present.
+- [ ] **`vesviet`**: no outbound links to `learn.tanhdev.com`.
 
 ## Related Skills
 
