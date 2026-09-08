@@ -1,8 +1,9 @@
 schema_version: "2"
 
 name: lease-team
-description: Global engineering core plus Lease content overlay and SEO publishing sprint cadence. Enforces the 5-Pillar Strategy (Intelligence, Information, Insights, Neighborhoods, Integration), 2026 GEO/AEO standards, and AI Overviews citation optimization for leaseinvietnam and maylanhtreotuong.
-version: 4.0.0
+display_name: Lease Content & SEO Team
+description: Content + SEO team pack for the Lease in Vietnam and May Lanh Treo Tuong Astro sites. Composes the global core with the lease-content overlay and the seo-publishing sprint overlay. Enforces the 5-Pillar Strategy (Intelligence, Information, Insights, Neighborhoods, Integration), 2026 GEO/AEO standards (<AnswerFirst> component, fact density, anti-slop gate), 8-batch empirical AEO upgrade discipline, E-E-A-T persona authorship, property cross-linking, AI Overviews citation optimization, and 7-day sprint cadence guardrails.
+version: 4.1.0
 
 tags:
   - core
@@ -10,6 +11,7 @@ tags:
   - seo
   - geo-aeo
   - content-strategy
+  - expat-housing
 author: user
 maintained_by: platform-team
 license: MIT
@@ -32,6 +34,49 @@ capabilities:
   - geo-aeo
   - publishing-workflow
   - ai-search-optimization
+  - empirical-content-upgrade
+  - eeat-persona-authorship
+  - property-link-integration
+
+content_focus:
+  primary_roles:
+    - content-writer
+    - seo-analyst
+    - task-planner
+    - content-manager
+  secondary_roles:
+    - reviewer
+  drafting_skills:
+    - write-leaseinvietnam-maylanhtreotuong-data
+    - write-article
+  audit_skills:
+    - optimize-seo
+    - audit-content
+  standards:
+    - "lease-content rules: content-schema, seo-baseline, affiliate-links"
+    - "seo-publishing overlay: 7-day boards, GEO/AI visibility tracking"
+  workflows:
+    - publish-lease-content
+    - seo-content-lifecycle
+    - content-publishing
+    - seo-keyword-brief
+
+corpus:
+  snapshot: "2026-09-08"
+  leaseinvietnam:
+    posts: 463
+    properties: 61
+    categories: 12
+    empirical_batches_completed: 8
+    posts_at_masterclass: 80
+    answerfirst_coverage: "463/463"
+    author_registry_personas: 16
+    indexes:
+      - leaseinvietnam/plan/CONTENT_INDEX.md
+  maylanhtreotuong:
+    collections: ["post", "product"]
+    indexes: []
+    note: regenerate index on next maylanhtreotuong sprint
 
 data_classification: internal
 

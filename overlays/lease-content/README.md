@@ -15,6 +15,17 @@ This overlay contains content-specific extensions for the Lease in Vietnam and M
 ### Workflows
 - `workflows/publish-lease-content.md`: 6-step content production workflow and 7-day mix guardrails.
 
+### Config
+- `config/collections.md`: Site roots, corpus inventory (lease: 463 posts / 61 properties as of 2026-09-08), category-folder convention, Zod schemas, gate coverage, author registry.
+
+## Corpus Index
+
+The overlay consumes — and must stay consistent with — the per-repo content index:
+
+- `leaseinvietnam/plan/CONTENT_INDEX.md`
+
+Regenerate that index after every batch upgrade, then update `config/collections.md` with the new counts.
+
 ## Standard 2026 Alignment
 
 This file is part of the agent-skills engineering pack. The 2026 upgrade
@@ -35,4 +46,4 @@ consistent Standard 2026 pointer.
   follow the META-RULE in `core/rules/code.md` — no commit, no push, no
   publish without explicit user confirmation.
 
-Last updated: 2026-09-01
+Last updated: 2026-09-08

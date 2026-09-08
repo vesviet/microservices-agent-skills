@@ -20,12 +20,13 @@ Both projects load `**/*.{md,mdx}` from those folders via Astro glob loaders; fr
 ## Core Rules
 
 - **confirm schema before new fields**: `post` and `property` / `product` schemas differ; optional `metadata` blocks follow the shared `metadataDefinition()` shape (`metadata.description`, OpenGraph, etc.)
-- **Lease in Vietnam posts** usually live under `post/YYYY-MM-DD/<slug>.mdx`; mirror the dated folder pattern when adding new posts unless the user specifies otherwise
+- **Lease in Vietnam posts** live under `post/<category>/<slug>.mdx` — category-folder convention (12 categories; see `config/collections.md`), not dated folders
 - **Lease `post` schema** uses `.passthrough()` for layout-specific keys (e.g. `layout`, guide/radar fields)—copy the same pattern as sibling posts with the same template (`GuideLayout`, `MarketRadarLayout`, `ScamAlertLayout`, `NeighborhoodLayout`)
 - **property** (lease) vs **product** (maylanh): use the correct numeric/string fields (`price`, `bedrooms`, `brand`, `model`, `hp`, `dataSources`, `bestFor`, `notFor`, …) and match units/currency conventions from neighboring files
 - **MDX**: only add `import` lines (e.g. `PostCallToAction`) when comparable posts in that site already do; keep import paths exactly as in those files
 - **dates**: use `publishDate` / `updateDate` / `priceCheckedDate` in ISO-like strings consistent with peers (`+07:00` or `Z` as used locally)
 - **claims and specs**: for products and legal/rental content, ground statements in `dataSources`, official links, or user-provided research; flag uncertain specs instead of inventing them
+- **corpus index**: check `leaseinvietnam/plan/CONTENT_INDEX.md` before batch work; refresh it after new posts land
 
 ## 2026 GEO/AEO & E-E-A-T Standards (Leaseinvietnam)
 
@@ -52,7 +53,7 @@ Select one of the 4 core templates based on user request:
 4. **Neighborhood Guide**: Uses `category: neighborhood`. Focuses on lifestyle fit, rent prices, pros/cons, and transport.
 
 ### 3. Read Schema And Exemplars
-Check `src/content/config.ts` and recent files. Ensure `title` ≤ 60 chars, `unique_angle` is set, and `anti_slop_gate: { gate_passed: true }` is present in frontmatter for leaseinvietnam posts.
+Check `src/content/config.ts` and recent files. Ensure `title` ≤ 60 chars, `unique_angle` is set, and `anti_slop_gate: { gate_passed: true }` is present in frontmatter for leaseinvietnam posts. Match the category folder for the chosen template (`guides`, `market-radar`, `scam`/`trust-safety`, `neighborhood`).
 
 ### 4. Author The File
 - Use `.mdx` for posts to allow `<AnswerFirst>` and other components.
